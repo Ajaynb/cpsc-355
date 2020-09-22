@@ -30,25 +30,13 @@ randomNumber(int m, int n)
     return rand() % (upper - lower) + lower;
 }
 
-void createTable(struct Table *table, int row, int column){
-    table->row = row;
-    table->column = column;
-
-    int **array = (int **)calloc(row, sizeof(int));
-    for (int t = 0; t < row; t++)
-    {
-        array[t] = (int *)calloc(column, sizeof(int));
-    }
-
-    table->array = array;
-}
-
 void initialize(struct Table *table)
 {
+    table->array = (int **)calloc(table->row, sizeof(int));
     for (int t = 0; t < table->row; t++)
     {
-        for (int r = 0; r < table->column; r++)
-        {
+        table->array[t] = (int *)calloc(table->column, sizeof(int));
+        for(int r = 0; r < table->column; r++){
             table->array[t][r] = randomNumber(0, 9);
         }
     }
@@ -82,8 +70,9 @@ int main()
     printf("number = %d %d %s\n", row, column, file);
 
     struct Table table;
+    table.row = row;
+    table.column = column;
 
-    createTable(&table, row, column);
     initialize(&table);
     display(&table);
 }
