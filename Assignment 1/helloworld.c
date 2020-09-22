@@ -75,4 +75,6 @@ int main()
 
     initialize(&table);
     display(&table);
+
+    free(&table);
 }
