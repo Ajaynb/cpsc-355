@@ -73,7 +73,7 @@ void display(struct Table *table)
 struct WordFrequency *topRelevantDocs(struct Table *table, int index)
 {
     // Preventing invalid user input. Index cannot be greater than the table size.
-    index = min(index, table->column);
+    index = min(index, table->column - 1);
 
     struct WordFrequency word;
 
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
             printf("Word %d in ", topWords[t].word);
             printf("Document %d: ", topWords[t].document);
             printf("Times of %d and ", topWords[t].times);
-            printf("Frequency of %2.1f%% ", topWords[t].frequency * 100);
+            printf("Frequency of %.1f%% ", topWords[t].frequency * 100);
             printf("\n");
         }
 
