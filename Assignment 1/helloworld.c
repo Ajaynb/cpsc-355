@@ -16,7 +16,7 @@ struct Table
 
 struct WordFrequency
 {
-    float frequency;
+    double frequency;
     int word;
     int times;
     int document;
@@ -91,7 +91,7 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index, int top)
         wf.document = t;
         wf.word = index;
         wf.times = table->array[t][index];
-        wf.frequency = (documentSize > 0) ? 1.0f * wf.times / documentSize : 0.0; // Preventing from dividing by 0
+        wf.frequency = (documentSize > 0) ? 1.0 * wf.times / documentSize : 0.0; // Preventing from dividing by 0
         words[t] = wf;
         printf("doc %d, word %d, times %d, freq %f\n", words[t].document, words[t].word, words[t].times, words[t].frequency);
     }
@@ -101,14 +101,14 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index, int top)
     {
         for (int r = 0; r < table->row - 1; r++)
         {
-            if(words[r].times > words[r + 1].times){
+            if (words[r].frequency < words[r + 1].frequency)
+            {
                 struct WordFrequency wf = words[r];
                 words[r] = words[r + 1];
                 words[r + 1] = wf;
             }
         }
     }
-
 
     printf("\n");
 
@@ -120,7 +120,7 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index, int top)
     struct WordFrequency *returnWords = (struct WordFrequency *)calloc(top, sizeof(word));
     for (int t = 0; t < top; t++)
     {
-        returnWords[t] = words[table->row - t - 1];
+        returnWords[t] = words[t];
     }
 
     free(words);
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
     int size = min(top, table.row);
     for (int t = 0; t < size; t++)
     {
-        printf("%d - %d, Document %d with Frequency %f\% of Word %d\n", t, size, topWords[t].document, topWords[t].frequency * 100, topWords[t].word);
+        printf("%d - %d, Document %d with Frequency %d of Word %d\n", t, size, topWords[t].document, topWords[t].frequency, topWords[t].word);
     }
 
     destroy(&table);
