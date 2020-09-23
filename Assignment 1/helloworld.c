@@ -96,7 +96,7 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index, int top)
         printf("doc %d, word %d, times %d, freq %f\n", words[t].document, words[t].word, words[t].times, words[t].frequency);
     }
 
-    // FIXME: Bubble Sort
+    // Bubble Sort
     for (int t = 0; t < table->row; t++)
     {
         for (int r = 0; r < table->row - 1; r++)
