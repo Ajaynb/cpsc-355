@@ -142,6 +142,7 @@ int main(int argc, char *argv[])
     time_t timestamp;
     srand((unsigned)time(&timestamp));
 
+    // FIXME: log
     // freopen("log.txt", "wt", stdout);
 
     int row, column;
@@ -182,6 +183,7 @@ int main(int argc, char *argv[])
     printf("How many top documents you want to retrieve? ");
     scanf("%d", &top);
 
+    // FIXME: top words
     struct WordFrequency *topWords = (struct WordFrequency *)topRelevantDocs(&table, index, top);
     int size = min(top, table.row);
     for (int t = 0; t < size; t++)
