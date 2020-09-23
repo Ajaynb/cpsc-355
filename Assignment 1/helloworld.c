@@ -74,7 +74,6 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index)
 {
     // Preventing invalid user input. Index cannot be greater than the table size.
     index = min(index, table->column);
-    top = min(top, table->row);
 
     struct WordFrequency word;
 
