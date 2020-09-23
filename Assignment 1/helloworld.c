@@ -101,11 +101,14 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index, int top)
     {
         for (int r = 0; r < table->row - 1; r++)
         {
-            struct WordFrequency wf = words[r];
-            words[r] = words[r + 1];
-            words[r + 1] = wf;
+            if(words[r].times > words[r + 1].times){
+                struct WordFrequency wf = words[r];
+                words[r] = words[r + 1];
+                words[r + 1] = wf;
+            }
         }
     }
+
 
     printf("\n");
 
