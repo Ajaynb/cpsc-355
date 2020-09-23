@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 
         printf("\n");
 
-    } while (command == 'y');
+    } while (command != 'n');
 
     destroy(&table);
 
