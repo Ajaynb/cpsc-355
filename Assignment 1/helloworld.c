@@ -22,7 +22,7 @@ struct WordFrequency
     int document;
 };
 
-int randomNumber(int m, int n)
+int randomNum(int m, int n)
 {
     // If the upper bound and the lower bound are the same
     if (m == n)
@@ -52,7 +52,7 @@ void populate(struct Table *table)
     {
         for (int r = 0; r < table->column; r++)
         {
-            int rand = randomNumber(0, 9);
+            int rand = randomNum(0, 9);
             table->array[t][r] = rand;
         }
     }
