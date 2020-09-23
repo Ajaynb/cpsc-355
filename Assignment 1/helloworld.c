@@ -92,8 +92,6 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index)
         wf.times = table->array[t][index];
         wf.frequency = (documentSize > 0) ? 100 * wf.times / documentSize : 0.0; // Preventing from dividing by 0
         words[t] = wf;
-
-        printf("doc %d, word %d, times %d, freq %f\n", words[t].document, words[t].word, words[t].times, words[t].frequency);
     }
 
     // Bubble Sort
@@ -108,13 +106,6 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index)
                 words[r + 1] = wf;
             }
         }
-    }
-
-    printf("\n");
-
-    for (int t = 0; t < table->row; t++)
-    {
-        printf("doc %d, word %d, times %d, freq %f\n", words[t].document, words[t].word, words[t].times, words[t].frequency);
     }
 
     return words;
