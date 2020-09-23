@@ -10,9 +10,16 @@
 struct Table
 {
     int **array;
-    int **sorted;
     int row;
     int column;
+};
+
+struct WordFrequency
+{
+    float frequency;
+    int word;
+    int times;
+    int document;
 };
 
 int randomNumber(int m, int n)
@@ -33,15 +40,20 @@ int randomNumber(int m, int n)
 void initialize(struct Table *table)
 {
     table->array = (int **)calloc(table->row, sizeof(int));
-    table->sorted = (int **)calloc(table->row, sizeof(int));
     for (int t = 0; t < table->row; t++)
     {
         table->array[t] = (int *)calloc(table->column, sizeof(int));
-        table->sorted[t] = (int *)calloc(table->column, sizeof(int));
+    }
+}
+
+void populate(struct Table *table)
+{
+    for (int t = 0; t < table->row; t++)
+    {
         for (int r = 0; r < table->column; r++)
         {
             int rand = randomNumber(0, 9);
-            table->array[t][r] = table->sorted[t][r] = rand;
+            table->array[t][r] = rand;
         }
     }
 }
@@ -58,72 +70,126 @@ void display(struct Table *table)
     }
 }
 
-void displaySorted(struct Table *table)
+struct WordFrequency *topRelevantDocs(struct Table *table, int index, int top)
+{
+    // Preventing invalid user input. Index cannot be greater than the table size.
+    index = min(index, table->column);
+    top = min(top, table->row);
+
+    struct WordFrequency word;
+
+    struct WordFrequency *words = (struct WordFrequency *)calloc(table->row, sizeof(word));
+    for (int t = 0; t < table->row; t++)
+    {
+        int documentSize = 0;
+        for (int r = 0; r < table->column; r++)
+        {
+            documentSize += table->array[t][r];
+        }
+
+        struct WordFrequency wf;
+        wf.document = t;
+        wf.word = index;
+        wf.times = table->array[t][index];
+        wf.frequency = (documentSize > 0) ? 1.0f * wf.times / documentSize : 0.0; // Preventing from dividing by 0
+        words[t] = wf;
+        printf("doc %d, word %d, times %d, freq %f\n", words[t].document, words[t].word, words[t].times, words[t].frequency);
+    }
+
+    // FIXME: Bubble Sort
+    for (int t = 0; t < table->row; t++)
+    {
+        for (int r = 0; r < table->row - 1; r++)
+        {
+            struct WordFrequency wf = words[r];
+            words[r] = words[r + 1];
+            words[r + 1] = wf;
+        }
+    }
+
+    printf("\n");
+
+    for (int t = 0; t < table->row; t++)
+    {
+        printf("doc %d, word %d, times %d, freq %f\n", words[t].document, words[t].word, words[t].times, words[t].frequency);
+    }
+
+    struct WordFrequency *returnWords = (struct WordFrequency *)calloc(top, sizeof(word));
+    for (int t = 0; t < top; t++)
+    {
+        returnWords[t] = words[table->row - t - 1];
+    }
+
+    free(words);
+
+    return returnWords;
+}
+
+void destroy(struct Table *table)
 {
     for (int t = 0; t < table->row; t++)
     {
-        for (int r = 0; r < table->column; r++)
-        {
-            printf("%d ", table->sorted[t][r]);
-        }
-        printf("\n");
+        // free(*table->array[t]);
     }
+    free(*table->array);
+    // free(*table->documentsSize);
+    free(table);
 }
 
-void bubbleSort(struct Table *table)
-{
-    for (int t = 0; t < table->row; t++)
-    {
-        for (int r = 0; r < table->column; r++)
-        {
-            for (int r = 0; r < table->column - 1; r++)
-            {
-                if (table->sorted[t][r] > table->sorted[t][r + 1])
-                {
-                    int temp = table->sorted[t][r];
-                    table->sorted[t][r] = table->sorted[t][r + 1];
-                    table->sorted[t][r + 1] = temp;
-                }
-            }
-        }
-    }
-}
-
-int main()
+int main(int argc, char *argv[])
 {
 
-    time_t t;
-    srand((unsigned)time(&t));
+    time_t timestamp;
+    srand((unsigned)time(&timestamp));
 
-    // printf("Say number \n");
+    // freopen("log.txt", "wt", stdout);
 
     int row, column;
-    // char file[40];
-    // scanf("%d %d %s", &row, &column, &file);
-    row = 6, column = 4;
+    char file[40];
 
-    // printf("number = %d %d %s\n", row, column, file);
+    if (argc > 1)
+    {
+        row = atoi(argv[1]), column = atoi(argv[2]);
+    }
+    else
+    {
+        row = 5, column = 6;
+    }
+
+    if (argc > 3)
+    {
+        strncpy(file, argv[3], 40);
+    }
+
+    printf("Say number %d\n", argc);
+
+    printf("number = %d %d %s\n", row, column, file);
 
     struct Table table;
     table.row = row;
     table.column = column;
 
     initialize(&table);
+    populate(&table);
     display(&table);
-
-    // int index, top;
-    // printf("Enter the index of the word you are searching for: ");
-    // scanf("%d", &index);
-
-    // printf("How many top documents you want to retrieve? ");
-    // scanf("%d", &top);
 
     printf("\n");
 
-    int arr[] = {0, 2, 6, 2, 5};
-    bubbleSort(&table);
-    // printf("%d %d %d %d %d", arr2[0], arr2[1], arr2[2], arr2[3], arr2[4]);
-    displaySorted(&table);
+    int index, top;
+    printf("Enter the index of the word you are searching for: ");
+    scanf("%d", &index);
 
-    free(&table);
+    printf("How many top documents you want to retrieve? ");
+    scanf("%d", &top);
+
+    struct WordFrequency *topWords = (struct WordFrequency *)topRelevantDocs(&table, index, top);
+    int size = min(top, table.row);
+    for (int t = 0; t < size; t++)
+    {
+        printf("%d - %d, Document %d with Frequency %f\% of Word %d\n", t, size, topWords[t].document, topWords[t].frequency * 100, topWords[t].word);
+    }
+
+    destroy(&table);
+
+    scanf("%d");
 }
