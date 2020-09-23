@@ -46,7 +46,7 @@ void initialize(struct Table *table)
     }
 }
 
-void populate(struct Table *table)
+void populate(struct Table *table, char *file)
 {
     for (int t = 0; t < table->row; t++)
     {
@@ -90,7 +90,7 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index)
         wf.document = t;
         wf.word = index;
         wf.times = table->array[t][index];
-        wf.frequency = (documentSize > 0) ? 100 * wf.times / documentSize : 0.0; // Preventing from dividing by 0
+        wf.frequency = (documentSize > 0) ? 1.0 * wf.times / documentSize : 0.0; // Preventing from dividing by 0
         words[t] = wf;
     }
 
@@ -122,19 +122,23 @@ void destroy(struct Table *table)
     free(table);
 }
 
+void logToFile()
+{
+    freopen("assign1.log", "wt", stdout);
+}
+
 int main(int argc, char *argv[])
 {
 
     time_t timestamp;
     srand((unsigned)time(&timestamp));
 
-    // FIXME: log
-    // freopen("log.txt", "wt", stdout);
+    // logToFile();
 
     // TODO: Read from file
 
     int row, column;
-    char file[40];
+    char *file;
 
     if (argc > 1)
     {
@@ -147,7 +151,8 @@ int main(int argc, char *argv[])
 
     if (argc > 3)
     {
-        strncpy(file, argv[3], 40);
+        // strncpy(file, argv[3], 40);
+        file = argv[3];
     }
 
     printf("Args: %d %d %s\n", row, column, file);
@@ -157,31 +162,44 @@ int main(int argc, char *argv[])
     table.column = column;
 
     initialize(&table);
-    populate(&table);
+    populate(&table, file);
     display(&table);
 
     printf("\n");
 
-    int index, top;
-    printf("Enter the index of the word you are searching for: ");
-    scanf("%d", &index);
+    char command = 'y';
 
-    printf("How many top documents you want to retrieve? ");
-    scanf("%d", &top);
+    do{
+        int index, top;
+        printf("Enter the index of the word you are searching for: ");
+        scanf("%d", &index);
 
-    // Top words
-    struct WordFrequency *topWords = (struct WordFrequency *)topRelevantDocs(&table, index);
-    int size = min(top, table.row);
-    for (int t = 0; t < size; t++)
-    {
-        printf("Word %d in ", topWords[t].word);
-        printf("Document %d: ", topWords[t].document);
-        printf("Times of %d and ", topWords[t].times);
-        printf("Frequency of %2.1f%% ", topWords[t].frequency);
+        printf("How many top documents you want to retrieve? ");
+        scanf("%d", &top);
+
+        // Top words
+        struct WordFrequency *topWords = (struct WordFrequency *)topRelevantDocs(&table, index);
+        int size = min(top, table.row);
+        for (int t = 0; t < size; t++)
+        {
+            printf("Word %d in ", topWords[t].word);
+            printf("Document %d: ", topWords[t].document);
+            printf("Times of %d and ", topWords[t].times);
+            printf("Frequency of %2.1f%% ", topWords[t].frequency * 100);
+            printf("\n");
+        }
+
+        free(topWords);
+
         printf("\n");
-    }
+
+        printf("Do you want to search again? (y/n) ");
+        scanf(" %c", &command);
+
+        printf("\n");
+
+    } while (command == 'y');
 
     destroy(&table);
 
-    scanf("%d");
 }
