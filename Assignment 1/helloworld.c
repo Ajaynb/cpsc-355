@@ -70,7 +70,7 @@ void display(struct Table *table)
     }
 }
 
-struct WordFrequency *topRelevantDocs(struct Table *table, int index, int top)
+struct WordFrequency *topRelevantDocs(struct Table *table, int index)
 {
     // Preventing invalid user input. Index cannot be greater than the table size.
     index = min(index, table->column);
@@ -91,8 +91,9 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index, int top)
         wf.document = t;
         wf.word = index;
         wf.times = table->array[t][index];
-        wf.frequency = (documentSize > 0) ? 1.0 * wf.times / documentSize : 0.0; // Preventing from dividing by 0
+        wf.frequency = (documentSize > 0) ? 100 * wf.times / documentSize : 0.0; // Preventing from dividing by 0
         words[t] = wf;
+
         printf("doc %d, word %d, times %d, freq %f\n", words[t].document, words[t].word, words[t].times, words[t].frequency);
     }
 
@@ -117,15 +118,7 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index, int top)
         printf("doc %d, word %d, times %d, freq %f\n", words[t].document, words[t].word, words[t].times, words[t].frequency);
     }
 
-    struct WordFrequency *returnWords = (struct WordFrequency *)calloc(top, sizeof(word));
-    for (int t = 0; t < top; t++)
-    {
-        returnWords[t] = words[t];
-    }
-
-    free(words);
-
-    return returnWords;
+    return words;
 }
 
 void destroy(struct Table *table)
@@ -148,6 +141,8 @@ int main(int argc, char *argv[])
     // FIXME: log
     // freopen("log.txt", "wt", stdout);
 
+    // TODO: Read from file
+
     int row, column;
     char file[40];
 
@@ -165,9 +160,7 @@ int main(int argc, char *argv[])
         strncpy(file, argv[3], 40);
     }
 
-    printf("Say number %d\n", argc);
-
-    printf("number = %d %d %s\n", row, column, file);
+    printf("Args: %d %d %s\n", row, column, file);
 
     struct Table table;
     table.row = row;
@@ -186,12 +179,16 @@ int main(int argc, char *argv[])
     printf("How many top documents you want to retrieve? ");
     scanf("%d", &top);
 
-    // FIXME: top words
-    struct WordFrequency *topWords = (struct WordFrequency *)topRelevantDocs(&table, index, top);
+    // Top words
+    struct WordFrequency *topWords = (struct WordFrequency *)topRelevantDocs(&table, index);
     int size = min(top, table.row);
     for (int t = 0; t < size; t++)
     {
-        printf("%d - %d, Document %d with Frequency %d of Word %d\n", t, size, topWords[t].document, topWords[t].frequency, topWords[t].word);
+        printf("Word %d in ", topWords[t].word);
+        printf("Document %d: ", topWords[t].document);
+        printf("Times of %d and ", topWords[t].times);
+        printf("Frequency of %2.1f%% ", topWords[t].frequency);
+        printf("\n");
     }
 
     destroy(&table);
