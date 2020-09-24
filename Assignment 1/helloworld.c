@@ -89,13 +89,9 @@ void display(struct Table *table)
 {
     printf("===== Table ===== \n");
     for (int t = 0; t < table->row; t++)
-    {
         for (int r = 0; r < table->column; r++)
-        {
             printf(" %d ", table->array[t][r]);
-        }
         printf("\n");
-    }
 }
 
 struct WordFrequency *topRelevantDocs(struct Table *table, int index)
@@ -107,9 +103,7 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index)
     {
         int documentSize = 0;
         for (int r = 0; r < table->column; r++)
-        {
             documentSize += table->array[t][r];
-        }
 
         struct WordFrequency wf;
         wf.document = t;
