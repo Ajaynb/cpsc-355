@@ -132,12 +132,7 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index)
 
 void destroy(struct Table *table)
 {
-    for (int t = 0; t < table->row; t++)
-    {
-        // free(*table->array[t]);
-    }
     free(*table->array);
-    // free(*table->documentsSize);
     free(table);
 }
 
