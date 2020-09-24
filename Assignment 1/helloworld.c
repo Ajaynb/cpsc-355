@@ -133,12 +133,6 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index)
     return words;
 }
 
-void destroy(struct Table *table)
-{
-    // free(*table->array);
-    free(table);
-}
-
 void logToFile()
 {
     freopen("assign1.log", "wt", stdout);
@@ -216,13 +210,7 @@ int main(int argc, char *argv[])
         printf("Do you want to search again? (y/n) ");
         scanf(" %c", &command);
 
-        // printf("\n");
-
     } while (command != 'n');
-
-    // destroy(&table);
-
-    // free(&table);
 
     return 0;
 }
