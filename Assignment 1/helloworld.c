@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
@@ -49,14 +50,34 @@ void initialize(struct Table *table)
 
 void populate(struct Table *table, char *file)
 {
+    bool fromFile = strcmp(file, "") != 0;
+    FILE *fp;
+    char text[UCHAR_MAX];
+
+    if (fromFile)
+        fp = fopen(file, "r");
+
     for (int t = 0; t < table->row; t++)
     {
+        if (fromFile && fgets(text, sizeof(text), fp) == NULL)
+            break;
+
         for (int r = 0; r < table->column; r++)
         {
-            int rand = randomNum(0, 9);
-            table->array[t][r] = rand;
+            if (fromFile)
+            {
+                table->array[t][r] = (text[r * 2] >= 48 && text[r * 2] <= 57) ? text[r * 2] - 48 : 0;
+            }
+            else
+            {
+                int rand = randomNum(0, 9);
+                table->array[t][r] = rand;
+            }
         }
     }
+
+    if (fromFile)
+        fclose(fp);
 }
 
 void display(struct Table *table)
@@ -134,14 +155,13 @@ int main(int argc, char *argv[])
 
     // logToFile();
 
-    // TODO: Read from file
-
     int row, column;
     char *file;
 
     if (argc > 1)
     {
         row = atoi(argv[1]), column = atoi(argv[2]);
+        row = max(0, row), column = max(0, column);
     }
     else
     {
@@ -150,8 +170,11 @@ int main(int argc, char *argv[])
 
     if (argc > 3)
     {
-        // strncpy(file, argv[3], 40);
         file = argv[3];
+    }
+    else
+    {
+        file = "";
     }
 
     printf("Args: %d %d %s\n", row, column, file);
