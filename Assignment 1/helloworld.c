@@ -50,7 +50,7 @@ void initialize(struct Table *table)
 
 void populate(struct Table *table, char *file)
 {
-    bool fromFile = strcmp(file, "") != 0;
+    bool fromFile = (file != NULL);
     FILE *fp;
     char text[UCHAR_MAX];
 
@@ -153,7 +153,6 @@ int main(int argc, char *argv[])
     // logToFile();
 
     int row, column;
-    char *file;
 
     if (argc > 1)
     {
@@ -165,23 +164,12 @@ int main(int argc, char *argv[])
         row = 5, column = 6;
     }
 
-    if (argc > 3)
-    {
-        file = argv[3];
-    }
-    else
-    {
-        file = "";
-    }
-
-    // printf("Args: %d %d %s\n", row, column, file);
-
     struct Table table;
     table.row = row;
     table.column = column;
 
     initialize(&table);
-    // populate(&table, file);
+    populate(&table, argv[3]);
     display(&table);
 
     printf("\n");
@@ -228,11 +216,13 @@ int main(int argc, char *argv[])
         printf("Do you want to search again? (y/n) ");
         scanf(" %c", &command);
 
-        printf("\n");
+        // printf("\n");
 
     } while (command != 'n');
 
-    destroy(&table);
+    // destroy(&table);
+
+    // free(&table);
 
     return 0;
 }
