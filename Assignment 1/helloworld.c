@@ -233,4 +233,6 @@ int main(int argc, char *argv[])
     } while (command != 'n');
 
     destroy(&table);
+
+    return 0;
 }
