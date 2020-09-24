@@ -66,7 +66,12 @@ void populate(struct Table *table, char *file)
         {
             if (fromFile)
             {
-                table->array[t][r] = (text[r * 2] >= 48 && text[r * 2] <= 57) ? text[r * 2] - 48 : 0;
+                int num = text[r * 2];
+
+                if (num >= 48 && num <= 57)
+                    table->array[t][r] = num - 48;
+                else
+                    break;
             }
             else
             {
