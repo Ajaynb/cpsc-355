@@ -88,10 +88,13 @@ void populate(struct Table *table, char *file)
 void display(struct Table *table)
 {
     printf("===== Table ===== \n");
-    for (int t = 0; t < table->row; t++)
+    for (int t = 0; t < table->row; t++){
         for (int r = 0; r < table->column; r++)
+        {
             printf(" %d ", table->array[t][r]);
+        }
         printf("\n");
+    }
 }
 
 struct WordFrequency *topRelevantDocs(struct Table *table, int index)
@@ -147,7 +150,7 @@ int main(int argc, char *argv[])
     time_t timestamp;
     srand((unsigned)time(&timestamp));
 
-    // logToFile();
+    logToFile();
 
     int row, column;
     char *file;
@@ -178,7 +181,7 @@ int main(int argc, char *argv[])
     table.column = column;
 
     initialize(&table);
-    populate(&table, file);
+    // populate(&table, file);
     display(&table);
 
     printf("\n");
