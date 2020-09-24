@@ -3,6 +3,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
@@ -60,11 +61,12 @@ void populate(struct Table *table, char *file)
 
 void display(struct Table *table)
 {
+    printf("===== Table ===== \n");
     for (int t = 0; t < table->row; t++)
     {
         for (int r = 0; r < table->column; r++)
         {
-            printf("%d ", table->array[t][r]);
+            printf(" %d ", table->array[t][r]);
         }
         printf("\n");
     }
@@ -72,9 +74,6 @@ void display(struct Table *table)
 
 struct WordFrequency *topRelevantDocs(struct Table *table, int index)
 {
-    // Preventing invalid user input. Index cannot be greater than the table size.
-    index = min(index, table->column - 1);
-
     struct WordFrequency word;
 
     struct WordFrequency *words = (struct WordFrequency *)calloc(table->row, sizeof(word));
@@ -169,20 +168,33 @@ int main(int argc, char *argv[])
 
     char command = 'y';
 
-    do{
+    do
+    {
         int index, top;
-        printf("Enter the index of the word you are searching for: ");
-        scanf("%d", &index);
+
+        printf("What is the index of the word you are searching for? ");
+        scanf(" %d", &index);
 
         printf("How many top documents you want to retrieve? ");
-        scanf("%d", &top);
+        scanf(" %d", &top);
+
+        printf("\n");
+
+        // Preventing invalid user input. Index cannot be greater than the table size.
+        index = min(index, table.column - 1);
+        index = max(0, index);
 
         // Top words
         struct WordFrequency *topWords = (struct WordFrequency *)topRelevantDocs(&table, index);
-        int size = min(top, table.row);
+
+        int size = 0;
+        size = min(top, table.row);
+        size = max(0, size);
+
+        printf("The top documents are: \n");
         for (int t = 0; t < size; t++)
         {
-            printf("Word %d in ", topWords[t].word);
+            // printf("Word %d in ", topWords[t].word);
             printf("Document %d: ", topWords[t].document);
             printf("Times of %d and ", topWords[t].times);
             printf("Frequency of %.1f%% ", topWords[t].frequency * 100);
@@ -201,5 +213,4 @@ int main(int argc, char *argv[])
     } while (command != 'n');
 
     destroy(&table);
-
 }
