@@ -135,7 +135,7 @@ struct WordFrequency *topRelevantDocs(struct Table *table, int index)
 
 void destroy(struct Table *table)
 {
-    free(*table->array);
+    // free(*table->array);
     free(table);
 }
 
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     time_t timestamp;
     srand((unsigned)time(&timestamp));
 
-    logToFile();
+    // logToFile();
 
     int row, column;
     char *file;
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
         file = "";
     }
 
-    printf("Args: %d %d %s\n", row, column, file);
+    // printf("Args: %d %d %s\n", row, column, file);
 
     struct Table table;
     table.row = row;
