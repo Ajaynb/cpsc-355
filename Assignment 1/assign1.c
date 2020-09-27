@@ -11,7 +11,7 @@
 
 struct Table
 {
-    int **array;
+    int array[20][20];
     int row;
     int column;
 };
@@ -39,50 +39,36 @@ int randomNum(int m, int n)
     return rand() % (upper - lower) + lower;
 }
 
-void initialize(struct Table *table)
+void initialize(struct Table *table, char *file)
 {
-    table->array = (int **)calloc(table->row, sizeof(int));
-    for (int t = 0; t < table->row; t++)
-    {
-        table->array[t] = (int *)calloc(table->column, sizeof(int));
-    }
-}
+    bool fromFile = (file != NULL);
+    FILE *fp;
+    char text[UCHAR_MAX];
 
-void populate(struct Table *table, char *file)
-{
-    // bool fromFile = (file != NULL);
-    bool fromFile = false;
-    // FILE *fp;
-    // char text[UCHAR_MAX];
+    printf("fromFile: %d", fromFile ? 1 : 0);
 
-    // printf("fromFile: %d", fromFile ? 1 : 0);
-
-    // if (fromFile)
-    // {
-    //     fp = fopen(file, "r");
-    // }
+    if (fromFile)
+        fp = fopen(file, "r");
 
     for (int t = 0; t < table->row; t++)
     {
-        // if (fromFile && fgets(text, sizeof(text), fp) == NULL)
-        // {
-        //     break;
-        // }
+        if (fromFile && fgets(text, sizeof(text), fp) == NULL)
+            break;
 
         for (int r = 0; r < table->column; r++)
         {
             if (fromFile)
             {
-                // int num = text[r * 2];
+                int num = text[r * 2];
 
-                // if (num >= 48 && num <= 57)
-                // {
-                //     table->array[t][r] = num - 48;
-                // }
-                // else
-                // {
-                //     break;
-                // }
+                if (num >= 48 && num <= 57)
+                {
+                    table->array[t][r] = num - 48;
+                }
+                else
+                {
+                    break;
+                }
             }
             else
             {
@@ -92,10 +78,8 @@ void populate(struct Table *table, char *file)
         }
     }
 
-    // if (fromFile)
-    // {
-    //     fclose(fp);
-    // }
+    if (fromFile)
+        fclose(fp);
 }
 
 void display(struct Table *table)
@@ -175,8 +159,7 @@ int main(int argc, char *argv[])
     table.row = row;
     table.column = column;
 
-    initialize(&table);
-    populate(&table, argv[3]);
+    initialize(&table, argv[3]);
     display(&table);
 
     printf("\n");
