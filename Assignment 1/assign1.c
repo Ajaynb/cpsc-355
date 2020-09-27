@@ -141,6 +141,11 @@ void logToFile()
 int main(int argc, char *argv[])
 {
 
+    if(argc < 2){
+        printf("Not enough parameters.\n");
+        return 0;
+    }
+
     time_t timestamp;
     srand((unsigned)time(&timestamp));
 
@@ -148,15 +153,8 @@ int main(int argc, char *argv[])
 
     int row, column;
 
-    if (argc > 1)
-    {
-        row = atoi(argv[1]), column = atoi(argv[2]);
-        row = max(0, row), column = max(0, column);
-    }
-    else
-    {
-        row = 5, column = 6;
-    }
+    row = atoi(argv[1]), column = atoi(argv[2]);
+    row = max(0, row), column = max(0, column);
 
     struct Table table;
     table.row = row;
