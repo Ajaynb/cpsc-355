@@ -141,7 +141,7 @@ void logToFile()
 int main(int argc, char *argv[])
 {
 
-    if(argc < 2){
+    if(argc < 3){
         printf("Not enough parameters.\n");
         return 0;
     }
