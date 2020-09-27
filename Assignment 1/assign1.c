@@ -45,8 +45,6 @@ void initialize(struct Table *table, char *file)
     FILE *fp;
     char text[UCHAR_MAX];
 
-    printf("fromFile: %d", fromFile ? 1 : 0);
-
     if (fromFile)
         fp = fopen(file, "r");
 
