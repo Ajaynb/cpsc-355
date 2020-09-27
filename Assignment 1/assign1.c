@@ -50,28 +50,39 @@ void initialize(struct Table *table)
 
 void populate(struct Table *table, char *file)
 {
-    bool fromFile = (file != NULL);
-    FILE *fp;
-    char text[UCHAR_MAX];
+    // bool fromFile = (file != NULL);
+    bool fromFile = false;
+    // FILE *fp;
+    // char text[UCHAR_MAX];
 
-    if (fromFile)
-        fp = fopen(file, "r");
+    // printf("fromFile: %d", fromFile ? 1 : 0);
+
+    // if (fromFile)
+    // {
+    //     fp = fopen(file, "r");
+    // }
 
     for (int t = 0; t < table->row; t++)
     {
-        if (fromFile && fgets(text, sizeof(text), fp) == NULL)
-            break;
+        // if (fromFile && fgets(text, sizeof(text), fp) == NULL)
+        // {
+        //     break;
+        // }
 
         for (int r = 0; r < table->column; r++)
         {
             if (fromFile)
             {
-                int num = text[r * 2];
+                // int num = text[r * 2];
 
-                if (num >= 48 && num <= 57)
-                    table->array[t][r] = num - 48;
-                else
-                    break;
+                // if (num >= 48 && num <= 57)
+                // {
+                //     table->array[t][r] = num - 48;
+                // }
+                // else
+                // {
+                //     break;
+                // }
             }
             else
             {
@@ -81,14 +92,17 @@ void populate(struct Table *table, char *file)
         }
     }
 
-    if (fromFile)
-        fclose(fp);
+    // if (fromFile)
+    // {
+    //     fclose(fp);
+    // }
 }
 
 void display(struct Table *table)
 {
     printf("===== Table ===== \n");
-    for (int t = 0; t < table->row; t++){
+    for (int t = 0; t < table->row; t++)
+    {
         for (int r = 0; r < table->column; r++)
         {
             printf(" %d ", table->array[t][r]);
@@ -141,9 +155,10 @@ void logToFile()
 int main(int argc, char *argv[])
 {
 
-    if(argc < 3){
+    if (argc < 3)
+    {
         printf("Not enough parameters.\n");
-        return 0;
+        return 1;
     }
 
     time_t timestamp;
@@ -165,7 +180,6 @@ int main(int argc, char *argv[])
     display(&table);
 
     printf("\n");
-
 
     char command = 'y';
 
