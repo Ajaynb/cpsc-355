@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
     int row, column;
 
     row = atoi(argv[1]), column = atoi(argv[2]);
-    row = max(0, row), column = max(0, column);
+    row = min(max(0, row), 20), column = min(max(0, column), 20);
 
     struct Table table;
     table.row = row;
