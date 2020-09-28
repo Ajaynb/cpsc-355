@@ -1,19 +1,19 @@
 ===== Table =====
- 8  5  8  2  6 
- 1  9  3  7  3 
- 4  3  3  4  9 
- 6  5  9  9  6 
- 8  8  4  6  9 
+ 3  1  9  4  7 
+ 1  0  5  5  4 
+ 2  5  6  1  8 
+ 9  3  4  3  0 
+ 5  4  4  2  5 
 
 What is the index of the word you are searching for? 5
 How many top documents you want to retrieve? 5
 
 The top documents are: 
-Document 02: Occurence of 9 and Frequency of 39.1% 
-Document 04: Occurence of 9 and Frequency of 25.7% 
-Document 00: Occurence of 6 and Frequency of 20.7% 
-Document 03: Occurence of 6 and Frequency of 17.1% 
-Document 01: Occurence of 3 and Frequency of 13.0% 
+Document 02: Occurence of 8 and Frequency of 36.4% 
+Document 00: Occurence of 7 and Frequency of 29.2% 
+Document 01: Occurence of 4 and Frequency of 26.7% 
+Document 04: Occurence of 5 and Frequency of 25.0% 
+Document 03: Occurence of 0 and Frequency of 0.0% 
 
 Do you want to search again? (y/n) n
 

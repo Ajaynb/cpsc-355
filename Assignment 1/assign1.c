@@ -47,7 +47,6 @@ int randomNum(int m, int n) {
     return rand() % (upper - lower + 1) + lower;
 }
 
-
 // Opening the logging
 void logToFile() {
     fp_log = fopen("assign1.log", "w");
@@ -104,8 +103,14 @@ void initialize(struct Table* table, char* file) {
     FILE* fp;
     char text[UCHAR_MAX];
 
+    // Open the file
     if (fromFile) {
         fp = fopen(file, "r");
+    }
+
+    // If file is failed to open, the file will be ignore
+    if(fp == NULL){
+        fromFile = false;
     }
 
     // Populate table with default value 0
@@ -183,8 +188,8 @@ void topRelevantDocs(struct Table* table, int index, int top) {
     // Bubble Sort
     for (int t = 0; t < table->row; t++) {
         for (int r = 0; r < table->row - 1; r++) {
-            if (words[r].frequency < words[r + 1].frequency) {
-                // Swap wordFrequency
+            if (words[r].frequency < words[r + 1].frequency) { // The greater ones should be at the top
+                // Swap two wordFrequency
                 struct WordFrequency wf = words[r];
                 words[r] = words[r + 1];
                 words[r + 1] = wf;
