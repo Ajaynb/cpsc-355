@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <time.h>
 #include <ctype.h>
 #include <string.h>
@@ -8,6 +9,8 @@
 
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
+
+FILE *fp;
 
 struct Table {
     int array[20][20];
@@ -22,6 +25,7 @@ struct WordFrequency {
     int document;
 };
 
+
 int randomNum(int m, int n) {
     // If the upper bound and the lower bound are the same
     if (m == n) {
@@ -35,6 +39,25 @@ int randomNum(int m, int n) {
     return rand() % (upper - lower) + lower;
 }
 
+
+
+void logToFile() {
+    fp = fopen("assign1.log", "w");
+}
+
+void print(char const *fmt, ...){
+    va_list ap;
+    
+    va_start(ap, fmt);
+    vprintf(fmt, ap);
+    va_end(ap);
+    
+    va_start(ap, fmt);
+    vfprintf(fp, fmt, ap);
+    va_end(ap);
+}
+
+
 void initialize(struct Table* table, char* file) {
     bool fromFile = (file != NULL);
     FILE* fp;
@@ -44,19 +67,24 @@ void initialize(struct Table* table, char* file) {
         fp = fopen(file, "r");
     }
 
+    for(int k = 0; k < 20; k ++){
+        for(int j = 0; j < 20; j ++){
+            table->array[k][j] = 0;
+        }
+    }
+
     for (int t = 0; t < table->row; t++) {
-        if (fromFile && fgets(text, sizeof(text), fp) == NULL)
+        if (fromFile && fgets(text, sizeof(text), fp) == NULL) {
             break;
+        }
 
         for (int r = 0; r < table->column; r++) {
             if (fromFile) {
                 int num = text[r * 2];
 
-                if (num >= 48 && num <= 57)
-                {
+                if (num >= 48 && num <= 57) {
                     table->array[t][r] = num - 48;
-                } else
-                {
+                } else {
                     break;
                 }
             } else {
@@ -73,12 +101,12 @@ void initialize(struct Table* table, char* file) {
 }
 
 void display(struct Table* table) {
-    printf("===== Table ===== \n");
+    print("===== Table =====\n");
     for (int t = 0; t < table->row; t++) {
         for (int r = 0; r < table->column; r++) {
-            printf(" %d ", table->array[t][r]);
+            print(" %d ", table->array[t][r]);
         }
-        printf("\n");
+        print("\n");
     }
 }
 
@@ -117,20 +145,16 @@ void topRelevantDocs(struct Table* table, int index, int top) {
     }
 
 
-    printf("The top documents are: \n");
+    print("The top documents are: \n");
     for (int t = 0; t < top; t++)
     {
-        // printf("Word %d in ", words[t].word);
-        printf("Document %d: ", words[t].document);
-        printf("Times of %d and ", words[t].times);
-        printf("Frequency of %.1f%% ", words[t].frequency * 100);
-        printf("\n");
+        // print("Word %d in ", words[t].word);
+        print("Document %d: ", words[t].document);
+        print("Times of %d and ", words[t].times);
+        print("Frequency of %.1f%% ", words[t].frequency * 100);
+        print("\n");
     }
 
-}
-
-void logToFile() {
-    freopen("assign1.log", "wt", stdout);
 }
 
 int main(int argc, char* argv[]) {
@@ -151,33 +175,37 @@ int main(int argc, char* argv[]) {
     table.row = row;
     table.column = column;
 
+    logToFile();
+
     initialize(&table, (argc >= 4) ? argv[3] : NULL);
     display(&table);
 
-    printf("\n");
+    print("\n");
 
-    char command = 'y';
+    char command;
 
     do {
 
         int index, top;
 
-        printf("What is the index of the word you are searching for? ");
+        print("What is the index of the word you are searching for? ");
+
         scanf(" %d", &index);
 
-        printf("How many top documents you want to retrieve? ");
+        print("How many top documents you want to retrieve? ");
         scanf(" %d", &top);
 
-        printf("\n");
+        print("\n");
 
         topRelevantDocs(&table, index, top);
 
-        printf("\n");
+        print("\n");
 
-        printf("Do you want to search again? (y/n) ");
+        print("Do you want to search again? (y/n) ");
         scanf(" %c", &command);
 
-    } while (command != 'n');
+    } while (command == 'y');
+
 
     return 0;
 }

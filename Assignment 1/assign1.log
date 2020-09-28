@@ -1,1 +1,15 @@
-How many top documents you want to retrieve? 
+===== Table =====
+ 1  4  4  6  2 
+ 4  8  1  1  7 
+ 2  3  6  8  5 
+ 5  8  5  0  5 
+ 0  0  6  2  4 
+
+What is the index of the word you are searching for? How many top documents you want to retrieve? 
+The top documents are: 
+Document 1: Times of 7 and Frequency of 33.3% 
+Document 4: Times of 4 and Frequency of 33.3% 
+Document 3: Times of 5 and Frequency of 21.7% 
+Document 2: Times of 5 and Frequency of 20.8% 
+
+Do you want to search again? (y/n) 
