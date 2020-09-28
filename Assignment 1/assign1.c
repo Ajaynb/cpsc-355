@@ -108,7 +108,7 @@ void initialize(struct Table* table, char* file) {
         fp = fopen(file, "r");
     }
 
-    // If file is failed to open, the file will be ignore
+    // If file fails to open, the file will be ignore
     if(fp == NULL){
         fromFile = false;
     }
