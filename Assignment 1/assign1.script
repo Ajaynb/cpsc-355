@@ -1,5 +1,5 @@
 Script started on 2020-09-27 22:15:17-06:00
-]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1$ ./assign1.o 5 5
+]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1$ ./assign1.out 5 5
 ===== Table =====
  3  0  4  8  7 
  3  4  2  5  2 
@@ -17,7 +17,7 @@ Document 00: Occurence of 7 and Frequency of 31.8%
 Do you want to search again? (y/n) n
 
 Ended.
-]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1$ ./assign1.o 15 15 occurences2.txt
+]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1$ ./assign1.out 15 15 occurences2.txt
 ===== Table =====
  2  3  7  8  1  2  4  8  7  1  2  6  4  8  9 
  2  2  4  3  5  4  5  2  3  4  5  4  2  3  5 
