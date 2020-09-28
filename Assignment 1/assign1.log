@@ -1,18 +1,54 @@
 ===== Table =====
- 0  3  7  2  2 
- 5  1  5  4  1 
- 8  0  1  8  1 
- 4  4  6  2  7 
- 3  2  8  7  8 
+ 3  2  8  3  8  8  3  1  4  0  4  5  0  0  4  3  5  1  6  1 
+ 7  3  6  8  2  5  6  4  2  4  3  3  4  0  6  4  6  7  3  1 
+ 6  7  6  6  6  2  0  2  3  6  3  8  7  8  6  0  4  3  2  4 
+ 5  3  5  1  4  2  5  1  8  6  1  5  4  7  0  1  7  7  4  8 
+ 2  7  6  1  6  1  1  8  2  2  3  7  5  8  8  0  0  2  0  8 
+ 8  1  2  4  6  2  3  5  0  7  2  2  6  6  3  1  7  3  1  0 
+ 5  2  8  1  0  5  0  0  8  0  6  5  8  8  7  5  1  2  8  8 
+ 0  0  1  4  6  3  4  5  6  5  3  2  5  2  1  5  6  1  3  5 
+ 8  0  8  5  6  7  2  5  0  8  4  7  6  4  1  4  7  5  7  2 
+ 8  1  2  4  2  3  1  8  5  4  4  2  3  1  8  0  8  8  6  6 
+ 5  8  5  3  3  6  7  8  0  5  8  8  6  1  3  8  5  2  5  8 
+ 5  7  1  8  0  7  6  8  6  1  6  3  1  0  6  2  6  2  0  6 
+ 7  8  5  2  1  6  0  6  0  5  3  3  4  4  2  4  3  6  1  7 
+ 8  7  8  7  7  5  7  2  7  5  6  3  5  0  4  4  7  4  8  5 
+ 7  2  8  2  4  8  4  5  3  6  4  0  4  3  5  1  7  4  1  3 
+ 7  8  5  3  8  0  5  4  2  4  7  0  4  6  1  0  3  5  3  5 
+ 2  5  5  5  7  2  4  3  4  5  6  2  4  0  4  2  7  0  4  0 
+ 3  3  8  7  7  0  5  2  5  7  5  8  3  1  2  1  3  6  4  5 
+ 2  0  8  5  0  3  7  8  1  2  6  4  3  5  1  2  5  4  2  2 
+ 2  7  8  6  8  1  5  1  5  1  6  7  1  3  3  8  4  8  5  6 
 
-What is the index of the word you are searching for? 5
-How many top documents you want to retrieve? 5
+What is the index of the word you are searching for? 13
+How many top documents you want to retrieve? 4
 
 The top documents are: 
-Document 3: Times of 7 and Frequency of 30.4% 
-Document 4: Times of 8 and Frequency of 28.6% 
-Document 0: Times of 2 and Frequency of 14.3% 
-Document 1: Times of 1 and Frequency of 6.2% 
-Document 2: Times of 1 and Frequency of 5.6% 
+Document 04: Occurence of 8 and Frequency of 10.4% 
+Document 06: Occurence of 8 and Frequency of 9.2% 
+Document 02: Occurence of 8 and Frequency of 9.0% 
+Document 05: Occurence of 6 and Frequency of 8.7% 
+
+Do you want to search again? (y/n) y
+
+What is the index of the word you are searching for? 15
+How many top documents you want to retrieve? 13
+
+The top documents are: 
+Document 19: Occurence of 8 and Frequency of 8.4% 
+Document 10: Occurence of 8 and Frequency of 7.7% 
+Document 07: Occurence of 5 and Frequency of 7.5% 
+Document 06: Occurence of 5 and Frequency of 5.7% 
+Document 12: Occurence of 4 and Frequency of 5.2% 
+Document 01: Occurence of 4 and Frequency of 4.8% 
+Document 00: Occurence of 3 and Frequency of 4.3% 
+Document 08: Occurence of 4 and Frequency of 4.2% 
+Document 13: Occurence of 4 and Frequency of 3.7% 
+Document 18: Occurence of 2 and Frequency of 2.9% 
+Document 16: Occurence of 2 and Frequency of 2.8% 
+Document 11: Occurence of 2 and Frequency of 2.5% 
+Document 05: Occurence of 1 and Frequency of 1.4% 
 
 Do you want to search again? (y/n) n
+
+Ended.

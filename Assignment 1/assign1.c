@@ -45,6 +45,10 @@ void logToFile() {
     fp_log = fopen("assign1.log", "w");
 }
 
+void logOffFile() {
+    fclose(fp_log);
+}
+
 void print(const char* restrict format, ...) {
     va_list vlist;
 
@@ -175,8 +179,8 @@ void topRelevantDocs(struct Table* table, int index, int top) {
     for (int t = 0; t < top; t++)
     {
         // print("Word %d in ", words[t].word);
-        print("Document %d: ", words[t].document);
-        print("Times of %d and ", words[t].times);
+        print("Document %02d: ", words[t].document);
+        print("Occurence of %d and ", words[t].times);
         print("Frequency of %.1f%% ", words[t].frequency * 100);
         print("\n");
     }
@@ -230,8 +234,14 @@ int main(int argc, char* argv[]) {
         print("Do you want to search again? (y/n) ");
         scan(" %c", &command);
 
+        print("\n");
+
     } while (command == 'y');
 
+
+    print("Ended.\n");
+
+    logOffFile();
 
     return 0;
 }

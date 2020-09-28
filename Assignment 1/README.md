@@ -2,3 +2,4 @@ https://stackoverflow.com/questions/6420194/how-to-print-both-to-stdout-and-file
 https://en.cppreference.com/w/c/variadic
 https://en.cppreference.com/w/c/io/vfprintf
 https://en.cppreference.com/w/c/io/vfscanf
+https://linux.die.net/man/3/va_arg
