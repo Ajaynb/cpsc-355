@@ -10,7 +10,7 @@
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
 
-FILE *fp_log;
+FILE* fp_log;
 
 struct Table {
     int array[20][20];
@@ -45,21 +45,21 @@ void logToFile() {
     fp_log = fopen("assign1.log", "w");
 }
 
-void print(const char *restrict format, ...){
+void print(const char* restrict format, ...) {
     va_list vlist;
-    
+
     va_start(vlist, format);
     vprintf(format, vlist);
     va_end(vlist);
-    
+
     va_start(vlist, format);
     vfprintf(fp_log, format, vlist);
     va_end(vlist);
 }
 
-void scan(const char *restrict format, ...){
+void scan(const char* restrict format, ...) {
     va_list vlist;
-    
+
     va_start(vlist, format);
     vscanf(format, vlist);
     va_end(vlist);
@@ -68,14 +68,18 @@ void scan(const char *restrict format, ...){
     va_start(vlist, format);
     while (*format != '\0') {
         if (*format == 'd') {
-            int *i = va_arg(vlist, int*);
-            fprintf(fp_log, "%d\n", *i);
+            int* i = va_arg(vlist, int*);
+            fprintf(fp_log, "%d", *i);
         } else if (*format == 'c') {
-            int *c = va_arg(vlist, int*);
-            fprintf(fp_log, "%c\n", *c);
+            int* c = va_arg(vlist, int*);
+            fprintf(fp_log, "%c", *c);
+        } else if (*format == 's') {
+            char* s = va_arg(vlist, char*);
+            fprintf(fp_log, "%s", s);
         }
         ++format;
     }
+    fprintf(fp_log, "%s", "\n");
     va_end(vlist);
 }
 
@@ -89,8 +93,8 @@ void initialize(struct Table* table, char* file) {
         fp = fopen(file, "r");
     }
 
-    for(int k = 0; k < 20; k ++){
-        for(int j = 0; j < 20; j ++){
+    for (int k = 0; k < 20; k++) {
+        for (int j = 0; j < 20; j++) {
             table->array[k][j] = 0;
         }
     }
