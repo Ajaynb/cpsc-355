@@ -7,9 +7,11 @@
 #include <stdbool.h>
 #include <limits.h>
 
+// Determine which one is greater/smaller between the given two numbers
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
 
+// Log file stream
 FILE* fp_log;
 
 struct Table {
@@ -25,7 +27,7 @@ struct WordFrequency {
     int document;
 };
 
-
+// Generate random number between the given range, inclusive.
 int randomNum(int m, int n) {
     // If the upper bound and the lower bound are the same
     if (m == n) {
@@ -36,7 +38,7 @@ int randomNum(int m, int n) {
     int upper = max(m, n);
     int lower = min(m, n);
 
-    return rand() % (upper - lower) + lower;
+    return rand() % (upper - lower + 1) + lower;
 }
 
 
@@ -178,7 +180,7 @@ void topRelevantDocs(struct Table* table, int index, int top) {
     print("The top documents are: \n");
     for (int t = 0; t < top; t++)
     {
-        // print("Word %d in ", words[t].word);
+        // print("Word %02d in ", words[t].word);
         print("Document %02d: ", words[t].document);
         print("Occurence of %d and ", words[t].times);
         print("Frequency of %.1f%% ", words[t].frequency * 100);
