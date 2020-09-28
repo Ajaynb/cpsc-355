@@ -68,16 +68,15 @@ void scan(const char *restrict format, ...){
     va_start(vlist, format);
     while (*format != '\0') {
         if (*format == 'd') {
-            int *i = (int *)va_arg(vlist, int*);
+            int *i = va_arg(vlist, int*);
             fprintf(fp_log, "%d\n", *i);
         } else if (*format == 'c') {
-            int *c = (int *)va_arg(vlist, int *);
+            int *c = va_arg(vlist, int*);
             fprintf(fp_log, "%c\n", *c);
         }
         ++format;
     }
     va_end(vlist);
-    
 }
 
 
@@ -213,9 +212,6 @@ int main(int argc, char* argv[]) {
         int index, top;
 
         print("What is the index of the word you are searching for? ");
-
-
-        printf("%d", &index);
         scan(" %d", &index);
 
         print("How many top documents you want to retrieve? ");
