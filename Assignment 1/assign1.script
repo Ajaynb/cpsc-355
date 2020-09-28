@@ -1,0 +1,63 @@
+Script started on 2020-09-27 22:15:17-06:00
+]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1$ ./assign1.o 5 5
+===== Table =====
+ 3  0  4  8  7 
+ 3  4  2  5  2 
+ 7  6  6  3  0 
+ 6  8  0  6  4 
+ 5  2  0  9  8 
+
+What is the index of the word you are searching for? 5
+How many top documents you want to retrieve? 2
+
+The top documents are: 
+Document 04: Occurence of 8 and Frequency of 33.3% 
+Document 00: Occurence of 7 and Frequency of 31.8% 
+
+Do you want to search again? (y/n) n
+
+Ended.
+]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1$ ./assign1.o 15 15 occurences2.txt
+===== Table =====
+ 2  3  7  8  1  2  4  8  7  1  2  6  4  8  9 
+ 2  2  4  3  5  4  5  2  3  4  5  4  2  3  5 
+ 8  3  2  9  8  7  1  3  9  8  0  6  5  1  7 
+ 0  9  8  6  1  4  2  3  9  6  4  5  7  0  6 
+ 8  9  7  1  4  2  3  7  8  9  0  5  4  8  9 
+ 8  9  4  3  2  1  7  8  9  0  4  3  2  1  7 
+ 2  1  7  8  9  0  4  3  2  7  8  9  0  4  7 
+ 2  8  5  6  7  6  6  4  5  6  8  2  4  5  2 
+ 5  7  2  7  8  9  0  4  3  2  1  7  9  8  0 
+ 7  8  3  9  8  2  7  0  5  7  2  9  5  6  6 
+ 9  7  0  4  7  3  5  2  1  8  4  0  7  8  4 
+ 4  5  9  6  7  9  3  7  2  1  9  0  4  7  4 
+ 0  9  7  2  3  2  1  2  4  4  8  8  7  0  4 
+ 7  7  8  6  4  6  1  9  0  4  1  9  8  1  3 
+ 2  9  6  4  2  3  1  6  7  0  4  3  2  1  6 
+
+What is the index of the word you are searching for? 10
+How many top documents you want to retrieve? 2
+
+The top documents are: 
+Document 12: Occurence of 8 and Frequency of 13.1% 
+Document 11: Occurence of 9 and Frequency of 11.7% 
+
+Do you want to search again? (y/n) y
+
+What is the index of the word you are searching for? 2 5
+How many top documents you want to retrieve? 5
+
+The top documents are: 
+Document 08: Occurence of 9 and Frequency of 12.5% 
+Document 11: Occurence of 9 and Frequency of 11.7% 
+Document 02: Occurence of 7 and Frequency of 9.1% 
+Document 13: Occurence of 6 and Frequency of 8.1% 
+Document 07: Occurence of 6 and Frequency of 7.9% 
+
+Do you want to search again? (y/n) n
+
+Ended.
+]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 1$ exit
+exit
+
+Script done on 2020-09-27 22:16:25-06:00
