@@ -8,12 +8,13 @@ There are validation checks in the code to identify invalid ibputs, but instead 
 
 Here are the possible cases and their fallbacks.
 
-1. If the file determined in the command line argument fails to open (for example, file does not exist), the file will be ignored. And as usual it will generate a random table.
+1. If the file given in the command line argument fails to open (for example, file does not exist), the file will be ignored. And as usual it will generate a random table.
 2. If user does not determine the table size at all in the command line, a default/minimum size of 5x5 random table will be generated.
 3. If the index of searching word is a negative number, the index will be set to 0. If the index exceeds the table size, the index will be set to the largest index.
 4. If the number of top document is a negative number, the number will be set to 0. If the number exceeds the total number of documents, the number will be set to the total number.
 5. If user determine a table size smaller than 5x5 in the command line, the table size will be set to the minimum size 5x5. If greater, it will be set to maximum size 20x20.
 6. If user input any character other than 'y' or 'n' for question of searching again, it will stop searching.
+7. If the table read from the given file is smaller than the determined table size, the unpopulated part will be filed with a default value 0. If reversed, the read table is greater than the determined table size, the overflowed part will be cut off. 
 
 ## Print and Scan functions
 
@@ -28,3 +29,7 @@ There is no implementation for such functions, so by researching online by piece
 - https://linux.die.net/man/3/va_arg
 
 As a result, the `print` function has the same functionality and usage with `printf`, `scan` has the same with `scanf`. In order to migrate to the customized functions, just simply replace all occurences of `printf` and `scanf` in the code with `print` and `scan`.
+
+## Occurences files
+
+Two occurences files are included. `occurences.txt` is the example 5x6 table given in the assignment pdf. `occurences2.txt` is a randomly generated 20x20 table.
