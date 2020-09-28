@@ -68,13 +68,13 @@ void scan(const char* restrict format, ...) {
     va_start(vlist, format);
     while (*format != '\0') {
         if (*format == 'd') {
-            int* i = va_arg(vlist, int*);
+            int *i = va_arg(vlist, int*);
             fprintf(fp_log, "%d", *i);
         } else if (*format == 'c') {
-            int* c = va_arg(vlist, int*);
+            int *c = va_arg(vlist, int*);
             fprintf(fp_log, "%c", *c);
         } else if (*format == 's') {
-            char* s = va_arg(vlist, char*);
+            char *s = va_arg(vlist, char*);
             fprintf(fp_log, "%s", s);
         }
         ++format;
