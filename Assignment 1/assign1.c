@@ -170,6 +170,7 @@ void topRelevantDocs(struct Table* table, int index, int top) {
     top = min(top, table->row);
     top = max(0, top);
 
+    // Build WordFrequency array
     struct WordFrequency words[MAX_ROW];
     for (int t = 0; t < table->row; t++) {
         int documentSize = 0; // Total words of current document
@@ -189,7 +190,7 @@ void topRelevantDocs(struct Table* table, int index, int top) {
     for (int t = 0; t < table->row; t++) {
         for (int r = 0; r < table->row - 1; r++) {
             if (words[r].frequency < words[r + 1].frequency) { // The greater ones should be at the top
-                // Swap two wordFrequency
+                // Swap two WordFrequency
                 struct WordFrequency wf = words[r];
                 words[r] = words[r + 1];
                 words[r + 1] = wf;
