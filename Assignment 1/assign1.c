@@ -10,7 +10,7 @@
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
 
-FILE *fp;
+FILE *fp_log;
 
 struct Table {
     int array[20][20];
@@ -42,19 +42,42 @@ int randomNum(int m, int n) {
 
 
 void logToFile() {
-    fp = fopen("assign1.log", "w");
+    fp_log = fopen("assign1.log", "w");
 }
 
-void print(char const *fmt, ...){
-    va_list ap;
+void print(const char *restrict format, ...){
+    va_list vlist;
     
-    va_start(ap, fmt);
-    vprintf(fmt, ap);
-    va_end(ap);
+    va_start(vlist, format);
+    vprintf(format, vlist);
+    va_end(vlist);
     
-    va_start(ap, fmt);
-    vfprintf(fp, fmt, ap);
-    va_end(ap);
+    va_start(vlist, format);
+    vfprintf(fp_log, format, vlist);
+    va_end(vlist);
+}
+
+void scan(const char *restrict format, ...){
+    va_list vlist;
+    
+    va_start(vlist, format);
+    vscanf(format, vlist);
+    va_end(vlist);
+
+
+    va_start(vlist, format);
+    while (*format != '\0') {
+        if (*format == 'd') {
+            int *i = (int *)va_arg(vlist, int*);
+            fprintf(fp_log, "%d\n", *i);
+        } else if (*format == 'c') {
+            int *c = (int *)va_arg(vlist, int *);
+            fprintf(fp_log, "%c\n", *c);
+        }
+        ++format;
+    }
+    va_end(vlist);
+    
 }
 
 
@@ -180,6 +203,7 @@ int main(int argc, char* argv[]) {
     initialize(&table, (argc >= 4) ? argv[3] : NULL);
     display(&table);
 
+
     print("\n");
 
     char command;
@@ -190,10 +214,12 @@ int main(int argc, char* argv[]) {
 
         print("What is the index of the word you are searching for? ");
 
-        scanf(" %d", &index);
+
+        printf("%d", &index);
+        scan(" %d", &index);
 
         print("How many top documents you want to retrieve? ");
-        scanf(" %d", &top);
+        scan(" %d", &top);
 
         print("\n");
 
@@ -202,7 +228,7 @@ int main(int argc, char* argv[]) {
         print("\n");
 
         print("Do you want to search again? (y/n) ");
-        scanf(" %c", &command);
+        scan(" %c", &command);
 
     } while (command == 'y');
 
