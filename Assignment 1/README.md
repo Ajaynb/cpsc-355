@@ -20,7 +20,7 @@ Here are the possible cases and their fallbacks.
 
 For having a good readability and elegent implementation of the code, in order to print and scan to console and log file at the same time, a customized `print` and `scan` functions are implemented.
 
-There is no implementation for such functions, so by researching online by pieces for a long time, they are implemented from the help of the following references:
+There is no implementation can be found online for such functions, so by researching online by pieces for a long time, they are implemented from the help of the following references:
 
 - https://stackoverflow.com/questions/6420194/how-to-print-both-to-stdout-and-file-in-c
 - https://en.cppreference.com/w/c/variadic
