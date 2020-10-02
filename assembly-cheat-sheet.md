@@ -51,6 +51,7 @@ Register|Description
 ```
         // Expose main function to OS
         .global main
+        .balign 4
 
 main:   
         // Saves state
