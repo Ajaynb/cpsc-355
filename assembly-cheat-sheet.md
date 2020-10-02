@@ -68,23 +68,23 @@ main:
 ## Addition and Subtraction
 
 ### Add
-Form: `add destination source source`  
+Form: `add destination, source, source`  
 
-Eg: `add x19 x20 x21`  
+Eg: `add x19, x20, x21`  
 Eq: `x19 = x20 + x21`
 
-Eg: `add x19 x20 10`  
+Eg: `add x19, x20, 10`  
 Eq: `x19 = x20 + 10`  
 
 Note: accepts immediate value
 
 ### Divide
-Form: `sub destination source source`  
+Form: `sub destination, source, source`  
 
-Eg: `sub x19 x20 x21`  
+Eg: `sub x19, x20, x21`  
 Eq: `x19 = x20 - x21`  
 
-Eg: `sub x19 x20 10`  
+Eg: `sub x19, x20, 10`  
 Eq: `x19 = x20 - 10`  
 
 Note: accepts immediate value
@@ -92,27 +92,27 @@ Note: accepts immediate value
 ## Multiplications
 
 ### Multiply
-Form: `mul destionation source source`  
+Form: `mul destionation, source, source`  
 
-Eg: `mul x19 x20 x21`  
+Eg: `mul x19, x20, x21`  
 Eq: `x19 = x20 * x21`  
 
 ### Multiply-add
-Form: `madd destination source source source`  
+Form: `madd destination, source, source, source`  
 
-Eg: `madd x19 x20 x21 x22`  
+Eg: `madd x19, x20, x21, x22`  
 Eq: `x19 = (x20 * x21) + x22`  
 
 ### Multiply-subtract
-Form: `msub destination source source source`  
+Form: `msub destination, source, source, source`  
 
-Eg: `msub x19 x20 x21 x22`  
+Eg: `msub x19, x20, x21, x22`  
 Eq: `x19 = (x20 * x21) - x22`  
 
 ### Multiply-negate
-Form: `mneg destination source source`  
+Form: `mneg destination, source, source`  
 
-Eg: `mneg x19 x20 x21`  
+Eg: `mneg x19, x20, x21`  
 Eq: `x19 = -(x20 * x21)`
 
 
@@ -120,15 +120,15 @@ Eq: `x19 = -(x20 * x21)`
 Note: integer division, discard remainders
 
 ### Signed-divide
-Form: `sdiv destination source source`  
+Form: `sdiv destination, source, source`  
 
-Eg: `sdiv x19 x20 x21`  
+Eg: `sdiv x19, x20, x21`  
 Eq: `x19 = x20 / x21`  
 
 ### Unsigned-divide
-Form: `udiv destination source source`  
+Form: `udiv destination, source, source`  
 
-Eg: `udiv x19 x20 x21`  
+Eg: `udiv x19, x20, x21`  
 Eq: `x19 = x20 / x21`  
 
 
