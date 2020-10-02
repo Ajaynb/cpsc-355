@@ -188,7 +188,7 @@ Flag Code|Description
 --|--
 Z|true if result is **z**ero
 N|true if result is **n**egative
-V|true if result O**v**erflows
+V|true if result o**v**erflows
 C|true if result generates a **c**arry out
 
 ### Conditions
