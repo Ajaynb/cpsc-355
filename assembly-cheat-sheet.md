@@ -4,7 +4,7 @@
 
 Register|Description
 --|--
-`x0`-`x7`|Arguments and Return values
+`x0`-`x7`|Arguments & Return values
 `x8`|Indirect result
 `x9`-`x15`|Temporary
 `x16`, `x17`|Intra-procedure-call temporary
@@ -222,7 +222,7 @@ define(d_r, x22)
 
         cmp     a_r,    b_r
         b.le    else
-        
+
         add     c_r,    a_r,    b_r
         add     d_r,    c_r,    5
 
