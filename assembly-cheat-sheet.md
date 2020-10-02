@@ -20,7 +20,6 @@
  - [Branching and Linking](#Branching-and-Linking)
  - [Condition and Compare](#Condition-and-Compare)
     - [Flags](#Flags)
-    - [Compare](#Compare)
     - [Conditions](#Conditions)
     - [If](#If)
     - [If-else](#If-else)
@@ -191,13 +190,6 @@ Z|true if result is **z**ero
 N|true if result is **n**egative
 V|true if result O**v**erflows
 C|true if result generates a **c**arry out
-
-### Compare
-Form: `cmp source source`  
-
-Eg: `cmp x19 x20`  
-Eq: `if (x19 == x20)`
-
 
 ### Conditions
 
