@@ -40,16 +40,22 @@ main:
 ### Add
 Form: `add destination source source`  
 
-Eg: `add x19 x20 x21`, x19 = x20 + x21  
-Eg: `add x19 x20 10`, x19 = x20 + 10  
+Eg: `add x19 x20 x21`  
+Eq: `x19 = x20 + x21`
+
+Eg: `add x19 x20 10`  
+Eq: `x19 = x20 + 10`  
 
 Note: accepts immediate value
 
 ### Divide
 Form: `sub destination source source`  
 
-Eg: `sub x19 x20 x21`, x19 = x20 - x21  
-Eg: `sub x19 x20 10`, x19 = x20 - 10  
+Eg: `sub x19 x20 x21`  
+Eq: `x19 = x20 - x21`  
+
+Eg: `sub x19 x20 10`  
+Eq: `x19 = x20 - 10`  
 
 Note: accepts immediate value
 
