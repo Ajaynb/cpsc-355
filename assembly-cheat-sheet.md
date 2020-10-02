@@ -1,5 +1,36 @@
 # Assembly x64 Cheat Sheet
 
+## Menu
+
+ - [Registers](#Registers)
+ - [Basic Program Structure](#Basic-Program-Structure)
+ - [Addition and Subtraction](#Addition-and-Subtraction)
+   - [Add](#Add)
+   - [Divide](#Divide)
+ - [Multiplications](#Multiplications)
+    - [Multiply](#Multiply)
+    - [Multiply-add](#Multiply-add)
+    - [Multiply-subtract](#Multiply-subtract)
+    - [Multiply-negate](#Multiply-negate)
+ - [Divisions](#Divisions)
+    - [Signed-divide](#Signed-divide)
+    - [Unsigned-divide](#Unsigned-divide)
+ - [Printing](#Printing)
+ - [Scanning](#Scanning)
+ - [Branching and Linking](#Branching-and-Linking)
+ - [Condition and Compare](#Condition-and-Compare)
+    - [Flags](#Flags)
+    - [Compare](#Compare)
+    - [Conditions](#Conditions)
+    - [If](#If)
+    - [If-else](#If-else)
+ - [Loops](#Loops)
+    - [Do-while](#Do-while)
+    - [While](#While)
+    - [For](#For)
+
+
+
 ## Registers
 
 Register|Description
