@@ -178,7 +178,7 @@ main:
         ldr     x1,     =n
         bl      scanf
         ldr     x1,     =n
-        ldr     x19,    [x1]                    // result stores in x19
+        ldr     x19,    [x1]  // result stores in x19
 ```
 
 
