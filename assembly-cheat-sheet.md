@@ -195,12 +195,12 @@ C|true if result generates a **c**arry out
 
 Condition Code|Description|C Equivalent|Flag
 --|--|--|--
-`eq`|equal|`==`|`Z == 1`
-`ne`|not equal|`!=`|`Z == 0`
-`gt`|greater than|`>`|`Z == 0 && N == V`
-`ge`|greater than or equal|`>=`|`N == V`
-`lt`|less than|`<`|`N != V`
-`le`|less than or equal|`<=`|`!(Z == 0 && N == V)`
+`eq`|**eq**ual|`==`|`Z == 1`
+`ne`|**n**ot **e**qual|`!=`|`Z == 0`
+`gt`|**g**reater **t**han|`>`|`Z == 0 && N == V`
+`ge`|**g**reater than or **e**qual|`>=`|`N == V`
+`lt`|**l**ess **t**han|`<`|`N != V`
+`le`|**l**ess than or **e**qual|`<=`|`!(Z == 0 && N == V)`
 
 
 ### If
