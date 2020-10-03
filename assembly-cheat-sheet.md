@@ -173,6 +173,12 @@ main:
         ldr     x1,     =n
         bl      scanf
         ldr     x14,    =n
+        
+        ldr     x0,     =input
+        ldr     x1,     =n
+        bl      scanf
+        ldr     x1,     =n
+        ldr     x19,    [x1]  // result stores in x19
 ```
 
 
