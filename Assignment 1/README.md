@@ -4,7 +4,7 @@
 The sorting algorithm used is **Bubble Sort**, which can be found in function `topRelevantDocs`.
 
 ## Input validation
-There are validation checks in the code to identify invalid ibputs, but instead of throwing error and ask again, it would **tolerant** the user's error at maximum, by having a fallback.
+There are validation checks in the code to identify invalid inputs, but instead of throwing error and ask again, it would **tolerant** the user's error at maximum, by having a fallback.
 
 Here are the possible cases and their fallbacks.
 
