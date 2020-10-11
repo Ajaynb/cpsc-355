@@ -115,7 +115,7 @@ loop:   add     x_loopTimes, x_loopTimes, 1                         // loopTimes
         b       notlow                                              // else continue;
 
 replow: mov     x_lowestOccurence, x_occurence                      // lowestOccurence = occurence; assign the current occurence as the lowest occurence
-notlow:
+notlow:                                                             // Continue
 
         // If current word occurence is the highest
         cmp     x_occurence,        x_highestOccurence              // if (occurence > highestOccurence);
@@ -123,13 +123,14 @@ notlow:
         b       nothigh                                             // else continue;
 
 rephigh:mov     x_highestOccurence, x_occurence                     // highestOccurence = occurence; assign the current occurence as the highest occurence
-nothigh:
-
+nothigh:                                                            // Continue
 
 
 postest:cmp     x_loopTimes, x_n                                    // if (loopTimes < n); loop condition
         b.lt    loop                                                // then keep looping;
         b       totaloccur                                          // else continue;
+
+
 
 
 totaloccur:                                                         // total occurence
