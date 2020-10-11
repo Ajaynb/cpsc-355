@@ -4,8 +4,8 @@ prtnwd: .string "Enter the number of words: "   // Message for user input on the
 prtocc: .string "Words occurence: "             // Prefix text for all word occurences
 prtnum: .string "%d "                           // Occurence of word
 prtsum: .string "Total occurence: %d \n"        // Total occurence
-prtlow: .string "Lowest frequency: %d\% \n"       // Lowest frequency
-prthig: .string "Highest frequency: %d\% \n"      // Highest frequency
+prtlow: .string "Lowest frequency: %d\% \n"     // Lowest frequency
+prthig: .string "Highest frequency: %d\% \n"    // Highest frequency
 linebr: .string "\n"                            // Line break
 scnocc: .asciz "%d"                             // Scan for user input
 
@@ -38,7 +38,6 @@ nrangeless:                                     // r range less
         b       nrangegreat                     // else continue;
 
 nless:  mov     x19,    5                       // n = 5;
-
 
 
 
@@ -166,6 +165,6 @@ frequency:                                      // frequency
         ret                                     // return to OS
 
 
-        .data                                       // global variables
-n: 	.int 	0                                   // int n = 0
+        .data                                   // global variables
+n: 	    .int 	0                               // int n = 0
 

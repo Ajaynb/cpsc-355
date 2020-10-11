@@ -1,8 +1,9 @@
 {
     "[yaml]": {
-        "editor.tabCompletion": "on",
-        "editor.insertSpaces": true,
         "editor.tabSize": 4,
-        "editor.autoIndent": "advanced"
-    }
+        "editor.autoIndent": "none"
+    },
+    "editor.detectIndentation": false,
+    "editor.tabSize": 4,
+    "workbench.tree.indent": 4
 }
