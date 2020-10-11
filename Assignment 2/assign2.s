@@ -80,7 +80,7 @@ pretest:cmp     x20,    x19                     // if (loopTimes < n)
 loop:   add     x20,    x20,    1               // loopTimes ++
 
         // Generate a random number as current word occurence
-        bl 	rand                            	// rand()
+        bl 	rand                                // rand()
 
         mov     x10,    10                      // int ten = 10;
         mov  	x9, 	x0                      // int rand = x0
