@@ -1,4 +1,5 @@
 
+// Define macro variables
 define(x_loopTimes, x20)
 define(x_totalOccurence, x21)
 define(x_lowestOccurence, x22)
