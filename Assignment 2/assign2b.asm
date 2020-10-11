@@ -63,9 +63,9 @@ ngreat: mov     x_n,    20                                          // n = 20;
 
 randomnumbers:                                                      // random numbers
         // Set random seed
-        mov 	x0, 	0                                           // 1st parameter: 0
-        bl 		time                                                // time(0);
-        bl 		srand                                               // srand(time(0)); set random seed to current timestamp
+        mov     x0,     0                                           // 1st parameter: 0
+        bl      time                                                // time(0);
+        bl      srand                                               // srand(time(0)); set random seed to current timestamp
 
         // Intialize variables
         mov     x_loopTimes,        0                               // int loopTimes = 0; initialize the times of loop
@@ -88,10 +88,10 @@ randomnumbers:                                                      // random nu
 loop:   add     x_loopTimes, x_loopTimes, 1                         // loopTimes ++;
 
         // Generate a random number as current word occurence
-        bl 	rand                                                    // rand(); get a random number as current word occurence
+        bl      rand                                                // rand(); get a random number as current word occurence
 
         mov     x10,    10                                          // int ten = 10; a constant for multiplication
-        mov  	x9, 	x0                                          // int rand = x0; get the random number
+        mov     x9,     x0                                          // int rand = x0; get the random number
 
         // Calculate and range the random number to 0-9
         udiv    x11,    x9,     x10                                 // int quotient = rand / 10; calculate the quotient after 10x
@@ -177,4 +177,4 @@ frequency:                                                          // frequency
 
 
         .data                                                       // global variables
-n: 	    .int 	0                                                   // int n = 0
+n:      .int    0                                                   // int n = 0
