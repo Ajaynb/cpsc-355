@@ -106,7 +106,7 @@ loop:   add     x20,    x20,    1               // loopTimes ++;
         b       notlow                          // else continue;
 
 replow: mov     x22,    x28                     // lowestOccurence = occurence; assign the current occurence as the lowest occurence
-notlow:
+notlow:                                         // Continue
 
         // If current word occurence is the highest
         cmp     x28,    x23                     // if (occurence > highestOccurence);
@@ -114,7 +114,7 @@ notlow:
         b       nothigh                         // else continue;
 
 rephigh:mov     x23,    x28                     // highestOccurence = occurence; assign the current occurence as the highest occurence
-nothigh:
+nothigh:                                        // Continue
 
         // Go back to pretest
         b       pretest                         // loop body end, back to condition pretest

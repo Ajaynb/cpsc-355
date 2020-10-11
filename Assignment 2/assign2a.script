@@ -1,0 +1,24 @@
+Script started on 2020-10-11 06:00:10-06:00
+]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 2yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 2$ gcc assign2.s -o assign2a.out
+]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 2yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 2$ ./assign2a.out
+Enter the number of words: 10
+Words occurence: 6 1 8 5 6 5 7 8 7 6 
+Total occurence: 59 
+Lowest frequency: 1% 
+Highest frequency: 13% 
+]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 2yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 2$ ./assign2a.out
+Enter the number of words: 1
+Words occurence: 9 4 5 2 4 
+Total occurence: 24 
+Lowest frequency: 8% 
+Highest frequency: 37% 
+]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 2yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 2$ ./assign2a.out
+Enter the number of words: 999
+Words occurence: 7 8 2 3 7 8 5 4 3 2 9 2 5 9 7 9 5 6 1 3 
+Total occurence: 105 
+Lowest frequency: 0% 
+Highest frequency: 8% 
+]0;yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 2yunfan.yang1@csa1:~/Desktop/cpsc-355/Assignment 2$ exit
+exit
+
+Script done on 2020-10-11 06:01:12-06:00
