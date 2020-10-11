@@ -1,4 +1,6 @@
 
+// Define macro variables
+
 
 
 
@@ -176,4 +178,3 @@ frequency:                                                          // frequency
 
         .data                                                       // global variables
 n: 	    .int 	0                                                   // int n = 0
-

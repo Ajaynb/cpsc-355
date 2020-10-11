@@ -1,5 +1,6 @@
 
 // Define macro variables
+define(x_n, x19)
 define(x_loopTimes, x20)
 define(x_totalOccurence, x21)
 define(x_lowestOccurence, x22)
@@ -36,27 +37,27 @@ main:                                                               // main func
         ldr     x1,     =n                                          // 2nd parameter: &n, the data to store for user input
         bl      scanf                                               // scanf(scnocc, &n);
         ldr     x1,     =n                                          // 2nd parameter: &n
-        ldr     x19,    [x1]                                        // int n = x1;
+        ldr     x_n,    [x1]                                        // int n = x1;
 
 
 
 nrangeless:                                                         // r range less
         // Check the range of n. If n is less than 5, then set the number of word to 5.
-        cmp     x19,    5                                           // if (n < 5);
+        cmp     x_n,    5                                           // if (n < 5);
         b.lt    nless                                               // then go to: nless n = 5;
         b       nrangegreat                                         // else continue;
 
-nless:  mov     x19,    5                                           // n = 5;
+nless:  mov     x_n,    5                                           // n = 5;
 
 
 
 nrangegreat:                                                        // n range greater
         // Check the range of n. If n is greater than 20, then set the number of word to 20.
-        cmp     x19,    20                                          // if (n > 20);
+        cmp     x_n,    20                                          // if (n > 20);
         b.gt    ngreat                                              // then go to: ngreat n = 20;
         b       randomnumbers                                       // else continue;
 
-ngreat: mov     x19,    20                                          // n = 20;
+ngreat: mov     x_n,    20                                          // n = 20;
 
 
 
@@ -126,7 +127,7 @@ nothigh:
 
 
 
-postest:cmp     x_loopTimes, x19                                    // if (loopTimes < n); loop condition
+postest:cmp     x_loopTimes, x_n                                    // if (loopTimes < n); loop condition
         b.lt    loop                                                // then keep looping;
         b       totaloccur                                          // else continue;
 
