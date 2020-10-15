@@ -19,12 +19,18 @@
 #define REWARD '$'
 
 struct Board {
-    float* array;
+    struct Block* array;
     int row;
     int column;
+    int size;
     int score;
     unsigned int negAmount;
     unsigned int speAmount;
+};
+
+struct Block {
+    float value;
+    bool covered;
 };
 
 // Generate random number between the given range, inclusive.
@@ -59,58 +65,69 @@ void initializeGame(struct Board* board) {
     board->column = max(MIN_COL, board->column);
 
     // Intialize map by allocating memory
-    int boardSize = board->row * board->column;
-    board->array = calloc(sizeof(float), boardSize);
+    board->size = board->row * board->column;
+    board->array = calloc(sizeof(struct Block), board->size);
 
     // Initialize statistics
     board->negAmount = 0;
     board->speAmount = 0;
 
     // Generate map
-    for (int t = 0; t < boardSize; t++) {
+    for (int t = 0; t < board->size; t++) {
         int type = randomNum(0, 9);
         float value = randomNum(0, 15) + randomNum(0, 99) * 0.01;
         value = min(15, value);
         value = max(0.01, value);
 
-        board->array[t] = value;
+        struct Block bl;
+        bl.value = value;
+        bl.covered = true;
+
+        board->array[t] = bl;
     }
     
-    while (board->negAmount != (int)(boardSize * NEG_PERCENT)) {
-        int index = randomNum(0, boardSize - 1);
-        if (board->array[index] >= 0) {
-            board->array[index] *= -1;
+    // Flip to negative numbers
+    while (board->negAmount < (int)(board->size * NEG_PERCENT)) {
+        int index = randomNum(0, board->size - 1);
+        if (board->array[index].value >= 0) {
+            board->array[index].value *= -1;
             board->negAmount++;
         }
     }
 
-    while (board->speAmount != (int)(boardSize * SPE_PERCENT)) {
-        int index = randomNum(0, boardSize - 1);
-        board->array[index] = REWARD;
+    // Flip to specials
+    while (board->speAmount < (int)(board->size * SPE_PERCENT)) {
+        int index = randomNum(0, board->size - 1);
+        board->array[index].value = REWARD;
         board->speAmount++;
     }
 
     // Generate Exit
-    int exitIndex = randomNum(0, boardSize - 1);
-    board->array[exitIndex] = EXIT;
+    int exitIndex = randomNum(0, board->size - 1);
+    board->array[exitIndex].value = EXIT;
 }
 
-void displayBoard(struct Board* board) {
-    int boardSize = board->row * board->column;
-    for (int t = 0; t < boardSize; t++) {
+void displayBoard(struct Board* board, bool peek) {
+    for (int t = 0; t < board->size; t++) {
         int col = t % board->column;
-        int value = board->array[t];
-
-        switch (value) {
-        case REWARD:
-        case EXIT:
-            printf("   %c    ", value);
-            break;
-        default:
-            printf("%6.2f  ", board->array[t]);
-            break;
+        int value = board->array[t].value;
+        
+        if (!board->array[t].covered || peek) {
+            switch (value) {
+            case REWARD:
+            case EXIT:
+                if (peek) printf("   %c    ", value);
+                else printf(" %c ", value);
+                break;
+            default:
+                if (peek) printf("%6.2f  ", board->array[t].value);
+                else printf(" %c ", (board->array[t].value > 0) ? '+' : '-');
+                break;
+            }
+        } else {
+            printf(" X ");
         }
-
+        
 
         if (col == board->column - 1) {
             printf("\n");
@@ -118,14 +135,14 @@ void displayBoard(struct Board* board) {
     }
 
     printf("negAmount %d, ", board->negAmount);
-    printf("size %d\n", boardSize);
-    float negRate = (1.0 * board->negAmount / boardSize) * 100;
+    printf("size %d\n", board->size);
+    float negRate = (1.0 * board->negAmount / board->size) * 100;
     printf("Total negative number rate: %.2f%%\n", negRate);
 
     printf("speAmount %d, ", board->speAmount);
-    printf("size %d\n", boardSize);
-    float speRate = (1.0 * board->speAmount / boardSize) * 100;
-    printf("Total special number rate: %.2f%%\n", speRate);
+    printf("size %d\n", board->size);
+    float speRate = (1.0 * board->speAmount / board->size) * 100;
+    printf("Total specials rate: %.2f%%\n", speRate);
 }
 
 
@@ -139,7 +156,10 @@ int main(int argc, char* argv[]) {
     board.column = 13;
 
     initializeGame(&board);
-    displayBoard(&board);
+    displayBoard(&board, true);
+
+    displayBoard(&board, false);
+
 
 
 }
