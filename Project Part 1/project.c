@@ -13,6 +13,8 @@
 
 #define MIN_ROW 10
 #define MIN_COL 10
+#define NEG_PERCENT 0.4
+#define SPE_PERCENT 0.2
 #define EXIT '*'
 #define REWARD '$'
 
@@ -26,7 +28,7 @@ struct Board {
 };
 
 // Generate random number between the given range, inclusive.
-int randomNum(int m, int n, bool neg) {
+int randomNum(int m, int n) {
     // If the upper bound and the lower bound are the same
     if (m == n) {
         return m;
@@ -48,9 +50,6 @@ int randomNum(int m, int n, bool neg) {
         remainder = (rand() & (modular - 1)) + lower;
     }
 
-    // Turn random number into negative
-    if (neg) remainder *= -1;
-
     return remainder;
 }
 
@@ -63,49 +62,36 @@ void initializeGame(struct Board* board) {
     int boardSize = board->row * board->column;
     board->array = calloc(sizeof(float), boardSize);
 
+    // Initialize statistics
     board->negAmount = 0;
     board->speAmount = 0;
 
     // Generate map
     for (int t = 0; t < boardSize; t++) {
-        int type = randomNum(0, 9, false);
-        float value;
-
-        switch (type) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-            // Negative number
-            value = randomNum(0, 15, true) + randomNum(0, 99, false) * 0.01;
-            value = max(-15, value);
-            value = min(-0.01, value);
-            board->negAmount++;
-            break;
-        case 4:
-        case 5:
-            // Special
-            if (type == 4 || type == 5) value = REWARD;
-            board->speAmount++;
-            break;
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-        default:
-            // Positive number
-            value = randomNum(0, 15, false) + randomNum(0, 99, false) * 0.01;
-            value = min(15, value);
-            value = max(0.01, value);
-            break;
-        }
+        int type = randomNum(0, 9);
+        float value = randomNum(0, 15) + randomNum(0, 99) * 0.01;
+        value = min(15, value);
+        value = max(0.01, value);
 
         board->array[t] = value;
+    }
+    
+    while (board->negAmount != (int)(boardSize * NEG_PERCENT)) {
+        int index = randomNum(0, boardSize - 1);
+        if (board->array[index] >= 0) {
+            board->array[index] *= -1;
+            board->negAmount++;
+        }
+    }
 
+    while (board->speAmount != (int)(boardSize * SPE_PERCENT)) {
+        int index = randomNum(0, boardSize - 1);
+        board->array[index] = REWARD;
+        board->speAmount++;
     }
 
     // Generate Exit
-    int exitIndex = randomNum(0, boardSize - 1, false);
+    int exitIndex = randomNum(0, boardSize - 1);
     board->array[exitIndex] = EXIT;
 }
 
@@ -149,8 +135,8 @@ int main(int argc, char* argv[]) {
     srand((unsigned)time(&timestamp));
 
     struct Board board;
-    board.row = 10;
-    board.column = 10;
+    board.row = 27;
+    board.column = 13;
 
     initializeGame(&board);
     displayBoard(&board);
