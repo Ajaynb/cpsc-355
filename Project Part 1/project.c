@@ -56,7 +56,7 @@ int randomNum(int m, int n, bool neg) {
 
 void initializeGame(struct Board* board) {
     // Ensure the board is at least the minimum size
-    board->row = max(MIN_ROW, board->column);
+    board->row = max(MIN_ROW, board->row);
     board->column = max(MIN_COL, board->column);
 
     // Intialize map by allocating memory
@@ -85,7 +85,7 @@ void initializeGame(struct Board* board) {
         case 4:
         case 5:
             // Special
-            if (type == 4) value = REWARD;
+            if (type == 4 || type == 5) value = REWARD;
             board->speAmount++;
             break;
         case 6:
@@ -101,8 +101,6 @@ void initializeGame(struct Board* board) {
         }
 
         board->array[t] = value;
-
-        // printf("negAmount %d\n", board->negAmount);
 
     }
 
@@ -133,10 +131,15 @@ void displayBoard(struct Board* board) {
         }
     }
 
-    printf("negAmount %d\n", board->negAmount);
+    printf("negAmount %d, ", board->negAmount);
     printf("size %d\n", boardSize);
     float negRate = (1.0 * board->negAmount / boardSize) * 100;
-    printf("Total negative number rate: %.2f%%", negRate);
+    printf("Total negative number rate: %.2f%%\n", negRate);
+
+    printf("speAmount %d, ", board->speAmount);
+    printf("size %d\n", boardSize);
+    float speRate = (1.0 * board->speAmount / boardSize) * 100;
+    printf("Total special number rate: %.2f%%\n", speRate);
 }
 
 
@@ -146,8 +149,8 @@ int main(int argc, char* argv[]) {
     srand((unsigned)time(&timestamp));
 
     struct Board board;
-    board.row = 20;
-    board.column = 15;
+    board.row = 10;
+    board.column = 10;
 
     initializeGame(&board);
     displayBoard(&board);
