@@ -35,7 +35,7 @@
 #define CLEAR 0
 
 struct Board {
-    struct Block* array;
+    struct Tile* array;
     unsigned int row;
     unsigned int column;
     unsigned int size;
@@ -48,7 +48,7 @@ struct Board {
     int status;
 };
 
-struct Block {
+struct Tile {
     float value;
     bool covered;
 };
@@ -86,7 +86,7 @@ void initializeGame(struct Board* board) {
 
     // Intialize map by allocating memory
     board->size = board->row * board->column;
-    board->array = calloc(sizeof(struct Block), board->size);
+    board->array = calloc(sizeof(struct Tile), board->size);
 
     // Initialize statistics
     board->negatives = 0;
@@ -104,7 +104,7 @@ void initializeGame(struct Board* board) {
         value = min(15, value);
         value = max(0.01, value);
 
-        struct Block bl;
+        struct Tile bl;
         bl.value = value;
         bl.covered = true;
 
