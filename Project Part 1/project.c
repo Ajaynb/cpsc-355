@@ -11,13 +11,28 @@
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
 #define clear_screen() printf("\033[2J");
+#define style(color, bold) printf("\033[%d;%dm", bold, color);
 
 #define MIN_ROW 10
 #define MIN_COL 10
+
 #define NEG_PERCENT 0.4
 #define SPE_PERCENT 0.2
+
 #define EXIT '*'
 #define REWARD '$'
+
+#define GAMING 0
+#define WIN 1
+#define DIE 2
+#define QUIT 3
+
+#define RED 31
+#define GREEN 32
+#define YELLOW 33
+#define BLUE 34
+#define CYAN 36
+#define CLEAR 0
 
 struct Board {
     struct Block* array;
@@ -29,6 +44,8 @@ struct Board {
     int lives;
     float score;
     int bombs;
+    int range;
+    int status;
 };
 
 struct Block {
@@ -64,8 +81,8 @@ int randomNum(int m, int n) {
 
 void initializeGame(struct Board* board) {
     // Ensure the board is at least the minimum size
-    // board->row = max(MIN_ROW, board->row);
-    // board->column = max(MIN_COL, board->column);
+    board->row = max(MIN_ROW, board->row);
+    board->column = max(MIN_COL, board->column);
 
     // Intialize map by allocating memory
     board->size = board->row * board->column;
@@ -76,7 +93,9 @@ void initializeGame(struct Board* board) {
     board->specials = 0;
     board->lives = 3;
     board->score = 0.0;
-    board->bombs = 3;
+    board->bombs = board->size * 0.05;
+    board->range = 1;
+    board->status = GAMING;
 
     // Generate map
     for (int t = 0; t < board->size; t++) {
@@ -91,7 +110,7 @@ void initializeGame(struct Board* board) {
 
         board->array[t] = bl;
     }
-    
+
     // Flip to negative numbers
     while (board->negatives < (int)(board->size * NEG_PERCENT)) {
         int index = randomNum(0, board->size - 1);
@@ -114,25 +133,34 @@ void initializeGame(struct Board* board) {
 }
 
 void displayGame(struct Board* board, bool peek) {
+    static float score;
+
     for (int t = 0; t < board->size; t++) {
         int col = t % board->column;
-        int value = board->array[t].value;
-        
+        float value = board->array[t].value;
+
         if (!board->array[t].covered || peek) {
-            switch (value) {
+            switch ((int)value) {
             case REWARD:
             case EXIT:
-                if (peek) printf("   %c    ", value);
-                else if (value == EXIT) printf("\033[1;34m%c\033[0;m  ", value);
-                else printf("\033[1;36m%c\033[0;m  ", value);
+                if (value == EXIT) style(CYAN, !peek) else style(YELLOW, !peek);
+
+                if (peek) printf("   %c    ", (int)value);
+                else printf("%c  ", (int)value);
+
+                style(CLEAR, false);
                 break;
             default:
-                if (peek) printf("%6.2f  ", board->array[t].value);
-                else printf("%s  ", (board->array[t].value > 0) ? "\033[1;32m+\033[0m" : "\033[1;31m-\033[0m");
+                if (value > 0) style(GREEN, !peek) else style(RED, !peek);
+
+                if (peek == true) printf("%6.2f  ", value);
+                else printf("%c  ", (value > 0) ? '+' : '-');
+
+                style(CLEAR, false);
                 break;
             }
         } else {
-            printf("x  ");
+            printf(".  ");
         }
 
         if (col == board->column - 1) {
@@ -147,21 +175,67 @@ void displayGame(struct Board* board, bool peek) {
         float speRate = (1.0 * board->specials / board->size) * 100;
         printf("Total specials:  %d/%d (%.2f%%)\n", board->specials, board->size, speRate);
     } else {
-        printf("Lives: %d\nScore: %.2f\nBombs: %d\n", board->lives, board->score, board->bombs);
+        printf("Lives: %d\n", board->lives);
+        printf("Score: %.2f	", board->score);
+
+        float scoreChange = board->score - score;
+        if (scoreChange > 0) style(GREEN, false) else style(RED, false);
+        if (scoreChange != 0) printf("(%+.2f)", scoreChange);
+        style(CLEAR, false);
+        printf("\n");
+
+        printf("Bombs: %d	", board->bombs);
+        if (board->range > 1) {
+            style(CYAN, false);
+            printf("(Reward: %dx range)", board->range);
+            style(CLEAR, false)
+        }
+        printf("\n");
     }
+    
+    score = board->score;
 
 }
 
 void playGame(struct Board* board, const int x, const int y) {
-    for (int t = -1; t <= 1; t++) {
-        for (int r = -1; r <= 1; r++) {
-            int index = ((x + t) * board->column) + y + r;
-            int current_y = index % board->column;
+    if (x < 0 || x >= board->row ||
+        y < 0 || y >= board->column) {
+        return;
+    }
 
-            if (index >= 0 && index < board->size && current_y >= y - 1 && current_y <= y + 1) {
+    int range = board->range;
+    board->range = 1;
+    board->bombs--;
+
+    for (int t = range * -1; t <= range; t++) {
+        for (int r = range * -1; r <= range; r++) {
+            int new_x = x + t;
+            int new_y = y + r;
+            int index = (new_x * board->column) + new_y;
+
+            if (index >= 0 && index < board->size &&
+                new_y >= 0 && new_y < board->column &&
+                board->array[index].covered) {
                 board->array[index].covered = false;
+                float value = board->array[index].value;
+
+                switch ((int)value) {
+                case REWARD:
+                    board->range = 2;
+                    break;
+                case EXIT:
+                    board->status = WIN;
+                    break;
+                default:
+                    board->score += value;
+                    break;
+                }
             }
         }
+    }
+
+    if (board->bombs <= 0) {
+        board->status = DIE;
     }
 }
 
@@ -183,11 +257,11 @@ int main(int argc, char* argv[]) {
     clear_screen();
 
     struct Board board;
-    board.row = 5;
-    board.column = 5;
+    board.row = 15;
+    board.column = 15;
 
     printf("Board: \n");
-    
+
     initializeGame(&board);
     displayGame(&board, true);
 
@@ -197,20 +271,22 @@ int main(int argc, char* argv[]) {
     char input[10];
     int x = -10, y = -10;
 
-    while (input[0] != 'q') {
+    do {
         clear_screen();
-
-        if (extractInput(input, "%d %d", &x, &y) == 2) {
-            playGame(&board, x, y);
-        }
-
         displayGame(&board, false);
 
         printf("\n");
         printf("Enter q to quit, \n");
         printf("Enter bomb position (x y): ");
         gets(input);
+
+        if (extractInput(input, "%d %d", &x, &y) == 2) {
+            playGame(&board, x, y);
+        } else if (input[0] == 'q') {
+            board.status = QUIT;
+        }
+
         printf("\n");
-    }
+    } while (board.status == GAMING);
 
 }
