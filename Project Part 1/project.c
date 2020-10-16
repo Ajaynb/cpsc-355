@@ -36,9 +36,9 @@
 
 struct Board {
     struct Block* array;
-    int row;
-    int column;
-    int size;
+    unsigned int row;
+    unsigned int column;
+    unsigned int size;
     unsigned int negatives;
     unsigned int specials;
     int lives;
@@ -160,7 +160,7 @@ void displayGame(struct Board* board, bool peek) {
                 break;
             }
         } else {
-            printf(".  ");
+            printf("·  ");
         }
 
         if (col == board->column - 1) {
@@ -288,5 +288,17 @@ int main(int argc, char* argv[]) {
 
         printf("\n");
     } while (board.status == GAMING);
+
+
+    if (board.status != QUIT) {
+        clear_screen();
+        displayGame(&board, false);
+        printf("\n");
+
+        printf("press ENTER to continue ... ");
+        getchar();
+        printf("\n");
+    }
+
 
 }
