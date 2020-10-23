@@ -38,7 +38,7 @@ struct Board {
     struct Tile* array;
     unsigned int row;
     unsigned int column;
-    unsigned int size;
+    unsigned int tiles;
     unsigned int negatives;
     unsigned int specials;
     int lives;
@@ -46,6 +46,9 @@ struct Board {
     int bombs;
     int range;
     int status;
+    float total_value;
+    unsigned long time;
+    unsigned int final_score;
 };
 
 struct Tile {
@@ -85,20 +88,20 @@ void initializeGame(struct Board* board) {
     board->column = max(MIN_COL, board->column);
 
     // Intialize map by allocating memory
-    board->size = board->row * board->column;
-    board->array = calloc(sizeof(struct Tile), board->size);
+    board->tiles = board->row * board->column;
+    board->array = calloc(sizeof(struct Tile), board->tiles);
 
     // Initialize statistics
     board->negatives = 0;
     board->specials = 0;
     board->lives = 3;
     board->score = 0.0;
-    board->bombs = board->size * 0.05;
+    board->bombs = board->tiles * 0.05;
     board->range = 1;
     board->status = GAMING;
 
     // Generate map
-    for (int t = 0; t < board->size; t++) {
+    for (int t = 0; t < board->tiles; t++) {
         int type = randomNum(0, 9);
         float value = randomNum(0, 15) + randomNum(0, 99) * 0.01;
         value = min(15, value);
@@ -107,13 +110,14 @@ void initializeGame(struct Board* board) {
         struct Tile bl;
         bl.value = value;
         bl.covered = true;
+        board->total_value += value;
 
         board->array[t] = bl;
     }
 
     // Flip to negative numbers
-    while (board->negatives < (int)(board->size * NEG_PERCENT)) {
-        int index = randomNum(0, board->size - 1);
+    while (board->negatives < (int)(board->tiles * NEG_PERCENT)) {
+        int index = randomNum(0, board->tiles - 1);
         if (board->array[index].value >= 0) {
             board->array[index].value *= -1;
             board->negatives++;
@@ -121,21 +125,21 @@ void initializeGame(struct Board* board) {
     }
 
     // Flip to specials
-    while (board->specials < (int)(board->size * SPE_PERCENT)) {
-        int index = randomNum(0, board->size - 1);
+    while (board->specials < (int)(board->tiles * SPE_PERCENT)) {
+        int index = randomNum(0, board->tiles - 1);
         board->array[index].value = REWARD;
         board->specials++;
     }
 
     // Generate Exit
-    int exitIndex = randomNum(0, board->size - 1);
+    int exitIndex = randomNum(0, board->tiles - 1);
     board->array[exitIndex].value = EXIT;
 }
 
 void displayGame(struct Board* board, bool peek) {
     static float score;
 
-    for (int t = 0; t < board->size; t++) {
+    for (int t = 0; t < board->tiles; t++) {
         int col = t % board->column;
         float value = board->array[t].value;
 
@@ -169,11 +173,13 @@ void displayGame(struct Board* board, bool peek) {
     }
 
     if (peek) {
-        float negRate = (1.0 * board->negatives / board->size) * 100;
-        printf("Total negatives: %d/%d (%.2f%%)\n", board->negatives, board->size, negRate);
+        float negRate = (1.0 * board->negatives / board->tiles) * 100;
+        printf("Total negatives: %d/%d (%.2f%%)\n", board->negatives, board->tiles, negRate);
 
-        float speRate = (1.0 * board->specials / board->size) * 100;
-        printf("Total specials:  %d/%d (%.2f%%)\n", board->specials, board->size, speRate);
+        float speRate = (1.0 * board->specials / board->tiles) * 100;
+        printf("Total specials:  %d/%d (%.2f%%)\n", board->specials, board->tiles, speRate);
+
+        printf("Total tile values:  %.2f\n", board->total_value);
     } else {
         printf("Lives: %d\n", board->lives);
         printf("Score: %.2f	", board->score);
@@ -192,12 +198,24 @@ void displayGame(struct Board* board, bool peek) {
         }
         printf("\n");
     }
-    
+
     score = board->score;
 
 }
 
+int calculateScore(struct Board* board) {
+    int score = board->score * 50 + (10 - board->time) * 20 + board->bombs * 50 + board->lives * 100;
+    return (score > 0) ? score : 0;
+}
+
 void playGame(struct Board* board, const int x, const int y) {
+    static unsigned long start_time;
+    static unsigned long end_time;
+
+    if (start_time == 0) {
+        start_time = time(NULL);
+    }
+
     if (x < 0 || x >= board->row ||
         y < 0 || y >= board->column) {
         return;
@@ -213,7 +231,7 @@ void playGame(struct Board* board, const int x, const int y) {
             int new_y = y + r;
             int index = (new_x * board->column) + new_y;
 
-            if (index >= 0 && index < board->size &&
+            if (index >= 0 && index < board->tiles &&
                 new_y >= 0 && new_y < board->column &&
                 board->array[index].covered) {
                 board->array[index].covered = false;
@@ -221,10 +239,14 @@ void playGame(struct Board* board, const int x, const int y) {
 
                 switch ((int)value) {
                 case REWARD:
-                    board->range = 2;
+                    // board->range = 2;
+                    board->range++;
                     break;
                 case EXIT:
                     board->status = WIN;
+                    end_time = time(NULL);
+                    board->time = end_time - start_time;
+                    board->final_score = calculateScore(board);
                     break;
                 default:
                     board->score += value;
@@ -247,6 +269,12 @@ int extractInput(const char* buf, const char* fmt, ...)
     int rc = vsscanf(buf, fmt, ap);
     va_end(ap);
     return rc;
+}
+
+void logScore(char* name, struct Board* board) {
+    FILE* fptr;
+    fptr = fopen("scores.log", "a");
+    fprintf(fptr, "%s,%d,%lu,%.2f,%d,%d,%d,%d\n", name, board->final_score, board->time, board->score, board->bombs, board->lives, board->tiles, board->status);
 }
 
 int main(int argc, char* argv[]) {
@@ -295,9 +323,27 @@ int main(int argc, char* argv[]) {
         displayGame(&board, false);
         printf("\n");
 
+        if (board.status == DIE) {
+            printf("You die.\n");
+        } else if (board.status == WIN) {
+            printf("You win!\n");
+        }
+
         printf("press ENTER to continue ... ");
         getchar();
         printf("\n");
+
+        // clear_screen();
+        printf("Please enter your name: ");
+        char name[100];
+        gets(name);
+        logScore(name, &board);
+
+        clear_screen();
+
+        printf("Your game time is: %lus\n", board.time);
+        printf("Your score is: %d pts\n", board.final_score);
+
     }
 
 
