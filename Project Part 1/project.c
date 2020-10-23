@@ -50,7 +50,9 @@ struct Play {
     int bombs;
     int range;
     int status;
-    unsigned long time;
+    unsigned long start_timestamp;
+    unsigned long end_timestamp;
+    unsigned long duration;
     unsigned int uncovered_tiles;
     int final_score;
 };
@@ -161,7 +163,7 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
             default:
                 if (value > 0) style(GREEN, !peek) else style(RED, !peek);
 
-                if (peek == true) printf("%6.2f  ", value);
+                if (peek == true) printf("%+6.2f  ", value);
                 else printf("%c  ", (value > 0) ? '+' : '-');
 
                 style(CLEAR, false);
@@ -175,6 +177,8 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
             printf("\n");
         }
     }
+
+    printf("\n");
 
     if (peek) {
         float negRate = (1.0 * board->negatives / board->tiles) * 100;
@@ -208,70 +212,65 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
 int calculateScore(struct Board* board, struct Play* play) {
     float rate = 1.0 * play->uncovered_tiles / board->tiles;
     float score = play->score * 20 + play->bombs * 33 + play->lives * 10;
-    float time_deduct = play->time * 46;
+    float time_deduct = play->duration * 46;
     int final_score = rate * score - time_deduct;
     play->final_score = final_score > 0 ? final_score : 0;
     return play->final_score;
 }
 
 void playGame(struct Board* board, struct Play* play, const int x, const int y) {
-    static unsigned long start_time;
-    static unsigned long end_time;
+    if (x >= 0 && x < board->row && y >= 0 && y < board->column && play->status == GAMING) {
+        int range = play->range;
+        play->range = 1;
+        play->bombs--;
 
-    if (play->status == GAMING && start_time == 0) {
-        start_time = time(NULL);
-    }
+        if (play->bombs <= 0) {
+            play->bombs = 0;
+            play->status = DIE;
+        }
 
-    if (x < 0 || x >= board->row ||
-        y < 0 || y >= board->column) {
-        return;
-    }
+        for (int t = range * -1; t <= range; t++) {
+            for (int r = range * -1; r <= range; r++) {
+                int new_x = x + t;
+                int new_y = y + r;
+                int index = (new_x * board->column) + new_y;
 
-    int range = play->range;
-    play->range = 1;
-    play->bombs--;
+                if (index >= 0 && index < board->tiles &&
+                    new_y >= 0 && new_y < board->column &&
+                    board->array[index].covered) {
+                    board->array[index].covered = false;
+                    float value = board->array[index].value;
+                    play->uncovered_tiles++;
 
-    if (play->bombs <= 0) {
-        play->bombs = 0;
-        play->status = DIE;
-    }
-
-    for (int t = range * -1; t <= range; t++) {
-        for (int r = range * -1; r <= range; r++) {
-            int new_x = x + t;
-            int new_y = y + r;
-            int index = (new_x * board->column) + new_y;
-
-            if (index >= 0 && index < board->tiles &&
-                new_y >= 0 && new_y < board->column &&
-                board->array[index].covered) {
-                board->array[index].covered = false;
-                float value = board->array[index].value;
-                play->uncovered_tiles++;
-
-                switch ((int)value) {
-                case REWARD:
-                    play->range++;
-                    break;
-                case EXIT:
-                    play->status = WIN;
-                    break;
-                default:
-                    play->score += value;
-                    break;
+                    switch ((int)value) {
+                    case REWARD:
+                        play->range++;
+                        break;
+                    case EXIT:
+                        play->status = WIN;
+                        break;
+                    default:
+                        play->score += value;
+                        break;
+                    }
                 }
             }
         }
     }
 
     if (play->status != GAMING) {
-        end_time = time(NULL);
-        play->time = end_time - start_time;
         play->final_score = calculateScore(board, play);
-        start_time = 0;
     }
 }
 
+void startGame(struct Play* play) {
+    play->start_timestamp = time(NULL);
+}
+
+void exitGame(struct Play* play) {
+    play->end_timestamp = time(NULL);
+    play->duration = play->end_timestamp - play->start_timestamp;
+}
 
 int extractInput(const char* buf, const char* fmt, ...)
 {
@@ -285,7 +284,7 @@ int extractInput(const char* buf, const char* fmt, ...)
 void logScore(struct Play* play) {
     FILE* fptr;
     fptr = fopen("scores.log", "a");
-    fprintf(fptr, "%s %d %lu %.2f %d %d %d\n", play->player, play->final_score, play->time, play->score, play->bombs, play->lives, play->status);
+    fprintf(fptr, "%s %d %lu %.2f %d %d %d\n", play->player, play->final_score, play->duration, play->score, play->bombs, play->lives, play->status);
     fclose(fptr);
 }
 
@@ -293,10 +292,10 @@ void displayTopScores(int n) {
     struct Play* plays = malloc(sizeof(struct Play));
     struct Play play;
     int size = 0;
-    
+
     FILE* fptr;
     fptr = fopen("scores.log", "r");
-    while (fscanf(fptr, "%s %d %lu %f %d %d %d\n", play.player, &play.final_score, &play.time, &play.score, &play.bombs, &play.lives, &play.status) != EOF) {
+    while (fscanf(fptr, "%s %d %lu %f %d %d %d\n", play.player, &play.final_score, &play.duration, &play.score, &play.bombs, &play.lives, &play.status) != EOF) {
         size++;
         plays = realloc(plays, sizeof(struct Play) * size);
         memcpy(&plays[size - 1], &play, sizeof(struct Play));
@@ -318,7 +317,7 @@ void displayTopScores(int n) {
     int times = min(size, n);
     for (int t = 0; t < times; t++) {
         play = plays[t];
-        printf("%s %d %lu %.2f %d %d %d\n", play.player, play.final_score, play.time, play.score, play.bombs, play.lives, play.status);
+        printf("%s %d %lu %.2f %d %d %d\n", play.player, play.final_score, play.duration, play.score, play.bombs, play.lives, play.status);
     }
 }
 
@@ -328,9 +327,6 @@ int main(int argc, char* argv[]) {
     srand((unsigned)time(&timestamp));
 
     clear_screen();
-
-    displayTopScores(2);
-    return 0;
 
     struct Board board;
     struct Play play;
@@ -347,6 +343,8 @@ int main(int argc, char* argv[]) {
 
     char input[10];
     int x = -10, y = -10;
+
+    startGame(&play);
 
     do {
         clear_screen();
@@ -366,33 +364,48 @@ int main(int argc, char* argv[]) {
         printf("\n");
     } while (play.status == GAMING);
 
+    exitGame(&play);
+
+    clear_screen();
+    displayGame(&board, &play, false);
+    printf("\n");
+
+    if (play.status == DIE) {
+        style(RED, true);
+        printf("You die. T_T\n");
+        style(CLEAR, false);
+    } else if (play.status == WIN) {
+        style(GREEN, true);
+        printf("You win! ^o^\n");
+        style(CLEAR, false);
+    } else if (play.status == QUIT) {
+        style(BLUE, true);
+        printf("You quit. *_*\n");
+        style(CLEAR, false);
+    }
+
+    printf("\n");
+
+    printf("press ENTER to continue...");
+    getchar();
+    printf("\n");
 
     if (play.status != QUIT) {
         clear_screen();
-        displayGame(&board, &play, false);
-        printf("\n");
 
-        if (play.status == DIE) {
-            printf("You die.\n");
-        } else if (play.status == WIN) {
-            printf("You win!\n");
-        }
+        style(CYAN, true);
+        printf("Logging:\n\n");
+        style(CLEAR, false);
 
-        printf("press ENTER to continue ... ");
-        getchar();
-        printf("\n");
-
-        clear_screen();
         printf("Please enter your name (no space): ");
         scanf("%s", play.player);
         logScore(&play);
-
-        clear_screen();
-
-        printf("Your game time is: %lus\n", play.time);
-        printf("Your score is: %d pts\n", play.final_score);
-
     }
+
+    clear_screen();
+
+    printf("Your game time is: %lus\n", play.duration);
+    printf("Your score is: %d pts\n", play.final_score);
 
 
 }
