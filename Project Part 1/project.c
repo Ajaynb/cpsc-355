@@ -290,13 +290,36 @@ void logScore(struct Play* play) {
 }
 
 void displayTopScores(int n) {
-    FILE* fptr;
+    struct Play* plays = malloc(sizeof(struct Play));
     struct Play play;
+    int size = 0;
+    
+    FILE* fptr;
     fptr = fopen("scores.log", "r");
     while (fscanf(fptr, "%s %d %lu %f %d %d %d\n", play.player, &play.final_score, &play.time, &play.score, &play.bombs, &play.lives, &play.status) != EOF) {
-        printf("%s %d %lu %.2f %d %d %d\n", play.player, play.final_score, play.time, play.score, play.bombs, play.lives, play.status);
+        size++;
+        plays = realloc(plays, sizeof(struct Play) * size);
+        memcpy(&plays[size - 1], &play, sizeof(struct Play));
     }
     fclose(fptr);
+
+    // Bubble Sort
+    for (int t = 0; t < size; t++) {
+        for (int r = 0; r < size - 1; r++) {
+            if (plays[r].final_score < plays[r + 1].final_score) { // The greater ones should be at the top
+                // Swap two Plays
+                struct Play py = plays[r];
+                plays[r] = plays[r + 1];
+                plays[r + 1] = py;
+            }
+        }
+    }
+
+    int times = min(size, n);
+    for (int t = 0; t < times; t++) {
+        play = plays[t];
+        printf("%s %d %lu %.2f %d %d %d\n", play.player, play.final_score, play.time, play.score, play.bombs, play.lives, play.status);
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -306,7 +329,7 @@ int main(int argc, char* argv[]) {
 
     clear_screen();
 
-    displayTopScores(1);
+    displayTopScores(2);
     return 0;
 
     struct Board board;
