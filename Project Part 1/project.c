@@ -10,7 +10,7 @@
 // Determine which one is greater/smaller between the given two numbers
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
-#define clear_screen() printf("\033[2J");
+#define clear_screen() printf("\ec");
 #define style(color, bold) printf("\033[%d;%dm", bold, color);
 
 #define MIN_ROW 10
@@ -46,7 +46,6 @@ struct Board {
     int bombs;
     int range;
     int status;
-    float total_value;
     unsigned long time;
     unsigned int final_score;
     char player[100];
@@ -111,7 +110,6 @@ void initializeGame(struct Board* board) {
         struct Tile bl;
         bl.value = value;
         bl.covered = true;
-        board->total_value += value;
 
         board->array[t] = bl;
     }
@@ -179,8 +177,6 @@ void displayGame(struct Board* board, bool peek) {
 
         float speRate = (1.0 * board->specials / board->tiles) * 100;
         printf("Total specials:  %d/%d (%.2f%%)\n", board->specials, board->tiles, speRate);
-
-        printf("Total tile values:  %.2f\n", board->total_value);
     } else {
         printf("Lives: %d\n", board->lives);
         printf("Score: %.2f	", board->score);
@@ -205,8 +201,8 @@ void displayGame(struct Board* board, bool peek) {
 }
 
 int calculateScore(struct Board* board) {
-    int score = board->score * 50 + (10 - board->time) * 20 + board->bombs * 50 + board->lives * 100;
-    return (score > 0) ? score : 0;
+    int score = board->score * 1000 - board->time * 500 + board->bombs * 250 + board->lives * 1000;
+    return score;
 }
 
 void playGame(struct Board* board, const int x, const int y) {
@@ -301,10 +297,10 @@ int main(int argc, char* argv[]) {
     time_t timestamp;
     srand((unsigned)time(&timestamp));
 
-    // clear_screen();
+    clear_screen();
 
-    displayTopScores(1);
-    return 0;
+    // displayTopScores(1);
+    // return 0;
 
     struct Board board;
     board.row = 15;
