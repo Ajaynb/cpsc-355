@@ -49,6 +49,7 @@ struct Board {
     float total_value;
     unsigned long time;
     unsigned int final_score;
+    char player[100];
 };
 
 struct Tile {
@@ -239,7 +240,6 @@ void playGame(struct Board* board, const int x, const int y) {
 
                 switch ((int)value) {
                 case REWARD:
-                    // board->range = 2;
                     board->range++;
                     break;
                 case EXIT:
@@ -271,10 +271,29 @@ int extractInput(const char* buf, const char* fmt, ...)
     return rc;
 }
 
-void logScore(char* name, struct Board* board) {
+void logScore(struct Board* board) {
     FILE* fptr;
     fptr = fopen("scores.log", "a");
-    fprintf(fptr, "%s,%d,%lu,%.2f,%d,%d,%d,%d\n", name, board->final_score, board->time, board->score, board->bombs, board->lives, board->tiles, board->status);
+    fprintf(fptr, "%s %d %lu %.2f %d %d %d %d\n", board->player, board->final_score, board->time, board->score, board->bombs, board->lives, board->tiles, board->status);
+    fclose(fptr);
+}
+
+void displayTopScores(int n) {
+    FILE* fptr;
+    struct Board board;
+    fptr = fopen("scores.log", "r");
+    while (fscanf(fptr, "%s %d %lu %f %d %d %d %d\n", board.player, &board.final_score, &board.time, &board.score, &board.bombs, &board.lives, &board.tiles, &board.status) != EOF) {
+        // printf("final score: %s\n", board.player);
+        // printf("final score: %d\n", board.final_score);
+        // printf("final score: %lu\n", board.time);
+        // printf("final score: %.2f\n", board.score);
+        // printf("final score: %d\n", board.bombs);
+        // printf("final score: %d\n", board.lives);
+        // printf("final score: %d\n", board.tiles);
+        // printf("final score: %d\n", board.status);
+        printf("%s %d %lu %.2f %d %d %d %d\n", board.player, board.final_score, board.time, board.score, board.bombs, board.lives, board.tiles, board.status);
+    }
+    fclose(fptr);
 }
 
 int main(int argc, char* argv[]) {
@@ -282,7 +301,10 @@ int main(int argc, char* argv[]) {
     time_t timestamp;
     srand((unsigned)time(&timestamp));
 
-    clear_screen();
+    // clear_screen();
+
+    displayTopScores(1);
+    return 0;
 
     struct Board board;
     board.row = 15;
@@ -333,11 +355,10 @@ int main(int argc, char* argv[]) {
         getchar();
         printf("\n");
 
-        // clear_screen();
-        printf("Please enter your name: ");
-        char name[100];
-        gets(name);
-        logScore(name, &board);
+        clear_screen();
+        printf("Please enter your name (no space): ");
+        scanf("%s", board.player);
+        logScore(&board);
 
         clear_screen();
 
