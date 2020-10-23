@@ -10,8 +10,10 @@
 // Determine which one is greater/smaller between the given two numbers
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
-#define clear_screen() //printf("\ec");
-#define style(color, bold) printf("\033[%d;%dm", bold, color);
+#define clearScreen() printf("\ec");
+#define color(color) printf("\033[%dm", color);
+#define bold() printf("\033[1m");
+#define clear() printf("\033[0m");
 
 #define MIN_ROW 10
 #define MIN_COL 10
@@ -32,7 +34,6 @@
 #define YELLOW 33
 #define BLUE 34
 #define CYAN 36
-#define CLEAR 0
 
 struct Board {
     struct Tile* array;
@@ -131,7 +132,7 @@ void initializeGame(struct Board* board, struct Play* play) {
     }
 
     // Flip to specials
-    while (board->specials < (int)(board->tiles * SPE_PERCENT)) {
+    while (board->specials < (int)(board->tiles* SPE_PERCENT)) {
         int index = randomNum(0, board->tiles - 1);
         board->array[index].value = REWARD;
         board->specials++;
@@ -142,72 +143,6 @@ void initializeGame(struct Board* board, struct Play* play) {
     board->array[exitIndex].value = EXIT;
 }
 
-void displayGame(struct Board* board, struct Play* play, bool peek) {
-    static float score;
-
-    for (int t = 0; t < board->tiles; t++) {
-        int col = t % board->column;
-        float value = board->array[t].value;
-
-        if (!board->array[t].covered || peek) {
-            switch ((int)value) {
-            case REWARD:
-            case EXIT:
-                if (value == EXIT) style(CYAN, !peek) else style(YELLOW, !peek);
-
-                if (peek) printf("   %c    ", (int)value);
-                else printf("%c  ", (int)value);
-
-                style(CLEAR, false);
-                break;
-            default:
-                if (value > 0) style(GREEN, !peek) else style(RED, !peek);
-
-                if (peek == true) printf("%+6.2f  ", value);
-                else printf("%c  ", (value > 0) ? '+' : '-');
-
-                style(CLEAR, false);
-                break;
-            }
-        } else {
-            printf("·  ");
-        }
-
-        if (col == board->column - 1) {
-            printf("\n");
-        }
-    }
-
-    printf("\n");
-
-    if (peek) {
-        float negRate = (1.0 * board->negatives / board->tiles) * 100;
-        printf("Total negatives: %d/%d (%.2f%%)\n", board->negatives, board->tiles, negRate);
-
-        float speRate = (1.0 * board->specials / board->tiles) * 100;
-        printf("Total specials:  %d/%d (%.2f%%)\n", board->specials, board->tiles, speRate);
-    } else {
-        printf("Lives: %d\n", play->lives);
-        printf("Score: %.2f	", play->score);
-
-        float scoreChange = play->score - score;
-        if (scoreChange > 0) style(GREEN, false) else style(RED, false);
-        if (scoreChange != 0) printf("(%+.2f)", scoreChange);
-        style(CLEAR, false);
-        printf("\n");
-
-        printf("Bombs: %d	", play->bombs);
-        if (play->range > 1) {
-            style(CYAN, false);
-            printf("(Reward: %dx range)", play->range);
-            style(CLEAR, false)
-        }
-        printf("\n");
-    }
-
-    score = play->score;
-
-}
 
 int calculateScore(struct Board* board, struct Play* play) {
     float rate = 1.0 * play->uncovered_tiles / board->tiles;
@@ -257,10 +192,6 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
             }
         }
     }
-
-    if (play->status != GAMING) {
-        play->final_score = calculateScore(board, play);
-    }
 }
 
 void startGame(struct Play* play) {
@@ -286,6 +217,86 @@ void logScore(struct Play* play) {
     fptr = fopen("scores.log", "a");
     fprintf(fptr, "%s %d %lu %.2f %d %d %d\n", play->player, play->final_score, play->duration, play->score, play->bombs, play->lives, play->status);
     fclose(fptr);
+}
+
+
+void displayGame(struct Board* board, struct Play* play, bool peek) {
+    static float score;
+
+    clearScreen();
+
+    if (peek) {
+        color(CYAN);
+        bold();
+        printf("Board: \n\n");
+        clear();
+    }
+
+    for (int t = 0; t < board->tiles; t++) {
+        int col = t % board->column;
+        float value = board->array[t].value;
+
+        if (!board->array[t].covered || peek) {
+            switch ((int)value) {
+            case REWARD:
+            case EXIT:
+                if (value == EXIT) color(CYAN) else color(YELLOW);
+                if (!peek) bold();
+
+                if (peek) printf("   %c    ", (int)value);
+                else printf("%c  ", (int)value);
+
+                clear();
+                break;
+            default:
+                if (value > 0) color(GREEN) else color(RED);
+                if (!peek) bold();
+
+                if (peek == true) printf("%+6.2f  ", value);
+                else printf("%c  ", (value > 0) ? '+' : '-');
+
+                clear();
+                break;
+            }
+        } else {
+            printf("·  ");
+        }
+
+        if (col == board->column - 1) {
+            printf("\n");
+        }
+    }
+
+    printf("\n");
+
+    if (peek) {
+        float negRate = (1.0 * board->negatives / board->tiles) * 100;
+        printf("Total negatives: %d/%d (%.2f%%)\n", board->negatives, board->tiles, negRate);
+
+        float speRate = (1.0 * board->specials / board->tiles) * 100;
+        printf("Total specials:  %d/%d (%.2f%%)\n", board->specials, board->tiles, speRate);
+    } else {
+        printf("Lives: %d\n", play->lives);
+        printf("Score: %.2f	", play->score);
+
+        float scoreChange = play->score - score;
+        if (scoreChange > 0) color(GREEN) else color(RED);
+        if (scoreChange != 0) printf("(%+.2f)", scoreChange);
+        clear();
+
+        printf("\n");
+
+        printf("Bombs: %d	", play->bombs);
+        if (play->range > 1) {
+            color(CYAN);
+            printf("(Reward: %dx range)", play->range);
+            clear();
+        }
+        printf("\n");
+    }
+
+    score = play->score;
+
 }
 
 void displayTopScores(int n) {
@@ -321,19 +332,88 @@ void displayTopScores(int n) {
     }
 }
 
+void displayStatus(struct Play* play) {
+    if (play->status == DIE) {
+        color(RED);
+        bold();
+        printf("------ YOU LOSE T_T ------ \n");
+        clear();
+    } else if (play->status == WIN) {
+        color(GREEN);
+        bold();
+        printf("------ YOU WIN! ^0^ ------ \n");
+        clear();
+    } else if (play->status == QUIT) {
+        color(BLUE);
+        bold();
+        printf("------ YOU QUIT *_* ------ \n");
+        clear();
+    }
+}
+
+
+void displayResult(struct Play* play) {
+    clearScreen();
+
+    color(CYAN);
+    bold();
+    printf("Result:\n\n");
+    clear();
+
+    printf("Player        ");
+    color(YELLOW);
+    bold();
+    printf("%s\n", play->player);
+    clear();
+
+    printf("Tiles score   ");
+    color(BLUE);
+    printf("%.2f pts\n", play->score);
+    clear();
+
+    printf("Left bombs    ");
+    color(BLUE);
+    printf("%d\n", play->bombs);
+    clear();
+
+    printf("Left lives    ");
+    color(BLUE);
+    printf("%d\n", play->lives);
+    clear();
+
+    printf("Duration      ");
+    color(BLUE);
+    printf("%lus\n", play->duration);
+    clear();
+
+    printf("Final score   ");
+    color(YELLOW);
+    bold();
+    printf("%d pts\n", play->final_score);
+    clear();
+}
+
+void displayLogging(struct Play* play) {
+    clearScreen();
+
+    color(CYAN);
+    bold();
+    printf("Logging:\n\n");
+    clear();
+
+    printf("Please enter your name (no space): ");
+    scanf("%s", play->player);
+}
+
 int main(int argc, char* argv[]) {
 
     time_t timestamp;
     srand((unsigned)time(&timestamp));
 
-    clear_screen();
-
     struct Board board;
     struct Play play;
     board.row = 15;
     board.column = 15;
-
-    printf("Board: \n");
 
     initializeGame(&board, &play);
     displayGame(&board, &play, true);
@@ -347,7 +427,6 @@ int main(int argc, char* argv[]) {
     startGame(&play);
 
     do {
-        clear_screen();
         displayGame(&board, &play, false);
 
         printf("\n");
@@ -360,30 +439,13 @@ int main(int argc, char* argv[]) {
         } else if (input[0] == 'q') {
             play.status = QUIT;
         }
-
-        printf("\n");
     } while (play.status == GAMING);
 
-    exitGame(&play);
-
-    clear_screen();
     displayGame(&board, &play, false);
-    printf("\n");
-
-    if (play.status == DIE) {
-        style(RED, true);
-        printf("You die. T_T\n");
-        style(CLEAR, false);
-    } else if (play.status == WIN) {
-        style(GREEN, true);
-        printf("You win! ^o^\n");
-        style(CLEAR, false);
-    } else if (play.status == QUIT) {
-        style(BLUE, true);
-        printf("You quit. *_*\n");
-        style(CLEAR, false);
-    }
-
+    exitGame(&play);
+    calculateScore(&board, &play);
+    printf("\n\n");
+    displayStatus(&play);
     printf("\n");
 
     printf("press ENTER to continue...");
@@ -391,21 +453,10 @@ int main(int argc, char* argv[]) {
     printf("\n");
 
     if (play.status != QUIT) {
-        clear_screen();
-
-        style(CYAN, true);
-        printf("Logging:\n\n");
-        style(CLEAR, false);
-
-        printf("Please enter your name (no space): ");
-        scanf("%s", play.player);
+        displayLogging(&play);
         logScore(&play);
+        displayResult(&play);
     }
-
-    clear_screen();
-
-    printf("Your game time is: %lus\n", play.duration);
-    printf("Your score is: %d pts\n", play.final_score);
 
 
 }
