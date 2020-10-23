@@ -10,7 +10,7 @@
 // Determine which one is greater/smaller between the given two numbers
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
-#define clear_screen() printf("\ec");
+#define clear_screen() //printf("\ec");
 #define style(color, bold) printf("\033[%d;%dm", bold, color);
 
 #define MIN_ROW 10
@@ -51,7 +51,8 @@ struct Play {
     int range;
     int status;
     unsigned long time;
-    unsigned int final_score;
+    unsigned int uncovered_tiles;
+    int final_score;
 };
 
 struct Tile {
@@ -102,6 +103,7 @@ void initializeGame(struct Board* board, struct Play* play) {
     play->bombs = board->tiles * 0.05;
     play->range = 1;
     play->status = GAMING;
+    play->uncovered_tiles = 0;
 
     // Generate map
     for (int t = 0; t < board->tiles; t++) {
@@ -204,15 +206,19 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
 }
 
 int calculateScore(struct Board* board, struct Play* play) {
-    int score = play->score * 1000 - play->time * 500 + play->bombs * 250 + play->lives * 1000;
-    return score;
+    float rate = 1.0 * play->uncovered_tiles / board->tiles;
+    float score = play->score * 20 + play->bombs * 33 + play->lives * 10;
+    float time_deduct = play->time * 46;
+    int final_score = rate * score - time_deduct;
+    play->final_score = final_score > 0 ? final_score : 0;
+    return play->final_score;
 }
 
 void playGame(struct Board* board, struct Play* play, const int x, const int y) {
     static unsigned long start_time;
     static unsigned long end_time;
 
-    if (start_time == 0) {
+    if (play->status == GAMING && start_time == 0) {
         start_time = time(NULL);
     }
 
@@ -225,6 +231,11 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
     play->range = 1;
     play->bombs--;
 
+    if (play->bombs <= 0) {
+        play->bombs = 0;
+        play->status = DIE;
+    }
+
     for (int t = range * -1; t <= range; t++) {
         for (int r = range * -1; r <= range; r++) {
             int new_x = x + t;
@@ -236,6 +247,7 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
                 board->array[index].covered) {
                 board->array[index].covered = false;
                 float value = board->array[index].value;
+                play->uncovered_tiles++;
 
                 switch ((int)value) {
                 case REWARD:
@@ -243,9 +255,6 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
                     break;
                 case EXIT:
                     play->status = WIN;
-                    end_time = time(NULL);
-                    play->time = end_time - start_time;
-                    play->final_score = calculateScore(board, play);
                     break;
                 default:
                     play->score += value;
@@ -255,8 +264,11 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
         }
     }
 
-    if (play->bombs <= 0) {
-        play->status = DIE;
+    if (play->status != GAMING) {
+        end_time = time(NULL);
+        play->time = end_time - start_time;
+        play->final_score = calculateScore(board, play);
+        start_time = 0;
     }
 }
 
@@ -270,28 +282,19 @@ int extractInput(const char* buf, const char* fmt, ...)
     return rc;
 }
 
-void logScore(struct Board* board, struct Play* play) {
+void logScore(struct Play* play) {
     FILE* fptr;
     fptr = fopen("scores.log", "a");
-    fprintf(fptr, "%s %d %lu %.2f %d %d %d %d\n", play->player, play->final_score, play->time, play->score, play->bombs, play->lives, board->tiles, play->status);
+    fprintf(fptr, "%s %d %lu %.2f %d %d %d\n", play->player, play->final_score, play->time, play->score, play->bombs, play->lives, play->status);
     fclose(fptr);
 }
 
 void displayTopScores(int n) {
     FILE* fptr;
-    struct Board board;
     struct Play play;
     fptr = fopen("scores.log", "r");
-    while (fscanf(fptr, "%s %d %lu %f %d %d %d %d\n", play.player, &play.final_score, &play.time, &play.score, &play.bombs, &play.lives, &board.tiles, &play.status) != EOF) {
-        // printf("final score: %s\n", board.player);
-        // printf("final score: %d\n", play.final_score);
-        // printf("final score: %lu\n", board.time);
-        // printf("final score: %.2f\n", board.score);
-        // printf("final score: %d\n", board.bombs);
-        // printf("final score: %d\n", board.lives);
-        // printf("final score: %d\n", board.tiles);
-        // printf("final score: %d\n", board.status);
-        printf("%s %d %lu %.2f %d %d %d %d\n", play.player, play.final_score, play.time, play.score, play.bombs, play.lives, board.tiles, play.status);
+    while (fscanf(fptr, "%s %d %lu %f %d %d %d\n", play.player, &play.final_score, &play.time, &play.score, &play.bombs, &play.lives, &play.status) != EOF) {
+        printf("%s %d %lu %.2f %d %d %d\n", play.player, play.final_score, play.time, play.score, play.bombs, play.lives, play.status);
     }
     fclose(fptr);
 }
@@ -303,8 +306,8 @@ int main(int argc, char* argv[]) {
 
     clear_screen();
 
-    // displayTopScores(1);
-    // return 0;
+    displayTopScores(1);
+    return 0;
 
     struct Board board;
     struct Play play;
@@ -359,7 +362,7 @@ int main(int argc, char* argv[]) {
         clear_screen();
         printf("Please enter your name (no space): ");
         scanf("%s", play.player);
-        logScore(&board, &play);
+        logScore(&play);
 
         clear_screen();
 
