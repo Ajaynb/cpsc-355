@@ -10,9 +10,8 @@
 // Determine which one is greater/smaller between the given two numbers
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
-#define clearScreen() printf("\ec");
+#define clearScreen() system("cls");
 #define color(color) printf("\033[%dm", color);
-#define bold() printf("\033[1m");
 #define clear() printf("\033[0m");
 
 #define MIN_ROW 10
@@ -227,7 +226,6 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
 
     if (peek) {
         color(CYAN);
-        bold();
         printf("Board: \n\n");
         clear();
     }
@@ -241,7 +239,6 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
             case REWARD:
             case EXIT:
                 if (value == EXIT) color(CYAN) else color(YELLOW);
-                if (!peek) bold();
 
                 if (peek) printf("   %c    ", (int)value);
                 else printf("%c  ", (int)value);
@@ -250,7 +247,6 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
                 break;
             default:
                 if (value > 0) color(GREEN) else color(RED);
-                if (!peek) bold();
 
                 if (peek == true) printf("%+6.2f  ", value);
                 else printf("%c  ", (value > 0) ? '+' : '-');
@@ -335,34 +331,28 @@ void displayTopScores(int n) {
 void displayStatus(struct Play* play) {
     if (play->status == DIE) {
         color(RED);
-        bold();
         printf("------ YOU LOSE T_T ------ \n");
         clear();
     } else if (play->status == WIN) {
         color(GREEN);
-        bold();
         printf("------ YOU WIN! ^0^ ------ \n");
         clear();
     } else if (play->status == QUIT) {
         color(BLUE);
-        bold();
         printf("------ YOU QUIT *_* ------ \n");
         clear();
     }
 }
 
-
 void displayResult(struct Play* play) {
     clearScreen();
 
     color(CYAN);
-    bold();
     printf("Result:\n\n");
     clear();
 
     printf("Player        ");
     color(YELLOW);
-    bold();
     printf("%s\n", play->player);
     clear();
 
@@ -388,7 +378,6 @@ void displayResult(struct Play* play) {
 
     printf("Final score   ");
     color(YELLOW);
-    bold();
     printf("%d pts\n", play->final_score);
     clear();
 }
@@ -397,7 +386,6 @@ void displayLogging(struct Play* play) {
     clearScreen();
 
     color(CYAN);
-    bold();
     printf("Logging:\n\n");
     clear();
 
@@ -406,7 +394,6 @@ void displayLogging(struct Play* play) {
 }
 
 int main(int argc, char* argv[]) {
-
     time_t timestamp;
     srand((unsigned)time(&timestamp));
 
