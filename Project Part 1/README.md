@@ -8,3 +8,4 @@ References:
 Additional Pack
 - Extra bomb: get a bonus bomb
 - Lucky score: get extra 10000 pts to the total uncovered score
+- What the heck: ???

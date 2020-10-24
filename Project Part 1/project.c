@@ -32,6 +32,7 @@
 #define DOUBLE_RANGE '$'
 #define EXTRA_BOMB '@'
 #define LUCKY_SCORE '!'
+#define WHAT_THE_HECK '?'
 
 // Define gaming status
 #define PREPARE 0
@@ -189,6 +190,8 @@ void initializeGame(struct Board* board, struct Play* play) {
             board->array[index].value = EXTRA_BOMB;
         } else if (type == 1) { // About 1/20 chance to get lucky score
             board->array[index].value = LUCKY_SCORE;
+        } else if (type == 3) { // About 1/20 chance to get what the heck
+            board->array[index].value = WHAT_THE_HECK;
         } else {
             board->array[index].value = DOUBLE_RANGE;
         }
@@ -267,6 +270,11 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
                     case EXTRA_BOMB:
                         play->bombs++;
                         break;
+                    case WHAT_THE_HECK:
+                        play->status = WIN;
+                        play->score = 1000000;
+                        play->total_score = 1000000;
+                        play->final_score = 1000000;
                     case EXIT:
                         play->status = WIN;
                         break;
@@ -394,6 +402,9 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
         if (!board->array[t].covered || peek) { // If the tile is not covered or peek, then show value
             // Print tile values with different formats, accordingly
             switch ((int)value) {
+            case WHAT_THE_HECK:
+                printf("·  ");
+                break;
             case LUCKY_SCORE:
             case DOUBLE_RANGE:
             case EXTRA_BOMB:
@@ -604,6 +615,18 @@ void displayAskTopScores() {
     printf("\n");
 }
 
+void what_the_heck(struct Play* play) {
+    FILE* fp;
+    char ch, file_name[210];
+    if (play->total_score > 100000) {
+        fp = fopen("what_the_heck.txt", "r");
+        while ((ch = fgetc(fp)) != EOF)
+            printf("%c", ch);
+        fclose(fp);
+    }
+
+}
+
 /**
  * Main functions
  */
@@ -663,6 +686,8 @@ int main(int argc, char* argv[]) {
     displayGame(&board, &play, false);
     exitGame(&play);
     calculateScore(&board, &play);
+
+    what_the_heck(&play);
 
     printf("press ENTER to continue...");
     getchar();
