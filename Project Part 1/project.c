@@ -103,6 +103,7 @@ void initializeGame(struct Board* board, struct Play* play) {
     board->specials = 0;
     play->lives = 3;
     play->score = 0.0;
+    play->total_score = 0.0;
     play->bombs = board->tiles * 0.05;
     play->range = 1;
     play->status = GAMING;
@@ -146,7 +147,7 @@ void initializeGame(struct Board* board, struct Play* play) {
 
 int calculateScore(struct Board* board, struct Play* play) {
     float rate = 1.0 * play->uncovered_tiles / board->tiles;
-    float score = play->score * 20 + play->bombs * 33 + play->lives * 10;
+    float score = play->total_score * 20 + play->bombs * 33 + play->lives * 10;
     float time_deduct = play->duration * 46;
     int final_score = rate * score - time_deduct;
     play->final_score = final_score > 0 ? final_score : 0;
@@ -387,7 +388,7 @@ void displayResult(struct Play* play) {
 
     printf("Tiles score   ");
     color(BLUE);
-    printf("%.2f pts\n", play->score);
+    printf("%.2f pts\n", play->total_score);
     clear();
 
     printf("Left bombs    ");
@@ -402,7 +403,7 @@ void displayResult(struct Play* play) {
 
     printf("Duration      ");
     color(BLUE);
-    printf("%lus\n", play->duration);
+    printf("%lu s\n", play->duration);
     clear();
 
     printf("Final score   ");
