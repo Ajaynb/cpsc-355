@@ -22,12 +22,14 @@
 #define SPE_PERCENT 0.2
 
 #define EXIT '*'
-#define REWARD '$'
+#define DOUBLE_RANGE '$'
+#define EXTRA_BOMB '@'
 
-#define GAMING 0
-#define WIN 1
-#define DIE 2
-#define QUIT 3
+#define PREPARE 0
+#define GAMING 1
+#define WIN 2
+#define DIE 3
+#define QUIT 4
 
 #define RED 31
 #define GREEN 32
@@ -107,7 +109,7 @@ void initializeGame(struct Board* board, struct Play* play) {
     play->total_score = 0.0;
     play->bombs = board->tiles * 0.05;
     play->range = 1;
-    play->status = GAMING;
+    play->status = PREPARE;
     play->uncovered_tiles = 0;
 
     // Generate map
@@ -136,7 +138,8 @@ void initializeGame(struct Board* board, struct Play* play) {
     // Flip to specials
     while (board->specials < (int)(board->tiles* SPE_PERCENT)) {
         int index = randomNum(0, board->tiles - 1);
-        board->array[index].value = REWARD;
+        int type = randomNum(0, 20);
+        board->array[index].value = (type == 0) ? EXTRA_BOMB : DOUBLE_RANGE;
         board->specials++;
     }
 
@@ -175,8 +178,11 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
                     play->uncovered_tiles++;
 
                     switch ((int)value) {
-                    case REWARD:
+                    case DOUBLE_RANGE:
                         play->range++;
+                        break;
+                    case EXTRA_BOMB:
+                        play->bombs++;
                         break;
                     case EXIT:
                         play->status = WIN;
@@ -203,6 +209,7 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
 }
 
 void startGame(struct Play* play) {
+    play->status = GAMING;
     play->start_timestamp = time(NULL);
 }
 
@@ -248,6 +255,8 @@ void logScore(struct Play* play) {
 void displayGame(struct Board* board, struct Play* play, bool peek) {
     static float score;
     static float lives;
+    static int bombs;
+    static int status;
 
     clearScreen();
 
@@ -263,7 +272,8 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
 
         if (!board->array[t].covered || peek) {
             switch ((int)value) {
-            case REWARD:
+            case DOUBLE_RANGE:
+            case EXTRA_BOMB:
             case EXIT:
                 if (value == EXIT) color(CYAN) else color(YELLOW);
 
@@ -302,11 +312,16 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
         printf("Lives: %d	", play->lives);
         int livesChange = play->lives - lives;
         if (livesChange > 0) color(GREEN) else color(RED);
-        if (livesChange != 0) printf("(%+d)", livesChange);
-        clear();
+        if (livesChange != 0) printf("(%+d)", livesChange); clear();
         printf("\n");
 
         printf("Bombs: %d	", play->bombs);
+        int bombsChange = play->bombs - bombs + 1;
+        if (bombsChange > 0 && status == GAMING) {
+            color(GREEN);
+            printf("(%+d)", bombsChange);
+            clear();
+        }
         if (play->range > 1) {
             color(CYAN);
             printf("(Reward: %dx range)", play->range);
@@ -317,8 +332,7 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
         printf("Score: %.2f	", play->score);
         float scoreChange = play->score - score;
         if (scoreChange > 0) color(GREEN) else color(RED);
-        if (scoreChange != 0) printf("(%+.2f)", scoreChange);
-        clear();
+        if (scoreChange != 0) printf("(%+.2f)", scoreChange); clear();
         printf("\n");
 
         printf("Total: %.2f	\n", play->total_score);
@@ -327,6 +341,8 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
 
     score = play->score;
     lives = play->lives;
+    bombs = play->bombs;
+    status = play->status;
 
     printf("\n");
 
