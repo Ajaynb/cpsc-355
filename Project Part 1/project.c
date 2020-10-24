@@ -382,7 +382,6 @@ void displayResult(struct Play* play) {
     printf("Please enter your name (no space): ");
     scanf("%s", play->player);
     printf("\n\n");
-    fflush(stdin);
 
     color(CYAN);
     printf("Result:\n\n");
@@ -441,7 +440,6 @@ void displayAskTopScores() {
 
         printf("Press ENTER to continue... ");
         getchar();
-        fflush(stdin);
     }
 
     printf("\n");
@@ -463,7 +461,6 @@ int main(int argc, char* argv[]) {
 
     printf("Press ENTER key to start game...");
     getchar();
-    fflush(stdin);
 
     char input[10];
     int x = -10, y = -10;
@@ -476,7 +473,6 @@ int main(int argc, char* argv[]) {
         printf("Enter q to quit, \n");
         printf("Enter bomb position (x y): ");
         gets(input);
-        fflush(stdin);
 
         if (extractInput(input, "%d %d", &x, &y) == 2) {
             playGame(&board, &play, x, y);
@@ -491,7 +487,6 @@ int main(int argc, char* argv[]) {
 
     printf("press ENTER to continue...");
     getchar();
-    fflush(stdin);
 
     if (play.status != QUIT) {
         displayResult(&play);
