@@ -6,4 +6,5 @@ References:
 - https://en.cppreference.com/w/c/io/vfscanf
 
 Additional Pack
-- Extra bomb
+- Extra bomb: get a bonus bomb
+- Lucky score: get extra 10000 pts to the total uncovered score

@@ -31,6 +31,7 @@
 #define EXIT '*'
 #define DOUBLE_RANGE '$'
 #define EXTRA_BOMB '@'
+#define LUCKY_SCORE '!'
 
 // Define gaming status
 #define PREPARE 0
@@ -184,7 +185,13 @@ void initializeGame(struct Board* board, struct Play* play) {
     while (board->specials < (int)(board->tiles * SPE_PERCENT)) {
         int index = randomNum(0, board->tiles - 1);
         int type = randomNum(0, 20);
-        board->array[index].value = (type == 0) ? EXTRA_BOMB : DOUBLE_RANGE; // About 1/5 chance to get extra bomb tile
+        if (type == 2) { // About 1/20 chance to get extra bomb tile
+            board->array[index].value = EXTRA_BOMB;
+        } else if (type == 1) { // About 1/20 chance to get lucky score
+            board->array[index].value = LUCKY_SCORE;
+        } else {
+            board->array[index].value = DOUBLE_RANGE;
+        }
         board->specials++;
     }
 
@@ -253,6 +260,9 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
                     switch ((int)value) {
                     case DOUBLE_RANGE:
                         play->range *= 2;
+                        break;
+                    case LUCKY_SCORE:
+                        play->total_score += 10000;
                         break;
                     case EXTRA_BOMB:
                         play->bombs++;
@@ -384,6 +394,7 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
         if (!board->array[t].covered || peek) { // If the tile is not covered or peek, then show value
             // Print tile values with different formats, accordingly
             switch ((int)value) {
+            case LUCKY_SCORE:
             case DOUBLE_RANGE:
             case EXTRA_BOMB:
             case EXIT:
