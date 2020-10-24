@@ -485,8 +485,8 @@ int main(int argc, char* argv[]) {
     getchar();
 
     if (play.status != QUIT) {
-        logScore(&play);
         displayResult(&play);
+        logScore(&play);
     }
 
     displayAskTopScores();
