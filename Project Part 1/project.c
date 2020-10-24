@@ -10,9 +10,10 @@
 // Determine which one is greater/smaller between the given two numbers
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
-#define clearScreen() system("cls"); printf("\ec"); fflush(stdout);
+#define clearScreen() system("cls"); printf("\ec");
 #define color(color) printf("\033[%dm", color);
 #define clear() printf("\033[0m");
+#define clean() while ((getchar()) != '\n');
 
 #define MIN_ROW 10
 #define MIN_COL 10
@@ -44,7 +45,7 @@ struct Board {
 };
 
 struct Play {
-    char player[10];
+    char player[100];
     int lives;
     float score;
     float total_score;
@@ -160,10 +161,6 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
         play->range = 1;
         play->bombs--;
 
-        if (range > board->tiles) {
-            range = board->tiles;
-        }
-
         for (int t = range * -1; t <= range; t++) {
             for (int r = range * -1; r <= range; r++) {
                 int new_x = x + t;
@@ -179,7 +176,7 @@ void playGame(struct Board* board, struct Play* play, const int x, const int y) 
 
                     switch ((int)value) {
                     case REWARD:
-                        play->range *= 2;
+                        play->range++;
                         break;
                     case EXIT:
                         play->status = WIN;
@@ -381,6 +378,7 @@ void displayResult(struct Play* play) {
 
     printf("Please enter your name (no space): ");
     scanf("%s", play->player);
+    clean();
     printf("\n\n");
 
     color(CYAN);
@@ -418,7 +416,10 @@ void displayResult(struct Play* play) {
     clear();
 
     printf("\n\n");
+    printf("press ENTER to continue...");
+    getchar();
 }
+
 
 void displayAskTopScores() {
 
@@ -433,7 +434,7 @@ void displayAskTopScores() {
     printf("Enter 0 to skip,\n");
     printf("How many top scores to check? ");
     scanf("%d", &n);
-    fflush(stdin);
+    clean();
 
     if (n > 0) {
         displayTopScores(n);
@@ -472,7 +473,7 @@ int main(int argc, char* argv[]) {
 
         printf("Enter q to quit, \n");
         printf("Enter bomb position (x y): ");
-        gets(input);
+        fgets(input, 10, stdin);
 
         if (extractInput(input, "%d %d", &x, &y) == 2) {
             playGame(&board, &play, x, y);
