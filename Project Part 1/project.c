@@ -10,7 +10,7 @@
 // Determine which one is greater/smaller between the given two numbers
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
-#define clearScreen() system("cls"); printf("\ec");
+#define clearScreen() system("cls"); printf("\ec"); fflush(stdout);
 #define color(color) printf("\033[%dm", color);
 #define clear() printf("\033[0m");
 
@@ -44,7 +44,7 @@ struct Board {
 };
 
 struct Play {
-    char player[100];
+    char player[10];
     int lives;
     float score;
     float total_score;
@@ -332,8 +332,6 @@ void displayGame(struct Board* board, struct Play* play, bool peek) {
 }
 
 void displayTopScores(int n) {
-    clearScreen();
-
     struct Play* plays = malloc(sizeof(struct Play));
     struct Play play;
     int size = 0;
@@ -359,11 +357,15 @@ void displayTopScores(int n) {
         }
     }
 
+    printf("\n");
+    printf("Player        | Final Score | Duration | Total Score | Bombs left | Lives left | Status\n");
     int times = min(size, n);
     for (int t = 0; t < times; t++) {
         play = plays[t];
-        printf("%s %d %lu %.2f %d %d %d\n", play.player, play.final_score, play.duration, play.total_score, play.bombs, play.lives, play.status);
+        printf("%s		%11.d   %8.lu   %11.2f   %10.d   %10.d   %6.d\n", play.player, play.final_score, play.duration, play.total_score, play.bombs, play.lives, play.status);
     }
+
+    printf("\n\n");
 }
 
 void displayResult(struct Play* play) {
@@ -410,11 +412,40 @@ void displayResult(struct Play* play) {
     color(YELLOW);
     printf("%d pts\n", play->final_score);
     clear();
+
+    printf("\n\n");
+}
+
+void displayAskTopScores() {
+
+    clearScreen();
+
+    color(CYAN);
+    printf("Top Scores:\n\n");
+    clear();
+
+    int n;
+    printf("You can check top scores here.\n\n");
+    printf("Enter 0 to skip,\n");
+    printf("How many top scores to check? ");
+    scanf("%d", &n);
+    fflush(stdin);
+
+    if (n > 0) {
+        displayTopScores(n);
+
+        printf("Press ENTER to continue... ");
+        getchar();
+    }
+
+    printf("\n");
 }
 
 int main(int argc, char* argv[]) {
     time_t timestamp;
     srand((unsigned)time(&timestamp));
+
+    displayAskTopScores();
 
     struct Board board;
     struct Play play;
@@ -458,5 +489,11 @@ int main(int argc, char* argv[]) {
         displayResult(&play);
     }
 
+    displayAskTopScores();
+
+    clearScreen();
+    color(CYAN);
+    printf("Thanks for playing. Have a nice day! \n\n");
+    clear();
 
 }
