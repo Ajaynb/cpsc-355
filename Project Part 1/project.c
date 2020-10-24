@@ -10,7 +10,7 @@
 // Determine which one is greater/smaller between the given two numbers
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
-#define clearScreen() system("cls");
+#define clearScreen() system("cls"); printf("\ec");
 #define color(color) printf("\033[%dm", color);
 #define clear() printf("\033[0m");
 
