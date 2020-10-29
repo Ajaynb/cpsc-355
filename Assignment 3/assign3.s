@@ -4,7 +4,7 @@
      // Product
      // Loop times
 
-output: .string "%d * %d	=	%d\n"
+output: .string "%d * %d = %d\n"
         // Expose main function to OS
         .global main
         .balign 4
