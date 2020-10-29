@@ -1,15 +1,19 @@
 
-define(x_er, x19)       // Multiplier
-define(x_cand, x20)     // Multiplicand
-define(x_prod, x21)     // Product
-define(x_time, x28)     // Loop times
+// Define variable names with macro for readability
+define(x_er, x19)                               // Multiplier, multipliER
+define(x_cand, x20)                             // Multiplicand, multipliCAND
+define(x_prod, x21)                             // Product, PRODuct
+define(x_time, x28)                             // Loop times
 
-output: .string "%d * %d = %d\n"
-        // Expose main function to OS
+output: .string "%d * %d = %d\n"                // The output string
+
+        // Expose main function to OS and set balign
         .global main
         .balign 4
 
-main:                                           // main function
+
+
+main:   // Main function
         // Saves state
         stp     x29,    x30,    [sp, -16]!      // space stack pointer
         mov     x29,    sp                      // frame-pointer = stack-pointer;
@@ -21,62 +25,66 @@ main:                                           // main function
 
         mov     x_er,   16                      // multiplier = 16;     set multiplier to 16
 
-loop:   
-        sub     x_er,   x_er,   1               // multiplier --;       decrese multiplier by 1
+
+
+loop:   // The loop of multiplier from -15 to 15
+        // Initialize values to default
         mov     x_cand, 0                       // multiplicand = 0;    set multiplicand to default 0
         mov     x_prod, 0                       // product = 0;         set product to 0
+        
+        // Decrease multiplier to the next value
+        sub     x_er,   x_er,   1               // multiplier --;       decrese multiplier by 1
 
-        mov     x_time, 0
-
+        // Loop condition
         cmp     x_er,   -15                     // if (multiplier < -15)
-        b.lt    end                             // then end the loop
+        b.lt    end                             // then end the whole loop, 15 to -15 finished
 
-random: bl      rand                            // rand();
+        // Generate a random number between 0 and 15
+        bl      rand                            // rand();
         and  	x9,     x0,     0xF             // rand() % 16;         range 0 - 15
         mov     x_cand, x9                      // multiplicand = rand; set random number to multiplicand
 
+
+
         
-
-
-multiply_start:                                 // Multiplication loop
+mult:   // Multiplication
         mov     x_time, 0                       // time = 0;            loop times set to default 0
 
-multiply_test:
-        cmp     x_time, 64                      // if (time > 64)       iterate 64 times
-        b.ge    multiply_end                    // then end the multiplication loop
+multst: // Loop condition, loop 64 times for 64 bits
+        cmp     x_time, 64                      // if (time > 64);      if over 64 times
+        b.ge    mulend                          // then end the multiplication loop
 
 
         // Least bit of cand
-        asr     x10,    x_cand, x_time          // x10 = multiplicand >> time;  right shift multiplier by x times
-        tst     x10,    0x1                     // if (x10 & 1)                 compare if the last digit is 1
+        asr     x10,    x_cand, x_time          // x10 = multiplicand >> time;  get xth least significant digit
+        tst     x10,    0x1                     // if (x10 & 1)         if the least digit is 1
         b.ne    proadd                          // then should add the product
         b       pronon                          // otherwise not add
 
-proadd: lsl     x9,     x_er,   x_time          // x9 = multiplier << time;     left shift multiplicand x times
-        add     x_prod, x_prod, x9              // product += x9;               add the result to product
+proadd: lsl     x9,     x_er,   x_time          // x9 = multiplier << time;     insert 0 to the right
+        add     x_prod, x_prod, x9              // product += x9;       add the result to product
 pronon:
-        add     x_time, x_time, 1               // time ++;     Increse time by 1
-        b       multiply_test                   // go back to multiplication loop test
-       
+        add     x_time, x_time, 1               // time ++;
+        b       multst                          // go back to multiplication loop test
 
-multiply_end:
-
-
-        
-        ldr     x0,     =output
-        mov     x1,     x_er
-        mov     x2,     x_cand
-        mov     x3,     x_prod
-        bl      printf
+mulend: // Multiplication End
 
 
-        // Go back to loop
-        b       loop
+
+        // Output multiplier, multiplicand and their product
+        ldr     x0,     =output                 // 1st parameter: the formatted string
+        mov     x1,     x_er                    // 2nd parameter: the multiplier
+        mov     x2,     x_cand                  // 3rd parameter: the multiplicand
+        mov     x3,     x_prod                  // 4th parameter: the product
+        bl      printf                          // printf(output, multiplier, multiplicand, product);
 
 
-end:
+        // Continue loop
+        b       loop                            // back to loop top
 
 
+
+end:    // Program end
         // Restores state
-        ldp     x29,    x30,    [sp], 16                            // return stack pointer space
-        ret                                                         // return to OS
+        ldp     x29,    x30,    [sp], 16        // return stack pointer space
+        ret                                     // return to OS
