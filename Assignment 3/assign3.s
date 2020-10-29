@@ -1,8 +1,8 @@
 
-define(x_er, x19)       // Multiplier
-define(x_cand, x20)     // Multiplicand
-define(x_prod, x21)     // Product
-define(x_time, x28)    // Loop times
+       // Multiplier
+     // Multiplicand
+     // Product
+    // Loop times
 
 output: .string "%d * %d = %d\n"
 testop:   .string "er %d, cand %d, prod %d\n"
@@ -22,45 +22,45 @@ main:                                                               // main func
         bl      time                            // time(0);
         bl      srand                           // srand(time(0)); set random seed to current timestamp
 
-        mov     x_er,   4
-        mov     x_cand, 3
-        mov     x_prod, 0
+        mov     x19,   4
+        mov     x20, 3
+        mov     x21, 0
 
 multiply:
-        mov     x_time, 0                       // loop times
+        mov     x28, 0                       // loop times
 
-test:   cmp     x_time, 64                      // Iterate 64 times
+test:   cmp     x28, 64                      // Iterate 64 times
         b.ge    end
 
 
         // Least bit of cand
-        asr     x11,    x_cand, x_time          // right shift multiplier by x times
+        asr     x11,    x20, x28          // right shift multiplier by x times
         ands    x10,    x11,    0x1             // compare if the last digit is 1
-        b.ne    proadd                          // If last bit is 1, flag is not set
+        b.ne    proadd                          // If last bit is 1
         b       pronon
 
-proadd: lsl     x9,     x_er,   x_time          // left shift multiplicand x times
-        add     x_prod, x_prod, x9              // add the result to product
+proadd: lsl     x9,     x19,   x28          // left shift multiplicand x times
+        add     x21, x21, x9              // add the result to product
 pronon:
 
 
         ldr     x0,     =testop
-        mov     x1,     x_er
-        mov     x2,     x_cand
-        mov     x3,     x_prod
+        mov     x1,     x19
+        mov     x2,     x20
+        mov     x3,     x21
         bl      printf
 
         // increment on times and go back to loop test
-        add     x_time, x_time, 1
+        add     x28, x28, 1
         b       test
 
 
 end:
 
         ldr     x0,     =output
-        mov     x1,     x_er
-        mov     x2,     x_cand
-        mov     x3,     x_prod
+        mov     x1,     x19
+        mov     x2,     x20
+        mov     x3,     x21
         bl      printf
 
         // Restores state
