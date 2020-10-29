@@ -22,8 +22,8 @@ main:                                                               // main func
         bl      time                            // time(0);
         bl      srand                           // srand(time(0)); set random seed to current timestamp
 
-        mov     x_er,   4
-        mov     x_cand, 3
+        mov     x_er,   5
+        mov     x_cand, 5
         mov     x_prod, 0
 
 multiply:
@@ -34,8 +34,8 @@ test:   cmp     x_time, 64                      // Iterate 64 times
 
 
         // Least bit of cand
-        asr     x11,    x_cand, x_time          // right shift multiplier by x times
-        ands    x10,    x11,    0x1             // compare if the last digit is 1
+        asr     x10,    x_cand, x_time          // right shift multiplier by x times
+        tst     x10,    0x1             // compare if the last digit is 1
         b.ne    proadd                          // If last bit is 1, flag is not set
         b       pronon
 
