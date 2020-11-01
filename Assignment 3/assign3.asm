@@ -64,7 +64,7 @@ multst: // Loop condition, loop 64 times for 64 bits
 
                                                 // The above is EQUIVALENT to (least significant bit * multiplicand) in the assignment specification, 
                                                 // because the least sign bit is either 1 or 0, if it's 1 then it's adding multiplier itself,
-                                                // if it's 0 then it's adding nothing. so the if condition would just help skipping adding 0 to the product
+                                                // if it's 0 then it's adding nothing. so the if condition just helps skipping adding 0 to the product
 
 proadd: // Then: add multiplier to product
         lsl     x9,     x_er,   x_time          // int shifted = multiplier << time;    shifting the multiplier to left by x times
