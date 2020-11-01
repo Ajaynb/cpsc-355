@@ -42,7 +42,7 @@ loop:   // The loop of multiplier from -15 to 15
 
         // Generate a random number between 0 and 15
         bl      rand                            // rand();
-        and  	x9,     x0,     0xF             // int rand = rand() % 15;      range from 0 - 15
+        and  	x9,     x0,     0xF             // int rand = rand() & 15;  range from 0 - 15
         mov     x20, x9                      // multiplicand = rand; set random number to multiplicand
 
 
@@ -54,19 +54,24 @@ multst: // Loop condition, loop 64 times for 64 bits
         cmp     x28, 64                      // if (time >= 64);      if loop reaches 64 times
         b.ge    mulend                          // then end the multiplication loop
 
-
         // Least bit of cand
         asr     x10,    x20, x28          // int leastBit = multiplicand >> time; get xth least significant digit
-        tst     x10,    0x1                     // if (leastBit & 1)  if the least bit is 1
-                                                // The above is EQUIVALENT to (the least significant bit * multiplicand) in the assignment specification, 
-                                                // because the least sign bit is either 1 or 0, if it's 1 then it's adding multiplier itself,
-                                                // if it's 0 then it's adding nothing. so the if condition would just help skipping adding 0 to the product
+        
+        // If: the least significant digit is not 0
+        tst     x10,    0x1                     // if (!leastBit & 1)  if the least bit is not 0
         b.ne    proadd                          // then should add the product
         b       pronon                          // otherwise not add
 
-proadd: lsl     x9,     x19,   x28          // int shifted = multiplier << time;    shifting the multiplier to left by x times
+                                                // The above is EQUIVALENT to (least significant bit * multiplicand) in the assignment specification, 
+                                                // because the least sign bit is either 1 or 0, if it's 1 then it's adding multiplier itself,
+                                                // if it's 0 then it's adding nothing. so the if condition just helps skipping adding 0 to the product
+
+proadd: // Then: add multiplier to product
+        lsl     x9,     x19,   x28          // int shifted = multiplier << time;    shifting the multiplier to left by x times
         add     x21, x21, x9              // product += shifted;  add the result to product
-pronon:
+pronon: // Else: nothing
+
+        // Adding loop times and continue loop
         add     x28, x28, 1               // time ++;
         b       multst                          // go back to multiplication loop test
 
