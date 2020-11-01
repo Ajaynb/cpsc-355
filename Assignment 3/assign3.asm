@@ -5,7 +5,7 @@ define(x_cand, x20)                             // Multiplicand, multipliCAND
 define(x_prod, x21)                             // Product, PRODuct
 define(x_time, x28)                             // Loop times
 
-output: .string "%d * %d = %d\n"                // The output string
+outstr: .string "%d * %d = %d\n"                // The output string
 
         // Expose main function to OS and set balign
         .global main
@@ -23,7 +23,8 @@ main:   // Main function
         bl      time                            // time(0);
         bl      srand                           // srand(time(0));      set random seed to current timestamp
 
-        mov     x_er,   16                      // multiplier = 16;     set multiplier to 16
+        mov     x_er,   16                      // multiplier = 16;     set multiplier to 16, 
+                                                // so every time the loop decrese it by 1 until it reaches -15 and end
 
 
 
@@ -37,46 +38,53 @@ loop:   // The loop of multiplier from -15 to 15
 
         // Loop condition
         cmp     x_er,   -15                     // if (multiplier < -15)
-        b.lt    end                             // then end the whole loop, 15 to -15 finished
+        b.lt    end                             // then loop is end, 15 to -15 finished, end the program
 
         // Generate a random number between 0 and 15
         bl      rand                            // rand();
-        and  	x9,     x0,     0xF             // rand() % 16;         range 0 - 15
+        and  	x9,     x0,     0xF             // int rand = rand() & 15;  range from 0 - 15
         mov     x_cand, x9                      // multiplicand = rand; set random number to multiplicand
 
 
 
-        
-mult:   // Multiplication
+mult:   // Multiplication Algorithm
         mov     x_time, 0                       // time = 0;            loop times set to default 0
 
 multst: // Loop condition, loop 64 times for 64 bits
-        cmp     x_time, 64                      // if (time > 64);      if over 64 times
+        cmp     x_time, 64                      // if (time >= 64);      if loop reaches 64 times
         b.ge    mulend                          // then end the multiplication loop
 
-
         // Least bit of cand
-        asr     x10,    x_cand, x_time          // x10 = multiplicand >> time;  get xth least significant digit
-        tst     x10,    0x1                     // if (x10 & 1)         if the least digit is 1
+        asr     x10,    x_cand, x_time          // int leastBit = multiplicand >> time; get xth least significant digit
+        
+        // If: the least significant digit is not 0
+        tst     x10,    0x1                     // if (!leastBit & 1)  if the least bit is not 0
         b.ne    proadd                          // then should add the product
         b       pronon                          // otherwise not add
 
-proadd: lsl     x9,     x_er,   x_time          // x9 = multiplier << time;     insert 0 to the right
-        add     x_prod, x_prod, x9              // product += x9;       add the result to product
-pronon:
+                                                // The above is EQUIVALENT to (least significant bit * multiplicand) in the assignment specification, 
+                                                // because the least sign bit is either 1 or 0, if it's 1 then it's adding multiplier itself,
+                                                // if it's 0 then it's adding nothing. so the if condition would just help skipping adding 0 to the product
+
+proadd: // Then: add multiplier to product
+        lsl     x9,     x_er,   x_time          // int shifted = multiplier << time;    shifting the multiplier to left by x times
+        add     x_prod, x_prod, x9              // product += shifted;  add the result to product
+pronon: // Else: nothing
+
+        // Adding loop times and continue loop
         add     x_time, x_time, 1               // time ++;
         b       multst                          // go back to multiplication loop test
 
-mulend: // Multiplication End
+mulend: // Multiplication Algorithm End
 
 
 
-        // Output multiplier, multiplicand and their product
-        ldr     x0,     =output                 // 1st parameter: the formatted string
+output: // outstr multiplier, multiplicand and their product
+        ldr     x0,     =outstr                 // 1st parameter: the formatted string
         mov     x1,     x_er                    // 2nd parameter: the multiplier
         mov     x2,     x_cand                  // 3rd parameter: the multiplicand
         mov     x3,     x_prod                  // 4th parameter: the product
-        bl      printf                          // printf(output, multiplier, multiplicand, product);
+        bl      printf                          // printf(outstr, multiplier, multiplicand, product);
 
 
         // Continue loop
