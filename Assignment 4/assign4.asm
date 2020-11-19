@@ -36,7 +36,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         min_col = 4
 
         // Equates for 2d array of table
-        ta_val = 4                              // table_array_values = sizeof(int)
+        ta_val = 8                              // table_array_values = sizeof(int)
 
         // Equates for struct Document          // struct Document {
         sd_occ = 0                              //     int occurence;
@@ -127,8 +127,8 @@ print_table_row:
         multiply(x_off, x_off, ta_val, -1)
 
 
-        ldr     x28,     [fp, x_off]
-        print(aloc, x_crow, x_ccol, x_off, x28)
+        ldr     x9,     [x29, x_off]
+        print(aloc, x_crow, x_ccol, x_off, x9)
 
         add     x_ccol, x_ccol, 1
         b       print_table_col
