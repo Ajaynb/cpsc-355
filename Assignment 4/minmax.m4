@@ -7,8 +7,9 @@ define(min, `
 if_%s:   mov    $1,     $2
         b       end_%s
 else_%s: mov  $1,     $3
+        b       end_%s
 end_%s:
-    ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))
+    ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))
     g_count()
 ')
 define(max, `
@@ -19,8 +20,9 @@ define(max, `
 if_%s:   mov    $1,     $2
         b       end_%s
 else_%s: mov  $1,     $3
+        b       end_%s
 end_%s:
-    ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))
+    ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))
     g_count()
 ')
 divert
