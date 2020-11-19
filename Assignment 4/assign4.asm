@@ -12,7 +12,7 @@
 
         // Defining the strings
 outstr: .string "ALLOC size: %d\n"                // The output string
-aloc:   .string "ALLOC[%d][%d] = %d\n"
+aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
 
         // Renaming registers
         x_row   .req    x19                     // row of table
@@ -88,10 +88,13 @@ generate_table_row:
         multiply(x_off, x_crow, x_col)
         add     x_off,  x_off,  x_ccol
         multiply(x_off, x_off, ta_val, -1)
-        print(aloc, x_crow, x_ccol, x_off)
 
+        random(x9, 0xF)
+        add     x9,     x9,     1
+        str 	x9,     [fp, x_off]
+        ldr     x9,     [fp, x_off]
 
-
+        print(aloc, x_crow, x_ccol, x_off, x9)
 
 
         add     x_ccol, x_ccol, 1
@@ -102,6 +105,39 @@ generate_table_row:
         add     x_crow, x_crow, 1
         b       generate_table_row
 generate_table_row_end:
+
+
+print_table:
+        mov     x_crow, xzr
+        mov     x_off,  xzr
+
+print_table_row:
+        cmp     x_crow, x_row
+        b.eq    print_table_row_end
+        mov     x_ccol, xzr
+
+        print_table_col:
+        cmp     x_ccol, x_col
+        b.eq    print_table_col_end
+
+        
+
+        multiply(x_off, x_crow, x_col)
+        add     x_off,  x_off,  x_ccol
+        multiply(x_off, x_off, ta_val, -1)
+
+
+        ldr     x28,     [fp, x_off]
+        print(aloc, x_crow, x_ccol, x_off, x28)
+
+        add     x_ccol, x_ccol, 1
+        b       print_table_col
+        print_table_col_end:
+
+
+        add     x_crow, x_crow, 1
+        b       print_table_row
+print_table_row_end:
 
 
 end:    // Program end
