@@ -1,14 +1,17 @@
 
-        include(`alloc.m4')
-        include(`forloop3.m4')
-        include(`foreach2.m4')
-        include(`print.m4')
-        include(`minmax.m4')
-        include(`rand.m4')
-        include(`addAll.m4')
 
         define(`g_counter',`0')dnl
         define(`g_count',`define(`g_counter',eval(g_counter+1))')dnl
+        
+        include(`alloc.m4')                     // Includes also muIAll.m4
+        include(`forloop3.m4')                  
+        include(`foreach2.m4')                  // Includes also qu0te.m4
+        include(`print.m4')                     
+        include(`minmax.m4')                    
+        include(`rand.m4')                      
+        include(`addAll.m4')                    
+        include(`struct.m4')                    
+
         
 
         // Defining the strings
@@ -20,7 +23,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         x_col   .req    x20                     // column of table
         x_arr   .req    x21                     // 2d array of table
         x_loc   .req    x23                     // 2d array allocate size
-        x_dar   .req    x22                     // struct documents array
+        x_dar   .req    x22                     // 5truct documents array
 
         x_crow  .req    x24                     // current row index
         x_ccol  .req    x25                     // current column index
@@ -39,7 +42,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         // Equates for 2d array of table
         ta_val = 8                              // table_array_values = sizeof(int)
 
-        // Equates for struct Document          // struct Document {
+        // Equates for 5truct Document          // 5truct Document {
         sd_occ = 0                              //     int occurence;
         sd_frq = 4                              //     int frequency;
         sd_ind = 8                              //     int index;
@@ -71,6 +74,23 @@ main:   // Main function
         alloc(x_loc, x_row,  x_col, ta_val)
         print(outstr, x_loc)
 
+        addAll(x11, 10, 90, 200, 300)
+        print(outstr, x11)
+
+        
+        alloc(x_arr, sd)
+        print(outstr, x_arr)
+
+        struct(x_arr, sd_occ, sd_frq, sd_ind)
+
+        writeStruct(13, x_arr, sd_frq)
+        readStruct(x11, x_arr, sd_frq)
+        print(outstr, x11)
+
+
+
+        b       end
+
 
 generate_table:
         mov     x_crow, xzr
@@ -87,7 +107,7 @@ generate_table_row:
         
 
         mulAll(x_off, x_crow, x_col)
-        add     x_off,  x_off,  x_ccol
+        addAll(x_off, x_off, x_ccol)
         mulAll(x_off, x_off, ta_val, -1)
 
         random(x9, 0xF)
@@ -144,6 +164,8 @@ print_table_row_end:
 end:    // Program end
 
         // Deallocate 2d array of table
+        dealloc(x_arr)
+
         dealloc(x_loc)
         
         // Restores state
