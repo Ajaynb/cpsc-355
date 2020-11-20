@@ -9,13 +9,15 @@
         
         
         
+        
+
 
 
                         
 
         // Defining the strings
 outstr: .string "ALLOC size: %d\n"                // The output string
-aloc:   .string "ALLOC row: %d, col: %d, offset: %d"
+aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
 
         // Renaming registers
         x_row   .req    x19                     // row of table
@@ -24,9 +26,9 @@ aloc:   .string "ALLOC row: %d, col: %d, offset: %d"
         x_loc   .req    x23                     // 2d array allocate size
         x_dar   .req    x22                     // struct documents array
 
-        x_crow  .req    x12                     // current row index
-        x_ccol  .req    x13                     // current column index
-        x_off   .req    x14                     // current offset
+        x_crow  .req    x24                     // current row index
+        x_ccol  .req    x25                     // current column index
+        x_off   .req    x26                     // current offset
 
         // Renaming x29 and x30 to FP and LR
         fp      .req    x29
@@ -39,7 +41,7 @@ aloc:   .string "ALLOC row: %d, col: %d, offset: %d"
         min_col = 4
 
         // Equates for 2d array of table
-        ta_val = 4                              // table_array_values = sizeof(int)
+        ta_val = 8                              // table_array_values = sizeof(int)
 
         // Equates for struct Document          // struct Document {
         sd_occ = 0                              //     int occurence;
@@ -67,7 +69,7 @@ main:   // Main function
         mov     x_row,  5
         mov     x_col,  5
 
-        // Limit the range of x_row and x_col
+        // Limit the range of x_row and x_col as input validation
         
     
         cmp     x_row,     max_row
@@ -170,15 +172,15 @@ end_3:
 
 generate_table:
         mov     x_crow, xzr
-        mov     x_ccol, xzr
 
 generate_table_row:
         cmp     x_crow, x_row
-        b.gt    generate_table_row_end
+        b.eq    generate_table_row_end
+        mov     x_ccol, xzr
 
         generate_table_col:
         cmp     x_ccol, x_col
-        b.gt    generate_table_col_end
+        b.eq    generate_table_col_end
 
         
 
@@ -223,7 +225,23 @@ generate_table_row:
         
         
     
+        
+        mov     x10,    -1                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
         mov     x_off,     x9                      // Result
+
+
+        
+        bl      rand                            // rand();
+        and  	x9,     x0,     0xF              // int x9 = rand() & 0xF;
+        mov     x9,     x9                      // x9 = x9;
+
+        add     x9,     x9,     1
+        str 	x9,     [fp, x_off]
+        ldr     x9,     [fp, x_off]
 
         
     
@@ -231,20 +249,20 @@ generate_table_row:
         
         
     
-        mov     x1,    xcrow
+        mov     x1,    x_crow
         
     
-        mov     x2,    xccol
+        mov     x2,    x_ccol
         
     
         mov     x3,    x_off
         
     
+        mov     x4,    x9
+        
+    
         ldr     x0,     =aloc
         bl      printf
-
-
-
 
 
 
@@ -256,6 +274,105 @@ generate_table_row:
         add     x_crow, x_crow, 1
         b       generate_table_row
 generate_table_row_end:
+
+
+print_table:
+        mov     x_crow, xzr
+        mov     x_off,  xzr
+
+print_table_row:
+        cmp     x_crow, x_row
+        b.eq    print_table_row_end
+        mov     x_ccol, xzr
+
+        print_table_col:
+        cmp     x_ccol, x_col
+        b.eq    print_table_col_end
+
+        
+
+        
+    
+        mov     x9,     1                       // Initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x_crow                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    x_col                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        mov     x_off,     x9                      // Result
+
+        add     x_off,  x_off,  x_ccol
+        
+    
+        mov     x9,     1                       // Initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x_off                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    ta_val                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    -1                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        mov     x_off,     x9                      // Result
+
+
+
+        ldr     x9,     [x29, x_off]
+        
+    
+    
+        
+        
+    
+        mov     x1,    x_crow
+        
+    
+        mov     x2,    x_ccol
+        
+    
+        mov     x3,    x_off
+        
+    
+        mov     x4,    x9
+        
+    
+        ldr     x0,     =aloc
+        bl      printf
+
+
+        add     x_ccol, x_ccol, 1
+        b       print_table_col
+        print_table_col_end:
+
+
+        add     x_crow, x_crow, 1
+        b       print_table_row
+print_table_row_end:
 
 
 end:    // Program end

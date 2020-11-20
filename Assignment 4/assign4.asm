@@ -5,6 +5,7 @@
         include(`print.m4')
         include(`minmax.m4')
         include(`rand.m4')
+        include(`addAll.m4')
 
         define(`g_counter',`0')dnl
         define(`g_count',`define(`g_counter',eval(g_counter+1))')dnl
@@ -60,7 +61,7 @@ main:   // Main function
         mov     x_row,  5
         mov     x_col,  5
 
-        // Limit the range of x_row and x_col
+        // Limit the range of x_row and x_col as input validation
         min(x_row, x_row, max_row)
         max(x_row, x_row, min_row)
         min(x_col, x_col, max_col)
@@ -85,9 +86,9 @@ generate_table_row:
 
         
 
-        multiply(x_off, x_crow, x_col)
+        mulAll(x_off, x_crow, x_col)
         add     x_off,  x_off,  x_ccol
-        multiply(x_off, x_off, ta_val, -1)
+        mulAll(x_off, x_off, ta_val, -1)
 
         random(x9, 0xF)
         add     x9,     x9,     1
@@ -122,9 +123,9 @@ print_table_row:
 
         
 
-        multiply(x_off, x_crow, x_col)
+        mulAll(x_off, x_crow, x_col)
         add     x_off,  x_off,  x_ccol
-        multiply(x_off, x_off, ta_val, -1)
+        mulAll(x_off, x_off, ta_val, -1)
 
 
         ldr     x9,     [x29, x_off]
