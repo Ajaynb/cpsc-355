@@ -26,10 +26,8 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         // Renaming registers
         x_row   .req    x19                     // row of table
         x_col   .req    x20                     // column of table
-        x_arr   .req    x21                     // 2d Array of table
-        x_loc   .req    x23                     // 2d Array allocate size
-        x_ar2   .req    x27
-        x_dar   .req    x22                     // 5truct documents Array
+        x_2da   .req    x21                     // 2d Array of Table
+        x_1da   .req    x22                     // 5truct documents Array
 
         x_crow  .req    x24                     // current row index
         x_ccol  .req    x25                     // current column index
@@ -46,7 +44,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         min_col = 4
 
         // Equates for 2d Array of table
-        ta_val = 8                              // table_array_values = sizeof(int)
+        int = 8                              // table_array_values = sizeof(int)
 
         // Equates for 5truct Document          // 5truct Document {
         sd_occ = 0                              //     int occurence;
@@ -128,7 +126,8 @@ end_3:
     
 
 
-        // Allocate 2d Array of table
+        
+        // Allocate 2d Array for Table
         
     
         mov     x9,     1                       // Initialize x9 to 1
@@ -149,7 +148,7 @@ end_3:
         
     
         
-        mov     x10,    ta_val                       // Move next multiplier to x10
+        mov     x10,    int                       // Move next multiplier to x10
         mul     x9,     x9,     x10             // And multiplies x10 to x9
         
         
@@ -184,265 +183,6 @@ else_4:
         bl      printf
 
 
-        
-    
-        mov     x9,     0                       // Initialize x9 to 0
-    
-        
-        
-    
-        
-        mov     x10,    10                       // Move next number to x10
-        add     x9,     x9,     x10             // And Adds x10 to x9
-        
-        
-    
-        
-        mov     x10,    90                       // Move next number to x10
-        add     x9,     x9,     x10             // And Adds x10 to x9
-        
-        
-    
-        
-        mov     x10,    200                       // Move next number to x10
-        add     x9,     x9,     x10             // And Adds x10 to x9
-        
-        
-    
-        
-        mov     x10,    300                       // Move next number to x10
-        add     x9,     x9,     x10             // And Adds x10 to x9
-        
-        
-    
-        mov     x11,     x9                      // Result
-
-        
-    
-    
-        
-        
-    
-        mov     x1,    x11
-        
-    
-        ldr     x0,     =outstr
-        bl      printf
-
-
-        mov     x_arr,  sd
-        
-        
-cmp     x_arr,     xzr                             // Compare negative
-        b.gt    if_5                           // Not negative
-        b       else_5                         
-
-if_5:   sub     x_arr,     xzr,    x_arr              // Negate the size
-else_5:
-        
-        and     x_arr,     x_arr,     -16             // And -16
-        add     sp,     sp,     x_arr              // Allocate on SP
-
-        
-
-
-        
-    
-    
-        
-        
-    
-        
-        add     x9,     x_arr,     sd_occ               // Add the size
-        str     wzr,    [x29,   x9]             // Store value
-        
-        
-    
-        
-        add     x9,     x_arr,     sd_frq               // Add the size
-        str     wzr,    [x29,   x9]             // Store value
-        
-        
-    
-        
-        add     x9,     x_arr,     sd_ind               // Add the size
-        str     wzr,    [x29,   x9]             // Store value
-        
-        
-    
-
-
-        
-        add     x9,     x_arr,     sd_frq              // Add the size
-        mov     x10,    13
-        str     x10,    [x29,   x9]             // And Adds x10 to x9
-
-        
-        add     x9,     x_arr,     sd_frq              // Add the size
-        ldr	    x11,     [x29,   x9]             // Load the value
-
-        
-    
-    
-        
-        
-    
-        mov     x1,    x11
-        
-    
-        ldr     x0,     =outstr
-        bl      printf
-
-
-        // Test for Arrays
-        
-    
-        mov     x9,     1                       // Initialize x9 to 1
-    
-        
-        
-    
-        
-        mov     x10,    x_row                       // Move next multiplier to x10
-        mul     x9,     x9,     x10             // And multiplies x10 to x9
-        
-        
-    
-        
-        mov     x10,    x_col                       // Move next multiplier to x10
-        mul     x9,     x9,     x10             // And multiplies x10 to x9
-        
-        
-    
-        
-        mov     x10,    ta_val                       // Move next multiplier to x10
-        mul     x9,     x9,     x10             // And multiplies x10 to x9
-        
-        
-    
-        mov     x_ar2,     x9                      // Result
-
-        
-        
-cmp     x_ar2,     xzr                             // Compare negative
-        b.gt    if_6                           // Not negative
-        b       else_6                         
-
-if_6:   sub     x_ar2,     xzr,    x_ar2              // Negate the size
-else_6:
-        
-        and     x_ar2,     x_ar2,     -16             // And -16
-        add     sp,     sp,     x_ar2              // Allocate on SP
-
-        
-
-
-        
-    
-        mov     x9,     1                       // Initialize x9 to 1
-    
-        
-        
-    
-        
-        mov     x10,    x_row                       // Move next multiplier to x10
-        mul     x9,     x9,     x10             // And multiplies x10 to x9
-        
-        
-    
-        
-        mov     x10,    x_col                       // Move next multiplier to x10
-        mul     x9,     x9,     x10             // And multiplies x10 to x9
-        
-        
-    
-        mov     x9,     x9                      // Result
-
-        
-    
-        mov     x9,     0                           // Loop Counter
-loop_7:
-        cmp     x9,     x9
-        b.eq    loop_end_7
-
-        mov     x10,    ta_val
-        mul     x10,    x10,    x9                  // Calculate Offset
-
-        str 	xzr,    [fp,    x10]                // Initialize with 0
-
-        add     x9,     x9,     1                   // Increment
-        b       loop_7
-
-loop_end_7:
-
-    
-    
-
-        
-        mov     x9,     ta_val
-        mov     x10,    23
-        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
-        add     x9,     x9,     x_ar2                  // Calculate Offset += Base
-
-        mov     x10,    69
-        str     x10,    [x29,   x9]
-
-        
-        mov     x9,     ta_val
-        mov     x10,    13
-        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
-        add     x9,     x9,     x_ar2                  // Calculate Offset += Base
-
-        mov     x10,    9
-        str     x10,    [x29,   x9]
-
-        
-        mov     x9,     ta_val
-        mov     x10,    13
-        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
-        add     x9,     x9,     x_ar2                  // Calculate Offset += Base
-
-        ldr     x11,     [x29,   x9]
-
-        
-    
-    
-        
-        
-    
-        mov     x1,    x11
-        
-    
-        ldr     x0,     =outstr
-        bl      printf
-
-        
-        mov     x9,     ta_val
-        mov     x10,    23
-        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
-        add     x9,     x9,     x_ar2                  // Calculate Offset += Base
-
-        ldr     x11,     [x29,   x9]
-
-        
-    
-    
-        
-        
-    
-        mov     x1,    x11
-        
-    
-        ldr     x0,     =outstr
-        bl      printf
-
-
-
-
-
-
-        b       end
-
 
 generate_table:
         mov     x_crow, xzr
@@ -456,8 +196,15 @@ generate_table_row:
         cmp     x_ccol, x_col
         b.eq    generate_table_col_end
 
+        // Generate Random Number
         
+        bl      rand                            // rand();
+        and  	x9,     x0,     0xF              // int x9 = rand() & 0xF;
+        mov     x11,     x9                      // x11 = x9;
 
+        add     x11,    x11,    1
+
+        // Calculate Index
         
     
         mov     x9,     1                       // Initialize x9 to 1
@@ -477,7 +224,7 @@ generate_table_row:
         
         
     
-        mov     x_off,     x9                      // Result
+        mov     x12,     x9                      // Result
 
         
     
@@ -498,44 +245,18 @@ generate_table_row:
         
         
     
-        mov     x_off,     x9                      // Result
-
-        
-    
-        mov     x9,     1                       // Initialize x9 to 1
-    
-        
-        
-    
-        
-        mov     x10,    x_off                       // Move next multiplier to x10
-        mul     x9,     x9,     x10             // And multiplies x10 to x9
-        
-        
-    
-        
-        mov     x10,    ta_val                       // Move next multiplier to x10
-        mul     x9,     x9,     x10             // And multiplies x10 to x9
-        
-        
-    
-        
-        mov     x10,    -1                       // Move next multiplier to x10
-        mul     x9,     x9,     x10             // And multiplies x10 to x9
-        
-        
-    
-        mov     x_off,     x9                      // Result
+        mov     x12,     x9                      // Result
 
 
         
-        bl      rand                            // rand();
-        and  	x9,     x0,     0xF              // int x9 = rand() & 0xF;
-        mov     x9,     x9                      // x9 = x9;
+        mov     x9,     int
+        mov     x10,    x12
+        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
+        add     x9,     x9,     x_2da                  // Calculate Offset += Base
 
-        add     x9,     x9,     1
-        str 	x9,     [fp, x_off]
-        ldr     x9,     [fp, x_off]
+        mov     x10,    x11
+        str     x10,    [x29,   x9]
+
 
         
     
@@ -552,7 +273,7 @@ generate_table_row:
         mov     x3,    x_off
         
     
-        mov     x4,    x9
+        mov     x4,    x11
         
     
         ldr     x0,     =aloc
@@ -621,7 +342,7 @@ print_table_row:
         
     
         
-        mov     x10,    ta_val                       // Move next multiplier to x10
+        mov     x10,    int                       // Move next multiplier to x10
         mul     x9,     x9,     x10             // And multiplies x10 to x9
         
         
@@ -673,16 +394,8 @@ end:    // Program end
 
         // Deallocate 2d Array of table
         
-        sub     x_ar2,     xzr,    x_ar2              // Negate the size again to positive
-        add     sp,     sp,     x_ar2              // Deallocate on SP
-
-        
-        sub     x_arr,     xzr,    x_arr              // Negate the size again to positive
-        add     sp,     sp,     x_arr              // Deallocate on SP
-
-        
-        sub     x_loc,     xzr,    x_loc              // Negate the size again to positive
-        add     sp,     sp,     x_loc              // Deallocate on SP
+        sub     x_2da,     xzr,    x_2da              // Negate the size again to positive
+        add     sp,     sp,     x_2da              // Deallocate on SP
 
         
         // Restores state
