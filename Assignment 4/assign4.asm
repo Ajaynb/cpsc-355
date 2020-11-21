@@ -30,7 +30,7 @@ highocc:.string "HIGHEST %d\n"
         x_off   .req    x23                     // current offset
         x_crow  .req    x24                     // current row index
         x_ccol  .req    x25                     // current column index
-        x_hiocc .req    x26                     
+        x_high  .req    x26                     
 
         // Renaming x29 and x30 to FP and LR
         fp      .req    x29
@@ -92,7 +92,7 @@ generate_table_row:
         cmp     x_crow, x_row
         b.eq    generate_table_row_end
         mov     x_ccol, xzr
-        mov     x_hiocc, xzr
+        mov     x_high, xzr
 
         // Calculate Index
         mulAll(x_off, x_crow, sd)
@@ -130,7 +130,7 @@ generate_table_row:
         writeStruct(x10, x_off, sd_occ)
 
         // Check highest occurence
-        max(x_hiocc, x_hiocc, x11)
+        max(x_high, x_high, x11)
 
         // Print
         print(aloc, x_crow, x_ccol, x9, x11)
@@ -140,8 +140,13 @@ generate_table_row:
         b       generate_table_col
         generate_table_col_end:
 
-
-        print(highocc, x_hiocc)
+        // Calculate Highest Frequency
+        readStruct(x11, x_off, sd_occ)
+        mulAll(x_high, x_high, 100)
+        sdiv    x_high,    x_high,    x11
+        print(highocc, x11)
+        print(highocc, x_high)
+        writeStruct(x_high, x_off, sd_frq)
 
         addAdd(x_crow)
         b       generate_table_row
@@ -163,7 +168,7 @@ print_table_row:
         addAll(x_off, x_off, x_1da, x_2da)
         print(outstr, x_off)
 
-        readStruct(x11, x_off, sd_occ)
+        readStruct(x11, x_off, sd_frq)
         print(outstr, x11)
 
 
