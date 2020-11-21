@@ -19,6 +19,7 @@
         // Defining the strings
 outstr: .string "ALLOC size: %d\n"                // The output string
 aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
+highocc:.string "HIGHEST %d\n"
 
         // Renaming registers
         x_row   .req    x19                     // row of table
@@ -29,6 +30,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         x_off   .req    x23                     // current offset
         x_crow  .req    x24                     // current row index
         x_ccol  .req    x25                     // current column index
+        x_hiocc .req    x26                     
 
         // Renaming x29 and x30 to FP and LR
         fp      .req    x29
@@ -90,6 +92,7 @@ generate_table_row:
         cmp     x_crow, x_row
         b.eq    generate_table_row_end
         mov     x_ccol, xzr
+        mov     x_hiocc, xzr
 
         // Calculate Index
         mulAll(x_off, x_crow, sd)
@@ -112,7 +115,7 @@ generate_table_row:
 
         // Generate Random Number
         random(x11, 0xF)
-        add     x11,    x11,    1
+        addEqual(x11, 1)
 
         // Calculate Index
         mulAll(x12, x_crow, x_col)
@@ -123,8 +126,11 @@ generate_table_row:
 
         // Add occurence to Structure total occurence
         readStruct(x12, x_off, sd_occ)
-        addEqual(x11, x12)
-        writeStruct(x11, x_off, sd_occ)
+        addAll(x10, x11, x12)
+        writeStruct(x10, x_off, sd_occ)
+
+        // Check highest occurence
+        max(x_hiocc, x_hiocc, x11)
 
         // Print
         print(aloc, x_crow, x_ccol, x9, x11)
@@ -134,6 +140,8 @@ generate_table_row:
         b       generate_table_col
         generate_table_col_end:
 
+
+        print(highocc, x_hiocc)
 
         addAdd(x_crow)
         b       generate_table_row

@@ -22,6 +22,7 @@
         // Defining the strings
 outstr: .string "ALLOC size: %d\n"                // The output string
 aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
+highocc:.string "HIGHEST %d\n"
 
         // Renaming registers
         x_row   .req    x19                     // row of table
@@ -32,6 +33,8 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         x_off   .req    x23                     // current offset
         x_crow  .req    x24                     // current row index
         x_ccol  .req    x25                     // current column index
+        x_hiocc .req    x26                     
+        x_rand  .req    x27
 
         // Renaming x29 and x30 to FP and LR
         fp      .req    x29
@@ -375,6 +378,7 @@ generate_table_row:
         mov     x11,     x9                      // x11 = x9;
 
         add     x11,    x11,    1
+        mov     x_rand, x11
 
         // Calculate Index
         
@@ -437,12 +441,57 @@ generate_table_row:
         ldr	    x12,     [x29,   x9]             // Load the value
 
         
-        add     x11, x11, x12
+    
+        mov     x9,     0                       // Initialize x9 to 0
+    
+        
+        
+    
+        
+        mov     x10,    x11                       // Move next number to x10
+        add     x9,     x9,     x10             // And Adds x10 to x9
+        
+        
+    
+        
+        mov     x10,    x12                       // Move next number to x10
+        add     x9,     x9,     x10             // And Adds x10 to x9
+        
+        
+    
+        mov     x10,     x9                      // Result
 
         
         add     x9,     x_off,     sd_occ              // Add the size
-        mov     x10,    x11
+        mov     x10,    x10
         str     x10,    [x29,   x9]             // And Adds x10 to x9
+
+
+        // Check highest occurence
+        
+    
+        cmp     x_hiocc,     x_rand
+        b.gt    if_6
+        b       else_6
+if_6:   mov    x_hiocc,     x_hiocc
+        b       end_6
+else_6: mov  x_hiocc,     x_rand
+        b       end_6
+end_6:
+    
+    
+
+        
+    
+    
+        
+        
+    
+        mov     x1,    x_hiocc
+        
+    
+        ldr     x0,     =highocc
+        bl      printf
 
 
         // Print
@@ -654,7 +703,6 @@ print_table_row:
     
         ldr     x0,     =aloc
         bl      printf
-
 
 
 
