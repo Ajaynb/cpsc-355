@@ -5,9 +5,9 @@ define(min, `
         cmp     $2,     $3
         b.lt    if_%s
         b       else_%s
-if_%s:   mov    $1,     $2
+if_%s:  mov    $1,     $2
         b       end_%s
-else_%s: mov  $1,     $3
+else_%s:mov  $1,     $3
         b       end_%s
 end_%s:
     ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))
@@ -20,9 +20,9 @@ define(max, `
         cmp     $2,     $3
         b.gt    if_%s
         b       else_%s
-if_%s:   mov    $1,     $2
+if_%s:  mov    $1,     $2
         b       end_%s
-else_%s: mov  $1,     $3
+else_%s:mov  $1,     $3
         b       end_%s
 end_%s:
     ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))
