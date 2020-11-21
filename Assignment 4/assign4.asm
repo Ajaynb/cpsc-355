@@ -23,10 +23,10 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         // Renaming registers
         x_row   .req    x19                     // row of table
         x_col   .req    x20                     // column of table
-        x_arr   .req    x21                     // 2d array of table
-        x_loc   .req    x23                     // 2d array allocate size
+        x_arr   .req    x21                     // 2d Array of table
+        x_loc   .req    x23                     // 2d Array allocate size
         x_ar2   .req    x27
-        x_dar   .req    x22                     // 5truct documents array
+        x_dar   .req    x22                     // 5truct documents Array
 
         x_crow  .req    x24                     // current row index
         x_ccol  .req    x25                     // current column index
@@ -42,8 +42,8 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         max_col = 16
         min_col = 4
 
-        // Equates for 2d array of table
-        ta_val = 8                              // table_array_values = sizeof(int)
+        // Equates for 2d Array of table
+        int = 8                              // table_array_values = sizeof(int)
 
         // Equates for 5truct Document          // 5truct Document {
         sd_occ = 0                              //     int occurence;
@@ -73,8 +73,8 @@ main:   // Main function
         min(x_col, x_col, max_col)
         max(x_col, x_col, min_col)
 
-        // Allocate 2d array of table
-        mulAll(x_loc, x_row,  x_col, ta_val)
+        // Allocate 2d Array of table
+        mulAll(x_loc, x_row,  x_col, int)
         alloc(x_loc)
         print(outstr, x_loc)
 
@@ -90,14 +90,17 @@ main:   // Main function
         print(outstr, x11)
 
         // Test for Arrays
-        mulAll(x_ar2, x_row, x_col, ta_val)
+        mulAll(x_ar2, x_row, x_col, int)
         alloc(x_ar2)
-        writeArray(69, x_ar2, ta_val, 23)
-        writeArray(9, x_ar2, ta_val, 13)
-        readArray(x11, x_ar2, ta_val, 13)
+        mulAll(x9, x_row, x_col)
+        array(x_ar2, x9, int)
+        writeArray(69, x_ar2, int, 23)
+        readArray(x11, x_ar2, int, 23)
         print(outstr, x11)
-        readArray(x11, x_ar2, ta_val, 23)
+        readArray(x11, x_ar2, int, 10)
         print(outstr, x11)
+
+
 
 
 
@@ -120,7 +123,7 @@ generate_table_row:
 
         mulAll(x_off, x_crow, x_col)
         addAll(x_off, x_off, x_ccol)
-        mulAll(x_off, x_off, ta_val, -1)
+        mulAll(x_off, x_off, int, -1)
 
         random(x9, 0xF)
         add     x9,     x9,     1
@@ -157,7 +160,7 @@ print_table_row:
 
         mulAll(x_off, x_crow, x_col)
         add     x_off,  x_off,  x_ccol
-        mulAll(x_off, x_off, ta_val, -1)
+        mulAll(x_off, x_off, int, -1)
 
 
         ldr     x9,     [x29, x_off]
@@ -175,7 +178,7 @@ print_table_row_end:
 
 end:    // Program end
 
-        // Deallocate 2d array of table
+        // Deallocate 2d Array of table
         dealloc(x_ar2)
         dealloc(x_arr)
         dealloc(x_loc)
