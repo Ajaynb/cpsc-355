@@ -5,7 +5,7 @@ define(struct, `
     foreach(`t', `$@', `
         ifelse(index, `1', `', `format(`
         add     x9,     $1,     t               // Add the size
-        str     wzr,    [x29,   x9]             // And Adds x10 to x9
+        str     wzr,    [x29,   x9]             // Store value
         ')')
         define(`index', incr(index))
     ')
@@ -13,7 +13,7 @@ define(struct, `
 // readStruct(value, base, attribute)
 define(readStruct, `
         add     x9,     $2,     $3              // Add the size
-        ldr		$1,     [x29,   x9]             // Load the value
+        ldr	    $1,     [x29,   x9]             // Load the value
 ')
 // writeStruct(value, base, attribute)
 define(writeStruct, `

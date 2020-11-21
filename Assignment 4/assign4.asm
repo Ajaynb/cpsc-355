@@ -4,6 +4,7 @@
         define(`g_count',`define(`g_counter',eval(g_counter+1))')dnl
         
         include(`alloc.m4')                     
+        include(`array.m4')                    
         include(`forloop3.m4')                  
         include(`foreach2.m4')                  // Includes also qu0te.m4
         include(`print.m4')                     
@@ -79,15 +80,15 @@ main:   // Main function
         addAll(x11, 10, 90, 200, 300)
         print(outstr, x11)
 
-        
-        alloc(x_arr, sd)
-        print(outstr, x_arr)
-
+        mov     x_arr,  sd
+        alloc(x_arr)
         struct(x_arr, sd_occ, sd_frq, sd_ind)
 
         writeStruct(13, x_arr, sd_frq)
         readStruct(x11, x_arr, sd_frq)
         print(outstr, x11)
+
+        
 
 
 
@@ -167,7 +168,6 @@ end:    // Program end
 
         // Deallocate 2d array of table
         dealloc(x_arr)
-
         dealloc(x_loc)
         
         // Restores state

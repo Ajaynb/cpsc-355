@@ -2,6 +2,7 @@
 
                         
                              
+                            
                           
         
                   // Includes also qu0te.m4
@@ -76,11 +77,24 @@ main:   // Main function
         
     
         cmp     x_row,     max_row
-        b.lt    if_1
+        b.lt    if_0
+        b       else_0
+if_0:   mov    x_row,     x_row
+        b       end_0
+else_0: mov  x_row,     max_row
+        b       end_0
+end_0:
+    
+    
+
+        
+    
+        cmp     x_row,     min_row
+        b.gt    if_1
         b       else_1
 if_1:   mov    x_row,     x_row
         b       end_1
-else_1: mov  x_row,     max_row
+else_1: mov  x_row,     min_row
         b       end_1
 end_1:
     
@@ -88,12 +102,12 @@ end_1:
 
         
     
-        cmp     x_row,     min_row
-        b.gt    if_2
+        cmp     x_col,     max_col
+        b.lt    if_2
         b       else_2
-if_2:   mov    x_row,     x_row
+if_2:   mov    x_col,     x_col
         b       end_2
-else_2: mov  x_row,     min_row
+else_2: mov  x_col,     max_col
         b       end_2
 end_2:
     
@@ -101,27 +115,14 @@ end_2:
 
         
     
-        cmp     x_col,     max_col
-        b.lt    if_3
+        cmp     x_col,     min_col
+        b.gt    if_3
         b       else_3
 if_3:   mov    x_col,     x_col
         b       end_3
-else_3: mov  x_col,     max_col
+else_3: mov  x_col,     min_col
         b       end_3
 end_3:
-    
-    
-
-        
-    
-        cmp     x_col,     min_col
-        b.gt    if_4
-        b       else_4
-if_4:   mov    x_col,     x_col
-        b       end_4
-else_4: mov  x_col,     min_col
-        b       end_4
-end_4:
     
     
 
@@ -157,11 +158,11 @@ end_4:
         
         
 cmp     x_loc,     xzr                             // Compare negative
-        b.gt    if_5                           // Not negative
-        b       else_5                         
+        b.gt    if_4                           // Not negative
+        b       else_4                         
 
-if_5:   sub     x_loc,     xzr,    x_loc              // Negate the size
-else_5:
+if_4:   sub     x_loc,     xzr,    x_loc              // Negate the size
+else_4:
         
         and     x_loc,     x_loc,     -16             // And -16
         add     sp,     sp,     x_loc              // Allocate on SP
@@ -228,15 +229,15 @@ else_5:
         bl      printf
 
 
-        
+        mov     x_arr,  sd
         
         
 cmp     x_arr,     xzr                             // Compare negative
-        b.gt    if_6                           // Not negative
-        b       else_6                         
+        b.gt    if_5                           // Not negative
+        b       else_5                         
 
-if_6:   sub     x_arr,     xzr,    x_arr              // Negate the size
-else_6:
+if_5:   sub     x_arr,     xzr,    x_arr              // Negate the size
+else_5:
         
         and     x_arr,     x_arr,     -16             // And -16
         add     sp,     sp,     x_arr              // Allocate on SP
@@ -250,33 +251,20 @@ else_6:
         
         
     
-        mov     x1,    x_arr
         
-    
-        ldr     x0,     =outstr
-        bl      printf
-
-
-        
-    
-    
-        
-        
-    
-        
-        add     x9,     x_arr,     sd_occ               // Add the size
+        add     x9,     0,     sd_occ               // Add the size
         str     wzr,    [x29,   x9]             // And Adds x10 to x9
         
         
     
         
-        add     x9,     x_arr,     sd_frq               // Add the size
+        add     x9,     0,     sd_frq               // Add the size
         str     wzr,    [x29,   x9]             // And Adds x10 to x9
         
         
     
         
-        add     x9,     x_arr,     sd_ind               // Add the size
+        add     x9,     0,     sd_ind               // Add the size
         str     wzr,    [x29,   x9]             // And Adds x10 to x9
         
         
@@ -290,7 +278,7 @@ else_6:
 
         
         add     x9,     x_arr,     sd_frq              // Add the size
-        ldr		x11,     [x29,   x9]             // Load the value
+        ldr	    x11,     [x29,   x9]             // Load the value
 
         
     
@@ -304,6 +292,8 @@ else_6:
         ldr     x0,     =outstr
         bl      printf
 
+
+        
 
 
 
@@ -541,7 +531,6 @@ end:    // Program end
         
         sub     x_arr,     xzr,    x_arr              // Negate the size again to positive
         add     sp,     sp,     x_arr              // Deallocate on SP
-
 
         
         sub     x_loc,     xzr,    x_loc              // Negate the size again to positive
