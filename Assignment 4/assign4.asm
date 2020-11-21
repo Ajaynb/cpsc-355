@@ -121,16 +121,21 @@ generate_table_row:
         // Write to 2d Array of Table
         writeArray(x11, x_2da, int, x12)
 
+        // Add occurence to Structure total occurence
+        readStruct(x12, x_off, sd_occ)
+        addEqual(x11, x12)
+        writeStruct(x11, x_off, sd_occ)
+
         // Print
         print(aloc, x_crow, x_ccol, x9, x11)
 
+        addAdd(x_ccol)
 
-        add     x_ccol, x_ccol, 1
         b       generate_table_col
         generate_table_col_end:
 
 
-        add     x_crow, x_crow, 1
+        addAdd(x_crow)
         b       generate_table_row
 generate_table_row_end:
 
@@ -150,7 +155,7 @@ print_table_row:
         addAll(x_off, x_off, x_1da, x_2da)
         print(outstr, x_off)
 
-        readStruct(x11, x_off, sd_ind)
+        readStruct(x11, x_off, sd_occ)
         print(outstr, x11)
 
 
@@ -171,13 +176,13 @@ print_table_row:
         print(aloc, x_crow, x_ccol, x12, x11)
 
 
+        addAdd(x_ccol)
 
-        add     x_ccol, x_ccol, 1
         b       print_table_col
         print_table_col_end:
 
 
-        add     x_crow, x_crow, 1
+        addAdd(x_crow)
         b       print_table_row
 print_table_row_end:
 

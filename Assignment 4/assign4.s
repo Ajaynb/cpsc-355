@@ -347,7 +347,7 @@ generate_table_row:
 
 
         
-        add     x9,     x_off,     sd_frq              // Add the size
+        add     x9,     x_off,     sd_ind              // Add the size
         ldr	    x11,     [x29,   x9]             // Load the value
 
         
@@ -431,6 +431,20 @@ generate_table_row:
         str     x10,    [x29,   x9]
 
 
+        // Add occurence to Structure total occurence
+        
+        add     x9,     x_off,     sd_occ              // Add the size
+        ldr	    x12,     [x29,   x9]             // Load the value
+
+        
+        add     x11, x11, x12
+
+        
+        add     x9,     x_off,     sd_occ              // Add the size
+        mov     x10,    x11
+        str     x10,    [x29,   x9]             // And Adds x10 to x9
+
+
         // Print
         
     
@@ -444,7 +458,7 @@ generate_table_row:
         mov     x2,    x_ccol
         
     
-        mov     x3,    x12
+        mov     x3,    x9
         
     
         mov     x4,    x11
@@ -454,13 +468,17 @@ generate_table_row:
         bl      printf
 
 
-
+        
         add     x_ccol, x_ccol, 1
+
+
         b       generate_table_col
         generate_table_col_end:
 
 
+        
         add     x_crow, x_crow, 1
+
         b       generate_table_row
 generate_table_row_end:
 
@@ -474,6 +492,87 @@ print_table_row:
         cmp     x_crow, x_row
         b.eq    print_table_row_end
         mov     x_ccol, xzr
+
+        // Calculate Index
+        
+    
+        mov     x9,     1                       // Initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x_crow                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    sd                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        mov     x_off,     x9                      // Result
+
+        
+    
+        mov     x9,     0                       // Initialize x9 to 0
+    
+        
+        
+    
+        
+        mov     x10,    x_off                       // Move next number to x10
+        add     x9,     x9,     x10             // And Adds x10 to x9
+        
+        
+    
+        
+        mov     x10,    x_1da                       // Move next number to x10
+        add     x9,     x9,     x10             // And Adds x10 to x9
+        
+        
+    
+        
+        mov     x10,    x_2da                       // Move next number to x10
+        add     x9,     x9,     x10             // And Adds x10 to x9
+        
+        
+    
+        mov     x_off,     x9                      // Result
+
+        
+    
+    
+        
+        
+    
+        mov     x1,    x_off
+        
+    
+        ldr     x0,     =outstr
+        bl      printf
+
+
+        
+        add     x9,     x_off,     sd_occ              // Add the size
+        ldr	    x11,     [x29,   x9]             // Load the value
+
+        
+    
+    
+        
+        
+    
+        mov     x1,    x11
+        
+    
+        ldr     x0,     =outstr
+        bl      printf
+
+
+
 
         print_table_col:
         cmp     x_ccol, x_col
@@ -559,12 +658,17 @@ print_table_row:
 
 
 
+        
         add     x_ccol, x_ccol, 1
+
+
         b       print_table_col
         print_table_col_end:
 
 
+        
         add     x_crow, x_crow, 1
+
         b       print_table_row
 print_table_row_end:
 
