@@ -26,9 +26,9 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         x_2da   .req    x21                     // 2d Array of Table
         x_1da   .req    x22                     // 5truct documents Array
 
+        x_off   .req    x23                     // current offset
         x_crow  .req    x24                     // current row index
         x_ccol  .req    x25                     // current column index
-        x_off   .req    x26                     // current offset
 
         // Renaming x29 and x30 to FP and LR
         fp      .req    x29
@@ -41,7 +41,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         min_col = 4
 
         // Equates for 2d Array of table
-        int = 4                              // table_array_values = sizeof(int)
+        int = 4                                 // sizeof(int)
 
         // Equates for 5truct Document          // 5truct Document {
         sd_occ = 0                              //     int occurence;
@@ -78,7 +78,7 @@ main:   // Main function
         print(outstr, x_2da)
 
         // Allocate 1d Array for Structures
-        mulAll(x_1da, x_row, x_col, sd)
+        mulAll(x_1da, x_row, sd)
         alloc(x_1da)
         print(outstr, x_1da)
 
@@ -90,6 +90,21 @@ generate_table_row:
         cmp     x_crow, x_row
         b.eq    generate_table_row_end
         mov     x_ccol, xzr
+
+        // Calculate Index
+        mulAll(x_off, x_crow, sd)
+        addAll(x_off, x_off, x_1da, x_2da)
+        print(outstr, x_off)
+
+        // Construct Structure
+        struct(x_off, sd_occ, sd_frq, sd_ind)
+        writeStruct(0, x_off, sd_occ)
+        writeStruct(0, x_off, sd_frq)
+        writeStruct(x_crow, x_off, sd_ind)
+
+        readStruct(x11, x_off, sd_ind)
+        print(outstr, x11)
+
 
         generate_table_col:
         cmp     x_ccol, x_col
@@ -103,11 +118,11 @@ generate_table_row:
         mulAll(x12, x_crow, x_col)
         addAll(x12, x12, x_ccol)
 
-        // Write to Array
+        // Write to 2d Array of Table
         writeArray(x11, x_2da, int, x12)
 
         // Print
-        print(aloc, x_crow, x_ccol, x12, x11)
+        print(aloc, x_crow, x_ccol, x9, x11)
 
 
         add     x_ccol, x_ccol, 1
@@ -118,6 +133,7 @@ generate_table_row:
         add     x_crow, x_crow, 1
         b       generate_table_row
 generate_table_row_end:
+
 
 
 print_table:
