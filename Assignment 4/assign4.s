@@ -26,10 +26,10 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         // Renaming registers
         x_row   .req    x19                     // row of table
         x_col   .req    x20                     // column of table
-        x_arr   .req    x21                     // 2d array of table
-        x_loc   .req    x23                     // 2d array allocate size
+        x_arr   .req    x21                     // 2d Array of table
+        x_loc   .req    x23                     // 2d Array allocate size
         x_ar2   .req    x27
-        x_dar   .req    x22                     // 5truct documents array
+        x_dar   .req    x22                     // 5truct documents Array
 
         x_crow  .req    x24                     // current row index
         x_ccol  .req    x25                     // current column index
@@ -45,7 +45,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         max_col = 16
         min_col = 4
 
-        // Equates for 2d array of table
+        // Equates for 2d Array of table
         ta_val = 8                              // table_array_values = sizeof(int)
 
         // Equates for 5truct Document          // 5truct Document {
@@ -128,7 +128,7 @@ end_3:
     
 
 
-        // Allocate 2d array of table
+        // Allocate 2d Array of table
         
     
         mov     x9,     1                       // Initialize x9 to 1
@@ -338,23 +338,69 @@ else_6:
 
 
         
+    
+        mov     x9,     1                       // Initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x_row                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    x_col                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        mov     x9,     x9                      // Result
+
+        
+    
+        mov     x9,     0                           // Loop Counter
+loop_7:
+        cmp     x9,     x9
+        b.eq    loop_end_7
+
+        mov     x10,    ta_val
+        mul     x10,    x10,    x9                  // Calculate Offset
+
+        str 	xzr,    [fp,    x10]                // Initialize with 0
+
+        add     x9,     x9,     1                   // Increment
+        b       loop_7
+
+loop_end_7:
+
+    
+    
+
+        
         mov     x9,     ta_val
-        mov     x10,    0
+        mov     x10,    23
         mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
         add     x9,     x9,     x_ar2                  // Calculate Offset += Base
-
-        // sub     x9,     xzr,    x9                  // Negate Offset
 
         mov     x10,    69
         str     x10,    [x29,   x9]
 
         
         mov     x9,     ta_val
-        mov     x10,    0
+        mov     x10,    13
         mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
         add     x9,     x9,     x_ar2                  // Calculate Offset += Base
 
-        // sub     x9,     xzr,    x9                  // Negate Offset
+        mov     x10,    9
+        str     x10,    [x29,   x9]
+
+        
+        mov     x9,     ta_val
+        mov     x10,    13
+        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
+        add     x9,     x9,     x_ar2                  // Calculate Offset += Base
 
         ldr     x11,     [x29,   x9]
 
@@ -369,6 +415,28 @@ else_6:
     
         ldr     x0,     =outstr
         bl      printf
+
+        
+        mov     x9,     ta_val
+        mov     x10,    23
+        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
+        add     x9,     x9,     x_ar2                  // Calculate Offset += Base
+
+        ldr     x11,     [x29,   x9]
+
+        
+    
+    
+        
+        
+    
+        mov     x1,    x11
+        
+    
+        ldr     x0,     =outstr
+        bl      printf
+
+
 
 
 
@@ -603,7 +671,7 @@ print_table_row_end:
 
 end:    // Program end
 
-        // Deallocate 2d array of table
+        // Deallocate 2d Array of table
         
         sub     x_ar2,     xzr,    x_ar2              // Negate the size again to positive
         add     sp,     sp,     x_ar2              // Deallocate on SP
