@@ -145,6 +145,16 @@ print_table_row:
         b.eq    print_table_row_end
         mov     x_ccol, xzr
 
+        // Calculate Index
+        mulAll(x_off, x_crow, sd)
+        addAll(x_off, x_off, x_1da, x_2da)
+        print(outstr, x_off)
+
+        readStruct(x11, x_off, sd_ind)
+        print(outstr, x11)
+
+
+
         print_table_col:
         cmp     x_ccol, x_col
         b.eq    print_table_col_end
