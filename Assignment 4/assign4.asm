@@ -3,13 +3,14 @@
         define(`g_counter',`0')dnl
         define(`g_count',`define(`g_counter',eval(g_counter+1))')dnl
         
-        include(`alloc.m4')                     // Includes also muIAll.m4
+        include(`alloc.m4')                     
         include(`forloop3.m4')                  
         include(`foreach2.m4')                  // Includes also qu0te.m4
         include(`print.m4')                     
         include(`minmax.m4')                    
         include(`rand.m4')                      
         include(`addAll.m4')                    
+        include(`mulAll.m4')                    
         include(`struct.m4')                    
 
         
@@ -71,7 +72,8 @@ main:   // Main function
         max(x_col, x_col, min_col)
 
         // Allocate 2d array of table
-        alloc(x_loc, x_row,  x_col, ta_val)
+        mulAll(x_loc, x_row,  x_col, ta_val)
+        alloc(x_loc)
         print(outstr, x_loc)
 
         addAll(x11, 10, 90, 200, 300)

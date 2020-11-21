@@ -1,16 +1,16 @@
 
 
                         
-        
-
-
-                     // Includes also muIAll.m4
+                             
                           
         
                   // Includes also qu0te.m4
                              
                             
                               
+        
+
+                    
         
 
                     
@@ -29,8 +29,8 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         x_loc   .req    x23                     // 2d array allocate size
         x_dar   .req    x22                     // 5truct documents array
 
-        x_crow  .req    x24                     // current row 5
-        x_ccol  .req    x25                     // current column 5
+        x_crow  .req    x24                     // current row index
+        x_ccol  .req    x25                     // current column index
         x_off   .req    x26                     // current offset
 
         // Renaming x29 and x30 to FP and LR
@@ -49,7 +49,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         // Equates for 5truct Document          // 5truct Document {
         sd_occ = 0                              //     int occurence;
         sd_frq = 4                              //     int frequency;
-        sd_ind = 8                              //     int 5;
+        sd_ind = 8                              //     int index;
         sd = 12                                 // };
 
         // Expose main function to OS and set balign
@@ -128,7 +128,6 @@ end_4:
 
         // Allocate 2d array of table
         
-        
     
         mov     x9,     1                       // Initialize x9 to 1
     
@@ -154,8 +153,8 @@ end_4:
         
     
         mov     x_loc,     x9                      // Result
-                              // Multiply all parameters to get a final size
 
+        
         
 cmp     x_loc,     xzr                             // Compare negative
         b.gt    if_5                           // Not negative
@@ -232,22 +231,6 @@ else_5:
         
         
         
-    
-        mov     x9,     1                       // Initialize x9 to 1
-    
-        
-        
-    
-        
-        mov     x10,    sd                       // Move next multiplier to x10
-        mul     x9,     x9,     x10             // And multiplies x10 to x9
-        
-        
-    
-        mov     x_arr,     x9                      // Result
-                              // Multiply all parameters to get a final size
-
-        
 cmp     x_arr,     xzr                             // Compare negative
         b.gt    if_6                           // Not negative
         b       else_6                         
@@ -302,7 +285,8 @@ else_6:
 
         
         add     x9,     x_arr,     sd_frq              // Add the size
-        str     13,     [x29,   x9]             // And Adds x10 to x9
+        mov     x10,    13
+        str     x10,    [x29,   x9]             // And Adds x10 to x9
 
         
         add     x9,     x_arr,     sd_frq              // Add the size

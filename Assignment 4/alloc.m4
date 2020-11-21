@@ -1,9 +1,6 @@
-include(`mulAll.m4')
 divert(`-1')
-// Defining Open Routine Functions: alloc(destination, param1, param2, ...)
+// alloc(size)
 define(alloc, `
-        mulAll($@)                              // Multiply all parameters to get a final size
-
         format(`
 cmp     $1,     xzr                             // Compare negative
         b.gt    if_%s                           // Not negative
@@ -18,7 +15,7 @@ else_%s:
         g_count()
 
 ')
-// Defining Open Routine Functions: dealloc(size)
+// dealloc(size)
 define(dealloc, `
         sub     $1,     xzr,    $1              // Negate the size again to positive
         add     sp,     sp,     $1              // Deallocate on SP

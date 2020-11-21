@@ -1,4 +1,5 @@
 divert(`-1')
+// print(string, param1, param2, ...)
 define(print, `
     define(`index', eval(`0'))
     foreach(`t', `$@', `

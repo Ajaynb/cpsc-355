@@ -1,5 +1,5 @@
 divert(`-1')
-// Defining Open Routine Functions: alloc(destination, param1, param2, ...)
+// struct(base, attribute1, attribute2, ...)
 define(struct, `
     define(`index', eval(`1'))
     foreach(`t', `$@', `
@@ -10,12 +10,12 @@ define(struct, `
         define(`index', incr(index))
     ')
 ')
-// Defining Open Routine Functions: dealloc(size)
+// readStruct(value, base, attribute)
 define(readStruct, `
         add     x9,     $2,     $3              // Add the size
         ldr		$1,     [x29,   x9]             // Load the value
 ')
-// Defining Open Routine Functions: dealloc(size)
+// writeStruct(value, base, attribute)
 define(writeStruct, `
         add     x9,     $2,     $3              // Add the size
         mov     x10,    $1

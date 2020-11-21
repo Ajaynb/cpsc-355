@@ -1,6 +1,6 @@
 include(`foreach2.m4')
 divert(`-1')
-// Additions: add(destination, param2, param3, ...)
+// add(destination, param2, param3, ...)
 define(addAll, `
     define(`index', eval(`1'))
         mov     x9,     0                       // Initialize x9 to 0

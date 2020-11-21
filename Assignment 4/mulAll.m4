@@ -1,6 +1,6 @@
 include(`foreach2.m4')
 divert(`-1')
-// Multiplications: multiply(destination, param2, param3, ...)
+// multiply(destination, param2, param3, ...)
 define(mulAll, `
     define(`index', eval(`1'))
         mov     x9,     1                       // Initialize x9 to 1
