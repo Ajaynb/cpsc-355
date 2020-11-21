@@ -7,7 +7,7 @@ define(alloc, `
         b.gt    if_%s                           // Not negative
         b       else_%s                         
 
-if_%s:   sub     $1,     xzr,    $1              // Negate the size
+if_%s:  sub     $1,     xzr,    $1              // Negate the size
 else_%s:
         and     $1,     $1,     -16             // And -16
         add     sp,     sp,     $1              // Allocate on SP
