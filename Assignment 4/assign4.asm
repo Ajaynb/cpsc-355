@@ -41,7 +41,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         min_col = 4
 
         // Equates for 2d Array of table
-        int = 8                              // table_array_values = sizeof(int)
+        int = 4                              // table_array_values = sizeof(int)
 
         // Equates for 5truct Document          // 5truct Document {
         sd_occ = 0                              //     int occurence;
@@ -76,6 +76,11 @@ main:   // Main function
         mulAll(x_2da, x_row,  x_col, int)
         alloc(x_2da)
         print(outstr, x_2da)
+
+        // Allocate 1d Array for Structures
+        mulAll(x_1da, x_row, x_col, sd)
+        alloc(x_1da)
+        print(outstr, x_1da)
 
 
 generate_table:
@@ -154,6 +159,7 @@ print_table_row_end:
 end:    // Program end
 
         // Deallocate 2d Array of table
+        dealloc(x_1da)
         dealloc(x_2da)
         
         // Restores state
