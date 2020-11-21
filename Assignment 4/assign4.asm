@@ -25,6 +25,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         x_col   .req    x20                     // column of table
         x_arr   .req    x21                     // 2d array of table
         x_loc   .req    x23                     // 2d array allocate size
+        x_ar2   .req    x27
         x_dar   .req    x22                     // 5truct documents array
 
         x_crow  .req    x24                     // current row index
@@ -88,7 +89,15 @@ main:   // Main function
         readStruct(x11, x_arr, sd_frq)
         print(outstr, x11)
 
-        
+        // Test for Arrays
+        mulAll(x_ar2, x_row, x_col, ta_val)
+        alloc(x_ar2)
+        writeArray(69, x_ar2, ta_val, 23)
+        writeArray(9, x_ar2, ta_val, 13)
+        readArray(x11, x_ar2, ta_val, 13)
+        print(outstr, x11)
+        readArray(x11, x_ar2, ta_val, 23)
+        print(outstr, x11)
 
 
 
@@ -167,6 +176,7 @@ print_table_row_end:
 end:    // Program end
 
         // Deallocate 2d array of table
+        dealloc(x_ar2)
         dealloc(x_arr)
         dealloc(x_loc)
         

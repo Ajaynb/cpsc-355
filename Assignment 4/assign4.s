@@ -28,6 +28,7 @@ aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
         x_col   .req    x20                     // column of table
         x_arr   .req    x21                     // 2d array of table
         x_loc   .req    x23                     // 2d array allocate size
+        x_ar2   .req    x27
         x_dar   .req    x22                     // 5truct documents array
 
         x_crow  .req    x24                     // current row index
@@ -252,20 +253,20 @@ else_5:
         
     
         
-        add     x9,     0,     sd_occ               // Add the size
-        str     wzr,    [x29,   x9]             // And Adds x10 to x9
+        add     x9,     x_arr,     sd_occ               // Add the size
+        str     wzr,    [x29,   x9]             // Store value
         
         
     
         
-        add     x9,     0,     sd_frq               // Add the size
-        str     wzr,    [x29,   x9]             // And Adds x10 to x9
+        add     x9,     x_arr,     sd_frq               // Add the size
+        str     wzr,    [x29,   x9]             // Store value
         
         
     
         
-        add     x9,     0,     sd_ind               // Add the size
-        str     wzr,    [x29,   x9]             // And Adds x10 to x9
+        add     x9,     x_arr,     sd_ind               // Add the size
+        str     wzr,    [x29,   x9]             // Store value
         
         
     
@@ -293,7 +294,82 @@ else_5:
         bl      printf
 
 
+        // Test for Arrays
         
+    
+        mov     x9,     1                       // Initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x_row                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    x_col                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    ta_val                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        mov     x_ar2,     x9                      // Result
+
+        
+        
+cmp     x_ar2,     xzr                             // Compare negative
+        b.gt    if_6                           // Not negative
+        b       else_6                         
+
+if_6:   sub     x_ar2,     xzr,    x_ar2              // Negate the size
+else_6:
+        
+        and     x_ar2,     x_ar2,     -16             // And -16
+        add     sp,     sp,     x_ar2              // Allocate on SP
+
+        
+
+
+        
+        mov     x9,     ta_val
+        mov     x10,    0
+        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
+        add     x9,     x9,     x_ar2                  // Calculate Offset += Base
+
+        // sub     x9,     xzr,    x9                  // Negate Offset
+
+        mov     x10,    69
+        str     x10,    [x29,   x9]
+
+        
+        mov     x9,     ta_val
+        mov     x10,    0
+        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
+        add     x9,     x9,     x_ar2                  // Calculate Offset += Base
+
+        // sub     x9,     xzr,    x9                  // Negate Offset
+
+        ldr     x11,     [x29,   x9]
+
+        
+    
+    
+        
+        
+    
+        mov     x1,    x11
+        
+    
+        ldr     x0,     =outstr
+        bl      printf
+
 
 
 
@@ -528,6 +604,10 @@ print_table_row_end:
 end:    // Program end
 
         // Deallocate 2d array of table
+        
+        sub     x_ar2,     xzr,    x_ar2              // Negate the size again to positive
+        add     sp,     sp,     x_ar2              // Deallocate on SP
+
         
         sub     x_arr,     xzr,    x_arr              // Negate the size again to positive
         add     sp,     sp,     x_arr              // Deallocate on SP
