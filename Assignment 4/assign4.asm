@@ -20,7 +20,7 @@
 outstr: .string "ALLOC size: %d\n"              // The output string
 aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
 highocc:.string "HIGHEST %d\n"
-tblhead:.string "Document   | Words              | Most Frequent | Percentage (Occurence / Total Occurence)\n----------------------------------------------------------------------------------------\n"
+tblhead:.string "Document   | Words              | Most Frequent | Percentage (Occurence / Total Occurence)\n------------------------------------------------------------------------------------------\n"
 docstr: .string "Document %d |"                 // Doucment 4:
 occstr: .string "%3.d "                         // Occurences
 frqstr: .string "|        Word %d | %d%% (%d/%d)"                         // Frequency
