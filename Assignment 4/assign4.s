@@ -20,9 +20,13 @@
         
 
         // Defining the strings
-outstr: .string "ALLOC size: %d\n"                // The output string
+outstr: .string "ALLOC size: %d\n"              // The output string
 aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
 highocc:.string "HIGHEST %d\n"
+docstr: .string "Document %d: "                 // Doucment 4:
+occstr: .string "%2.d "                         // Occurences
+frqstr: .string "%d%%"                          // Frequency
+linebr: .string "\n"
 
         // Renaming registers
         x_row   .req    x19                     // row of table
@@ -33,8 +37,7 @@ highocc:.string "HIGHEST %d\n"
         x_off   .req    x23                     // current offset
         x_crow  .req    x24                     // current row index
         x_ccol  .req    x25                     // current column index
-        x_hiocc .req    x26                     
-        x_rand  .req    x27
+        x_high  .req    x26                     
 
         // Renaming x29 and x30 to FP and LR
         fp      .req    x29
@@ -244,6 +247,7 @@ generate_table_row:
         cmp     x_crow, x_row
         b.eq    generate_table_row_end
         mov     x_ccol, xzr
+        mov     x_high, xzr
 
         // Calculate Index
         
@@ -377,8 +381,9 @@ generate_table_row:
         and  	x9,     x0,     0xF              // int x9 = rand() & 0xF;
         mov     x11,     x9                      // x11 = x9;
 
-        add     x11,    x11,    1
-        mov     x_rand, x11
+        
+        add     x11, x11, 1
+
 
         // Calculate Index
         
@@ -470,28 +475,16 @@ generate_table_row:
         // Check highest occurence
         
     
-        cmp     x_hiocc,     x_rand
+        cmp     x_high,     x11
         b.gt    if_6
         b       else_6
-if_6:   mov    x_hiocc,     x_hiocc
+if_6:   mov    x_high,     x_high
         b       end_6
-else_6: mov  x_hiocc,     x_rand
+else_6: mov  x_high,     x11
         b       end_6
 end_6:
     
     
-
-        
-    
-    
-        
-        
-    
-        mov     x1,    x_hiocc
-        
-    
-        ldr     x0,     =highocc
-        bl      printf
 
 
         // Print
@@ -524,6 +517,62 @@ end_6:
         b       generate_table_col
         generate_table_col_end:
 
+        // Calculate Highest Frequency
+        
+        add     x9,     x_off,     sd_occ              // Add the size
+        ldr	    x11,     [x29,   x9]             // Load the value
+
+        
+    
+        mov     x9,     1                       // Initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x_high                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    100                       // Move next multiplier to x10
+        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        
+        
+    
+        mov     x_high,     x9                      // Result
+
+        sdiv    x_high,    x_high,    x11
+        
+    
+    
+        
+        
+    
+        mov     x1,    x11
+        
+    
+        ldr     x0,     =highocc
+        bl      printf
+
+        
+    
+    
+        
+        
+    
+        mov     x1,    x_high
+        
+    
+        ldr     x0,     =highocc
+        bl      printf
+
+        
+        add     x9,     x_off,     sd_frq              // Add the size
+        mov     x10,    x_high
+        str     x10,    [x29,   x9]             // And Adds x10 to x9
+
 
         
         add     x_crow, x_crow, 1
@@ -542,7 +591,7 @@ print_table_row:
         b.eq    print_table_row_end
         mov     x_ccol, xzr
 
-        // Calculate Index
+        // Calculate Offset
         
     
         mov     x9,     1                       // Initialize x9 to 1
@@ -591,35 +640,19 @@ print_table_row:
     
         mov     x_off,     x9                      // Result
 
+
+        // Print Document Index
         
     
     
         
         
     
-        mov     x1,    x_off
+        mov     x1,    xcrow
         
     
-        ldr     x0,     =outstr
+        ldr     x0,     =docstr
         bl      printf
-
-
-        
-        add     x9,     x_off,     sd_occ              // Add the size
-        ldr	    x11,     [x29,   x9]             // Load the value
-
-        
-    
-    
-        
-        
-    
-        mov     x1,    x11
-        
-    
-        ldr     x0,     =outstr
-        bl      printf
-
 
 
 
@@ -689,19 +722,10 @@ print_table_row:
         
         
     
-        mov     x1,    x_crow
+        mov     x1,    x11
         
     
-        mov     x2,    x_ccol
-        
-    
-        mov     x3,    x12
-        
-    
-        mov     x4,    x11
-        
-    
-        ldr     x0,     =aloc
+        ldr     x0,     =occstr
         bl      printf
 
 
@@ -712,6 +736,35 @@ print_table_row:
 
         b       print_table_col
         print_table_col_end:
+
+
+        
+        
+        add     x9,     x_off,     sd_frq              // Add the size
+        ldr	    x11,     [x29,   x9]             // Load the value
+
+        
+    
+    
+        
+        
+    
+        mov     x1,    x11
+        
+    
+        ldr     x0,     =frqstr
+        bl      printf
+
+        
+        
+    
+    
+        
+        
+    
+        ldr     x0,     =linebr
+        bl      printf
+
 
 
         
