@@ -70,6 +70,11 @@ main:   // Main function
         mov     x_row,  0
         mov     x_col,  0
 
+        cmp     x0,     3
+        b.ge    command_param
+        b       command_param_skip
+
+command_param:
         mov 	x_argv, x1
         ldr 	x0, 	[x_argv, 8]
         bl 	atoi
@@ -78,6 +83,7 @@ main:   // Main function
         ldr	x0, 	[x_argv, 16]
         bl 	atoi
         mov 	x_col, 	x0
+command_param_skip:
 
 
         // Random seed
