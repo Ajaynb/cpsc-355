@@ -86,7 +86,6 @@ main:   // Main function
         mulAll(x_1da, x_row, sd)                // x_1da = x_row * sd; Calculate memory size of 1d Array of Structures
         alloc(x_1da)                            //                              Allocate x_1da size of memory
 
-
 generate_table:
         mov     x_crow, xzr                     // x_crow = 0; Set current row index to 0
 
