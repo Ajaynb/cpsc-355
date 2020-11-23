@@ -6,7 +6,7 @@
         include(`alloc.m4')                     
         include(`array.m4')                    
         include(`forloop3.m4')                  
-        include(`foreach2.m4')                  // Includes also qu0te.m4
+        include(`foreach2.m4')                  // Includes qu0te.m4
         include(`print.m4')                     
         include(`minmax.m4')                    
         include(`rand.m4')                      
@@ -17,13 +17,10 @@
         
 
         // Defining the strings
-outstr: .string "ALLOC size: %d\n"              // The output string
-aloc:   .string "ALLOC[%d][%d](%d) = %d\n"
-highocc:.string "HIGHEST %d\n"
 tblhead:.string "Document   | Words              | Most Frequent | Percentage (Occurence / Total Occurence)\n------------------------------------------------------------------------------------------\n"
-docstr: .string "Document %d |"                 // Doucment 4:
-occstr: .string "%3.d "                         // Occurences
-frqstr: .string "|        Word %d | %d%% (%d/%d)"                         // Frequency
+docstr: .string "Document %d |"
+occstr: .string "%3.d "
+frqstr: .string "|        Word %d | %d%% (%d/%d)"
 linebr: .string "\n"
 
         // Renaming registers
@@ -51,7 +48,7 @@ linebr: .string "\n"
         // Equates for 2d Array of table
         int = 8                                 // sizeof(int)
 
-        // Equates for 5truct Document          // 5truct Document {
+        // Equates for Structucture Document    // Struct Document {
         sd_occ = 0                              //     int hiOccurence;
         sd_frq = 8                              //     int hiFrequency;
         sd_ind = 16                             //     int hiIndex;
@@ -69,169 +66,157 @@ main:   // Main function
 
         // Random seed
         randomSeed()
-        
+
         // Set up row and col variables
         mov     x_row,  5
         mov     x_col,  5
 
-        // Limit the range of x_row and x_col as input validation
-        min(x_row, x_row, max_row)
-        max(x_row, x_row, min_row)
-        min(x_col, x_col, max_col)
-        max(x_col, x_col, min_col)
+        // Limit the range of row and col as input validation
+        min(x_row, x_row, max_row)              // x_row = Min(x_row, max_row);
+        max(x_row, x_row, min_row)              // x_row = Max(x_row, min_row);
+        min(x_col, x_col, max_col)              // x_col = Min(x_col, max_col);
+        max(x_col, x_col, min_col)              // x_col = Max(x_col, min_col);
 
         
         // Allocate 2d Array for Table
-        mulAll(x_2da, x_row,  x_col, int)
-        alloc(x_2da)
-        print(outstr, x_2da)
+        mulAll(x_2da, x_row,  x_col, int)       // x_2da = x_row * x_col * int; Calculate memory size of 2d Array of the Table
+        alloc(x_2da)                            //                              Allocate x_2da size of memory
 
         // Allocate 1d Array for Structures
-        mulAll(x_1da, x_row, sd)
-        alloc(x_1da)
-        print(outstr, x_1da)
+        mulAll(x_1da, x_row, sd)                // x_1da = x_row * sd; Calculate memory size of 1d Array of Structures
+        alloc(x_1da)                            //                              Allocate x_1da size of memory
 
 
 generate_table:
-        mov     x_crow, xzr
+        mov     x_crow, xzr                     // x_crow = 0; Set current row index to 0
 
-generate_table_row:
-        cmp     x_crow, x_row
-        b.eq    generate_table_row_end
-        mov     x_ccol, xzr
-        mov     x_hiocc, xzr
+generate_table_row:                             // Start of the while loop
+        cmp     x_crow, x_row                   // if (x_crow == x_row)         If the current row index reaches the row amount
+        b.eq    generate_table_row_end          // {generate_table_row_end}     then go to generate_table_row_end to end the loop
+        mov     x_ccol, xzr                     // x_ccol = 0;                  Set current column index to 0
+        mov     x_hiocc, xzr                    // x_hiocc = 0;                 Set the current highest occurence to 0
 
         // Calculate Index
-        mulAll(x_off, x_crow, sd)
-        addAll(x_off, x_off, x_1da, x_2da)
-        print(outstr, x_off)
+        mulAll(x_off, x_crow, sd)               // x_off = x_crow * sd;         Calculate offset of the current element in 1d Array of Structures
+        addAll(x_off, x_off, x_1da, x_2da)      // x_off = x_off + x_1da + x_2da;
 
         // Construct Structure
-        struct(x_off, sd_occ, sd_frq, sd_ind, sd_tocc)
-        writeStruct(0, x_off, sd_occ)
-        writeStruct(0, x_off, sd_frq)
-        writeStruct(0, x_off, sd_tocc)
-        writeStruct(x_crow, x_off, sd_ind)
-
-        readStruct(x11, x_off, sd_ind)
-        print(outstr, x11)
+        struct(x_off, sd_occ, sd_frq, sd_ind, sd_tocc)  // Construct the Structure
+        writeStruct(0, x_off, sd_occ)           // Initialize 0 to the Structure document.hiOccurence
+        writeStruct(0, x_off, sd_frq)           // Initialize 0 to the Structure document.hiFrequency
+        writeStruct(0, x_off, sd_tocc)          // Initialize 0 to the Structure document.totalOccurence
+        writeStruct(0, x_off, sd_ind)           // Initialize 0 to the Structure document.occurence
 
 
-        generate_table_col:
-        cmp     x_ccol, x_col
-        b.eq    generate_table_col_end
+        generate_table_col:                     // Start of the while loop
+        cmp     x_ccol, x_col                   // if (x_ccol == x_col)         If current column index reached the column amount
+        b.eq    generate_table_col_end          // {generate_table_col_end}     then go to generate_table_col_end to end the loop
 
         // Generate Random Number
-        random(x11, 0xF)
-        addEqual(x11, 1)
+        random(x11, 0xF)                        // int rand = Random(15);       Generate a Random number from 0 to 15
+        addEqual(x11, 1)                        // rand += 1;                   Let the range be 1 to 16
 
         // Calculate Index
-        mulAll(x12, x_crow, x_col)
-        addAll(x12, x12, x_ccol)
+        mulAll(x12, x_crow, x_col)              // int index = x_crow * x_col; 
+        addAll(x12, x12, x_ccol)                // index = index + x_ccol;      Calculate current index in the 2d Array of the Table
 
         // Write to 2d Array of Table
-        writeArray(x11, x_2da, int, x12)
+        writeArray(x11, x_2da, int, x12)        // x_2da[index] = rand; Write the Random number to the Array
 
         // Add occurence to Structure total occurence
-        readStruct(x12, x_off, sd_tocc)
-        addAll(x10, x11, x12)
-        writeStruct(x10, x_off, sd_tocc)
+        readStruct(x12, x_off, sd_tocc)         // int totalOccurence = x_1da[x_off].tocc;              Read the total occurence from the current Structure from the 1d Array of Structure
+        addAll(x10, x11, x12)                   // int newTotalOccurnece = totalOccurence + rand;       Calculate the new total occurence
+        writeStruct(x10, x_off, sd_tocc)        // x_1da[x_off].tocc = newTotalOccurnece;               Write back the new total occurence to the Structure
 
         // Check highest occurence & index
-        cmp     x_hiocc,x11
-        b.lt    struct_write
-        b       struct_else
+        cmp     x_hiocc,x11                     // if (x_hiocc < rand)          If the current rand value is greater than the highest occurence
+        b.lt    struct_write                    // {struct_write}               then go to struct_write to overwrite the value
+        b       struct_else                     // else{}                       otherwise do nothing
 struct_write:
-        mov     x_hiocc,x11
-        mov     x_hiind,x_ccol
+        mov     x_hiocc,x11                     // x_hiocc = rand;              Set the highest value to rand as the new highest one
+        mov     x_hiind,x_ccol                  // x_hiind = x_ccol;            Set the highest index to the current index
 struct_else:
 
-        // Print
-        print(aloc, x_crow, x_ccol, x9, x11)
-
-        addAdd(x_ccol)
-
-        b       generate_table_col
-        generate_table_col_end:
+        addAdd(x_ccol)                          // x_ccol ++;                   Index increment
+        b       generate_table_col              // Go back to the loop top
+        generate_table_col_end:                 // End of while loop
 
         // Write highest occurence & index
-        writeStruct(x_hiocc, x_off, sd_occ)
-        writeStruct(x_hiind, x_off, sd_ind)
+        writeStruct(x_hiocc, x_off, sd_occ)     // x_1da[x_off].occurence = x_hiocc             Write the hiOccurent to the Structure
+        writeStruct(x_hiind, x_off, sd_ind)     // x_1da[x_off].index = x_hiind                 Write the hiIndex to the Structure
         
         // Calculate Highest Frequency
-        readStruct(x11, x_off, sd_tocc)
-        mulAll(x_hiocc, x_hiocc, 100)
-        sdiv    x_hiocc,    x_hiocc,    x11
-        print(highocc, x11)
-        print(highocc, x_hiocc)
-        writeStruct(x_hiocc, x_off, sd_frq)
+        readStruct(x11, x_off, sd_tocc)         // int totalOccurence = x_1da[x_off].tocc;      Read the total occurence from the Structure
+        mulAll(x_hiocc, x_hiocc, 100)           // x_hiocc = x_hiocc * 100;                         
+        sdiv    x_hiocc,    x_hiocc,    x11     // x_hiocc = x_hiocc / totalOccurence;          Divide to get the frequency
+        writeStruct(x_hiocc, x_off, sd_frq)     // x_1da[x_off].frequency = x_hiocc;            Write the highest frequency to the Structure
 
-        addAdd(x_crow)
-        b       generate_table_row
-generate_table_row_end:
+        addAdd(x_crow)                          // x_crow ++;                                   Index increment
+        b       generate_table_row              // Go back to the top
+generate_table_row_end:                         // End of while loop
 
 
 
 print_table:
-        mov     x_crow, xzr
-        mov     x_off,  xzr
+        mov     x_crow, xzr                     // x_crow = 0; Set current row index to 0
+        mov     x_off,  xzr                     // x_off = 0; Set current offset to 0
 
-        print(tblhead)
+        print(tblhead)                          // Print table head
 
-print_table_row:
-        cmp     x_crow, x_row
-        b.eq    print_table_row_end
-        mov     x_ccol, xzr
+print_table_row:                                // Start of the while loop
+        cmp     x_crow, x_row                   // if (x_crow == x_row)         If current row index reached the row amount
+        b.eq    print_table_row_end             // {print_table_row_end}        then go to print_table_row_end to end the loop
+        mov     x_ccol, xzr                     // x_ccol = 0;                  Intialize 0 to the current column index
 
         // Calculate Offset
-        mulAll(x_off, x_crow, sd)
-        addAll(x_off, x_off, x_1da, x_2da)
+        mulAll(x_off, x_crow, sd)               // x_off = x_crow * sd;
+        addAll(x_off, x_off, x_1da, x_2da)      // x_off = x_off + x_1da + x_2da;
 
         // Print Document Index
-        print(docstr, x_crow)
+        print(docstr, x_crow)                   //                              Print the document index
 
 
-        print_table_col:
-        cmp     x_ccol, x_col
-        b.eq    print_table_col_end
+        print_table_col:                        // Start of the while loop
+        cmp     x_ccol, x_col                   // if (x_ccol == x_col)         If current column index reached the column amount
+        b.eq    print_table_col_end             // {print_table_col_end}        then go to print_table_col_end to end the loop
 
 
         // Calculate Index
-        mulAll(x12, x_crow, x_col)
-        addAll(x12, x12, x_ccol)
+        mulAll(x12, x_crow, x_col)              // int index = x_crow + x_col;
+        addAll(x12, x12, x_ccol)                // index = index + x_ccol;      Calculate current index in the 2d Array of the Table
 
-        // Write to Array
-        readArray(x11, x_2da, int, x12)
+        // Read from Array
+        readArray(x11, x_2da, int, x12)         // int occ = x_2da[index];      Read the occurence of current word from 2d Array of the Table
 
         // Print Current Word Occurence
-        print(occstr, x11)
+        print(occstr, x11)                      //                              Print the word occurence
 
 
-        addAdd(x_ccol)
+        addAdd(x_ccol)                          // x_ccol ++;                   Index increment
 
-        b       print_table_col
-        print_table_col_end:
+        b       print_table_col                 // Go back to the loop
+        print_table_col_end:                    // End of the while loop
 
-
-        readStruct(x11, x_off, sd_ind)
-        readStruct(x12, x_off, sd_frq)
-        readStruct(x13, x_off, sd_occ)
-        readStruct(x14, x_off, sd_tocc)
-        print(frqstr, x11, x12, x13, x14)
+        // Print out the highest frequency word
+        readStruct(x11, x_off, sd_ind)          // int hiIndex = x_1da[x_off].sd_ind;
+        readStruct(x12, x_off, sd_frq)          // int hiFrequency = x_1da[x_off].sd_frq;
+        readStruct(x13, x_off, sd_occ)          // int hiOccurence = x_1da[x_off].sd_occ;
+        readStruct(x14, x_off, sd_tocc)         // int totalOccurence = x_1da[x_off].sd_tocc;
+        print(frqstr, x11, x12, x13, x14)       // Print(frqstr, hiIndex, hiFrequency, hiOccurence, totalOccurence);
         
-        print(linebr)
+        print(linebr)                           // Print line break
 
 
-        addAdd(x_crow)
-        b       print_table_row
-print_table_row_end:
+        addAdd(x_crow)                          // x_crow ++;                   Index increment
+        b       print_table_row                 // Go back to the loop
+print_table_row_end:                            // End of the while loop
 
 
 end:    // Program end
 
         // Deallocate 2d Array of table
-        dealloc(x_1da)
-        dealloc(x_2da)
+        dealloc(x_1da)                          // Deallocate 1d Array
+        dealloc(x_2da)                          // Deallocate 2d Array
         
         // Restores state
         ldp     x29,    x30,    [sp], 16        // return stack pointer space
