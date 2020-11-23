@@ -34,6 +34,7 @@ linebr: .string "\n"
         x_ccol  .req    x25                     // current column index
         x_hiocc .req    x26                     // highest occurence
         x_hiind .req    x27                     // highest index
+        x_argv  .req    x28
 
         // Renaming x29 and x30 to FP and LR
         fp      .req    x29
@@ -64,12 +65,23 @@ main:   // Main function
         stp     x29,    x30,    [sp, -16]!      // space stack pointer
         mov     x29,    sp                      // frame-pointer = stack-pointer;
 
+        
+        // Set up row and col variables
+        mov     x_row,  0
+        mov     x_col,  0
+
+        mov 	x_argv, x1
+        ldr 	x0, 	[x_argv, 8]
+        bl 	atoi
+        mov	x_row, 	x0
+
+        ldr	x0, 	[x_argv, 16]
+        bl 	atoi
+        mov 	x_col, 	x0
+
+
         // Random seed
         randomSeed()
-
-        // Set up row and col variables
-        mov     x_row,  5
-        mov     x_col,  5
 
         // Limit the range of row and col as input validation
         min(x_row, x_row, max_row)              // x_row = Min(x_row, max_row);
