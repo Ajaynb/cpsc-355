@@ -34,7 +34,7 @@ linebr: .string "\n"
         x_ccol  .req    x25                     // current column index
         x_hiocc .req    x26                     // highest occurence
         x_hiind .req    x27                     // highest index
-        x_argv  .req    x28
+        x_argv  .req    x28                     // argv
 
         // Renaming x29 and x30 to FP and LR
         fp      .req    x29
