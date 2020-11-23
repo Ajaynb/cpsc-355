@@ -17,7 +17,7 @@
         
 
         // Defining the strings
-tblhead:.string "Document   | Words              | Most Frequent | Percentage (Occurence / Total Occurence)\n------------------------------------------------------------------------------------------\n"
+tblhead:.string "Document   | Words              | Most Frequent | Frequency (Occurence / Total Occurence)\n------------------------------------------------------------------------------------------\n"
 docstr: .string "Document %d |"
 occstr: .string "%3.d "
 frqstr: .string "|        Word %d | %d%% (%d/%d)"
