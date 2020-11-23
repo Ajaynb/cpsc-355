@@ -1,0 +1,124 @@
+Script started on 2020-11-22 23:39:32-07:00
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4$ gdb as[K[K./a.out[K[K[K[K[K[K[K[K[K[K[Km4 assign4.asm > assign4.s
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4$ gcc assign4.s
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4$ ./a.out
+Document   | Words              | Most Frequent | Percentage (Occurence / Total Occurence)
+------------------------------------------------------------------------------------------
+Document 0 | 10   3   3   4 |        Word 0 | 50% (10/20)
+Document 1 | 13  16   7  10 |        Word 1 | 34% (16/46)
+Document 2 | 13   7  12   1 |        Word 0 | 39% (13/33)
+Document 3 | 15   8   7   7 |        Word 0 | 40% (15/37)
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4$ ./a.out 5[K1 1
+Document   | Words              | Most Frequent | Percentage (Occurence / Total Occurence)
+------------------------------------------------------------------------------------------
+Document 0 | 10   2   7   5 |        Word 0 | 41% (10/24)
+Document 1 | 12  15  13  12 |        Word 1 | 28% (15/52)
+Document 2 |  3  10   7   2 |        Word 1 | 45% (10/22)
+Document 3 |  3  15   5  11 |        Word 1 | 44% (15/34)
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4$ ./a.out 20 20
+Document   | Words              | Most Frequent | Percentage (Occurence / Total Occurence)
+------------------------------------------------------------------------------------------
+Document 0 | 11  10   2   6   3   2  16  10  16  13  15   9  11   3   3   3 |        Word 6 | 12% (16/133)
+Document 1 | 10  11  11   4   7  10  11  11   2  16  15   8  12   1   1   6 |        Word 9 | 11% (16/136)
+Document 2 | 10   2  11  13   4  10   6   3   7   4  12   1   6  14   3  15 |        Word 15 | 12% (15/121)
+Document 3 |  8  13   2  14   7  13   8   8  12   6  16   7   6  16  13  15 |        Word 10 | 9% (16/164)
+Document 4 |  1   7  11   4   1  16   7   7   3   2   7   8  15   9   6   6 |        Word 5 | 14% (16/110)
+Document 5 |  5   8   3  11   4  10   3  15  15   2   5   4   1   1   2   1 |        Word 7 | 16% (15/90)
+Document 6 |  8  13   5   8  12  11  14  15  12   4   6  10  12  12  15  16 |        Word 15 | 9% (16/173)
+Document 7 |  3   1  11   6  10  13   4   8  14   8  11  14   9  12  14  16 |        Word 15 | 10% (16/154)
+Document 8 |  8   2   7   4  12   4   2   7   7   7  16   2   2  14   1   4 |        Word 10 | 16% (16/99)
+Document 9 | 14  11   9   7   7  12  14   4   4   8   1  12   4  15  11  11 |        Word 13 | 10% (15/144)
+Document 10 | 16   1  14  12   4  15   2  10   6   2  11   7  15  11  11  13 |        Word 0 | 10% (16/150)
+Document 11 |  6   3   3  12  15   1  16   2   8  16  13  11  14   7   6  14 |        Word 6 | 10% (16/147)
+Document 12 |  7   3   9  10   2  10   3   7  11  13  13  10   7   7   6  12 |        Word 9 | 10% (13/130)
+Document 13 | 10   8   8   8   8   7   9  16   6   5  10   4  11  15   1   1 |        Word 7 | 12% (16/127)
+Document 14 |  2   9  10   3   2  12   9  13   8   5   6  14  12  11  10   5 |        Word 11 | 10% (14/131)
+Document 15 |  2   1  12  10   7   4   9  12   8   2  15   2   1  15   2   2 |        Word 10 | 14% (15/104)
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4$ ./a.out 5 5
+Document   | Words              | Most Frequent | Percentage (Occurence / Total Occurence)
+------------------------------------------------------------------------------------------
+Document 0 |  2  16  11  14  11 |        Word 1 | 29% (16/54)
+Document 1 | 16   3   5   1  14 |        Word 0 | 41% (16/39)
+Document 2 |  5   4  13  12  15 |        Word 4 | 30% (15/49)
+Document 3 | 14  13   5  10  15 |        Word 4 | 26% (15/57)
+Document 4 | 10   5   5   5   4 |        Word 0 | 34% (10/29)
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4$ gdb a.out
+GNU gdb (GDB) Fedora 8.1.1-4.fc28
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "aarch64-redhat-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from a.out...(no debugging symbols found)...done.
+(gdb) b
+No default breakpoint address now.
+(gdb) b generate_table_row
+Breakpoint 1 at 0x4008c8
+(gdb) r
+Starting program: /home/ugb/yunfan.yang1/Desktop/cpsc-355/Assignment 4/a.out 
+warning: the debug information found in "/usr/lib/debug//usr/lib64/ld-2.27.so.debug" does not match "/lib/ld-linux-aarch64.so.1" (CRC mismatch).
+
+Missing separate debuginfos, use: dnf debuginfo-install glibc-2.27-38.fc28.aarch64
+warning: the debug information found in "/usr/lib/debug//lib64/libc-2.27.so.debug" does not match "/lib64/libc.so.6" (CRC mismatch).
+
+warning: the debug information found in "/usr/lib/debug//usr/lib64/libc-2.27.so.debug" does not match "/lib64/libc.so.6" (CRC mismatch).
+
+
+Breakpoint 1, 0x00000000004008c8 in generate_table_row ()
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x00000000004008c8 in generate_table_row ()
+(gdb) $[Kx/d[K4d $x29+$x21
+0xfffffffff120:	9	9	15	16
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x00000000004008c8 in generate_table_row ()
+(gdb) cx/4d $x29+$x21[C[C[1P[1@8
+0xfffffffff120:	9	9	15	16
+0xfffffffff130:	9	16	2	13
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x00000000004008c8 in generate_table_row ()
+(gdb) cx/8d $x29+$x21[1P[1@1[1@2
+0xfffffffff120:	9	9	15	16
+0xfffffffff130:	9	16	2	13
+0xfffffffff140:	4	10	11	16
+(gdb) x/12d $x29+$x21[1P[1@6
+0xfffffffff120:	9	9	15	16
+0xfffffffff130:	9	16	2	13
+0xfffffffff140:	4	10	11	16
+0xfffffffff150:	0	0	0	0
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x00000000004008c8 in generate_table_row ()
+(gdb) cx/16d $x29+$x21
+0xfffffffff120:	9	9	15	16
+0xfffffffff130:	9	16	2	13
+0xfffffffff140:	4	10	11	16
+0xfffffffff150:	16	7	9	7
+(gdb) c
+Continuing.
+Document   | Words              | Most Frequent | Percentage (Occurence / Total Occurence)
+------------------------------------------------------------------------------------------
+Document 0 |  9   9  15  16 |        Word 3 | 32% (16/49)
+Document 1 |  9  16   2  13 |        Word 1 | 40% (16/40)
+Document 2 |  4  10  11  16 |        Word 3 | 39% (16/41)
+Document 3 | 16   7   9   7 |        Word 0 | 41% (16/39)
+[Inferior 1 (process 6825) exited with code 01]
+(gdb) q
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 4$ exit
+exit
+
+Script done on 2020-11-22 23:41:18-07:00

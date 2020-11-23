@@ -47,7 +47,7 @@ linebr: .string "\n"
         min_col = 4
 
         // Equates for 2d Array of table
-        int = 8                                 // sizeof(int)
+        int = 4                                 // sizeof(int)
 
         // Equates for Structucture Document    // Struct Document {
         sd_occ = 0                              //     int hiOccurence;
@@ -67,22 +67,22 @@ main:   // Main function
 
         
         // Set up row and col variables
-        mov     x_row,  0
-        mov     x_col,  0
+        mov     x_row,  0                       // Intialize a default value
+        mov     x_col,  0                       // Intialize a default value
 
-        cmp     x0,     3
-        b.ge    command_param
-        b       command_param_skip
+        cmp     x0,     3                       // if (argc >= 3);              If the command argument amount is at least 3
+        b.ge    command_param                   // then {command_param}         Read arguments
+        b       command_param_skip              // else {command_param_skip}    Else skip
 
 command_param:
-        mov 	x_argv, x1
-        ldr 	x0, 	[x_argv, 8]
-        bl 	atoi
-        mov	x_row, 	x0
+        mov 	x_argv, x1                      //                              Store argv to the variable
+        ldr 	x0, 	[x_argv, 8]             // Argument 1: argv[0]
+        bl 	atoi                            // atoi(argv[0])
+        mov	x_row, 	x0                      // int row = atoi(argv[0])
 
-        ldr	x0, 	[x_argv, 16]
-        bl 	atoi
-        mov 	x_col, 	x0
+        ldr	x0, 	[x_argv, 16]            // Argument 1: argv[1]
+        bl 	atoi                            // atoi(argv[1])
+        mov 	x_col, 	x0                      // int col = atoi(argv[1])
 command_param_skip:
 
 
