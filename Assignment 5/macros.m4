@@ -1,6 +1,6 @@
 divert(`-1')
-define(`g_counter',`0')dnl
-define(`g_count',`define(`g_counter',eval(g_counter+1))')dnl
+define(`xcounter',`0')dnl
+define(`xcount',`define(`xcounter',eval(xcounter+1))')dnl
 divert
 
 divert(`-1')
@@ -38,8 +38,8 @@ define(`_forloop',
 divert
 
 divert(`-1')
-// addAll(destination, param2, param3, ...) -> destination = param2 + param3 + ...
-define(addAll, `
+// xadd(destination, param2, param3, ...) -> destination = param2 + param3 + ...
+define(xadd, `
     define(`index', eval(`1'))
         mov     x9,     0                       // Initialize x9 to 0
     foreach(`t', `$@', `
@@ -51,19 +51,19 @@ define(addAll, `
     ')
         mov     $1,     x9                      // Result
 ')
-// addAdd(variable) -> variable ++;
-define(addAdd, `
+// xaddAdd(variable) -> variable ++;
+define(xaddAdd, `
         add     $1, $1, 1
 ')
-// addEqual(variable, param2) -> variable += param2;
-define(addEqual, `
+// xaddEqual(variable, param2) -> variable += param2;
+define(xaddEqual, `
         add     $1, $1, $2
 ')
 divert
 
 divert(`-1')
-// array(destination, element_amount, element_size)
-define(array, `
+// xarray(destination, element_amount, element_size)
+define(xarray, `
     format(`
         mov     x9,     0                           // Loop Counter
 loop_%s:
@@ -80,11 +80,11 @@ loop_%s:
 
 loop_end_%s:
 
-    ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))
-    g_count()
+    ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+    xcount()
 ')
-// readArray(destination, base, size, index)
-define(readArray, `
+// xreadArray(destination, base, size, index)
+define(xreadArray, `
         mov     x9,     $3
         mov     x10,    $4
         mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
@@ -92,8 +92,8 @@ define(readArray, `
 
         ldr     $1,     [x29,   x9]
 ')
-// writeArray(value, base, size, index)
-define(writeArray, `
+// xwriteArray(value, base, size, index)
+define(xwriteArray, `
         mov     x9,     $3
         mov     x10,    $4
         mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
@@ -105,8 +105,8 @@ define(writeArray, `
 divert
 
 divert(`-1')
-// min(destination, num1, num2)
-define(min, `
+// xmin(destination, num1, num2)
+define(xmin, `
     format(`
         cmp     $2,     $3
         b.lt    if_%s
@@ -116,12 +116,12 @@ if_%s:  mov    $1,     $2
 else_%s:mov  $1,     $3
         b       end_%s
 end_%s:
-    ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))
-    g_count()
+    ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+    xcount()
 ')
 
-// max(destination, num1, num2)
-define(max, `
+// xmax(destination, num1, num2)
+define(xmax, `
     format(`
         cmp     $2,     $3
         b.gt    if_%s
@@ -131,14 +131,14 @@ if_%s:  mov    $1,     $2
 else_%s:mov  $1,     $3
         b       end_%s
 end_%s:
-    ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))
-    g_count()
+    ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+    xcount()
 ')
 divert
 
 divert(`-1')
-// multiply(destination, param2, param3, ...)
-define(mulAll, `
+// xmul(destination, param2, param3, ...)
+define(xmul, `
     define(`index', eval(`1'))
         mov     x9,     1                       // Initialize x9 to 1
     foreach(`t', `$@', `
@@ -153,8 +153,8 @@ define(mulAll, `
 divert
 
 divert(`-1')
-// print(string, param1, param2, ...) -> Just like how to use printf :)
-define(print, `
+// xprint(string, param1, param2, ...) -> Just like how to use printf :)
+define(xprint, `
     define(`index', eval(`0'))
     foreach(`t', `$@', `
         ifelse(index, `0', `', `format(`mov     x%s,    %s', eval(index), `t')')
@@ -166,15 +166,15 @@ define(print, `
 divert
 
 divert(`-1')
-// randomSeed()
-define(randomSeed, `
+// xrandSeed()
+define(xrandSeed, `
         mov     x0,     0                       // 1st parameter: 0
         bl      time                            // time(0);
         bl      srand                           // srand(time(0));
 ')
 
-// random()
-define(random, `
+// xrand()
+define(xrand, `
         bl      rand                            // rand();
         and  	x9,     x0,     $2              // int x9 = rand() & $2;
         mov     $1,     x9                      // $1 = x9;
@@ -182,8 +182,8 @@ define(random, `
 divert
 
 divert(`-1')
-// struct(base, attribute1, attribute2, ...)
-define(struct, `
+// xstruct(base, attribute1, attribute2, ...)
+define(xstruct, `
     define(`index', eval(`1'))
     foreach(`t', `$@', `
         ifelse(index, `1', `', `format(`
@@ -193,13 +193,13 @@ define(struct, `
         define(`index', incr(index))
     ')
 ')
-// readStruct(value, base, attribute)
-define(readStruct, `
+// xreadStruct(value, base, attribute)
+define(xreadStruct, `
         add     x9,     $2,     $3              // Add the size
         ldr	    $1,     [x29,   x9]             // Load the value
 ')
-// writeStruct(value, base, attribute)
-define(writeStruct, `
+// xwriteStruct(value, base, attribute)
+define(xwriteStruct, `
         add     x9,     $2,     $3              // Add the size
         mov     x10,    $1
         str     x10,    [x29,   x9]             // And Adds x10 to x9
