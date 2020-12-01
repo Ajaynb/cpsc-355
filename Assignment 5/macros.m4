@@ -1,4 +1,9 @@
 divert(`-1')
+define(`g_counter',`0')dnl
+define(`g_count',`define(`g_counter',eval(g_counter+1))')dnl
+divert
+
+divert(`-1')
 # quote(args) - convert args to single-quoted string
 define(`quote', `ifelse(`$#', `0', `', ``$*'')')
 # dquote(args) - convert args to quoted list of quoted strings
