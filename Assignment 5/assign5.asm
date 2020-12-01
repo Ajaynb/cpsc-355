@@ -1,4 +1,12 @@
-        include(`macros.m4')                    
+        include(`macros.m4')
+        
+        // Equates for alloc & dealloc
+        alloc = -16
+        dealloc = -alloc
+
+         //Define register aliases
+        fp      .req    x29
+        lr      .req    x30
 
         // Equates for constants
         max_row = 20
@@ -8,15 +16,18 @@
 
 
 
+        // Expose main function to OS and set balign
+        .global main
+        .balign 4
+
 main:   // Main function
         // Saves state
-        stp     x29,    x30,    [sp, -16]!      // space stack pointer
-        mov     x29,    sp                      // frame-pointer = stack-pointer;
+        stp     fp,     lr,     [sp, alloc]!    // store FP and LR on stack, and allocate space for local variables
+        mov     fp,     sp                      // update FP to current SP
 
 
 
+        // Restores state
+        ldp     fp,     lr,     [sp], dealloc   // deallocate stack memory
+        ret                                     // return to calling code in OS
 
-
-end:    // Restores state
-        ldp     x29,    x30,    [sp], 16        // return stack pointer space
-        ret                                     // return to OS
