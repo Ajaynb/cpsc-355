@@ -25,6 +25,7 @@ output: .string "%d, %d\n"
         st_row = 0
         st_col = 8
         st_arr = 16
+        st_arr_base = st + st_arr
         st_arr_amount = max_row * max_col
         st_arr_size = st_arr_amount * int
         st_size = -(st_arr + st_arr_size + 16) & -16
@@ -76,6 +77,10 @@ main:   // Main function
         xprint(output, x21, x22)
 
         xprint(output, st_size, st_arr_size)
+
+        xarray(st_arr_base, st_arr_amount, int)
+        xreadArray(x23, st_arr_base, int, 4)
+        xprint(output, x23, x23)
 
         // Deallocate memory
         xdealloc(st_size)                        // deallocate struct Table
