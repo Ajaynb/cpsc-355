@@ -41,15 +41,15 @@ divert(`-1')
 // xadd(destination, param2, param3, ...) -> destination = param2 + param3 + ...
 define(xadd, `
     define(`index', eval(`1'))
-        mov     x9,     0                       // Initialize x9 to 0
+        mov     x9,     0                       // initialize x9 to 0
     foreach(`t', `$@', `
         ifelse(index, `1', `', `format(`
-        mov     x10,    t                       // Move next number to x10
-        add     x9,     x9,     x10             // And Adds x10 to x9
+        mov     x10,    t                       // move next number to x10
+        add     x9,     x9,     x10             // and Adds x10 to x9
         ')')
         define(`index', incr(index))
     ')
-        mov     $1,     x9                      // Result
+        mov     $1,     x9                      // result
 ')
 // xaddAdd(variable) -> variable ++;
 define(xaddAdd, `
@@ -65,17 +65,17 @@ divert(`-1')
 // xarray(destination, element_amount, element_size)
 define(xarray, `
     format(`
-        mov     x9,     0                           // Loop Counter
+        mov     x9,     0                           // loop Counter
 loop_%s:
         cmp     x9,     $2
         b.eq    loop_end_%s
 
         mov     x10,    $3
-        mul     x10,    x10,    x9                  // Calculate Offset
+        mul     x10,    x10,    x9                  // calculate Offset
 
-        str 	xzr,    [fp,    x10]                // Initialize with 0
+        str 	xzr,    [fp,    x10]                // initialize with 0
 
-        add     x9,     x9,     1                   // Increment
+        add     x9,     x9,     1                   // increment
         b       loop_%s
 
 loop_end_%s:
@@ -87,8 +87,8 @@ loop_end_%s:
 define(xreadArray, `
         mov     x9,     $3
         mov     x10,    $4
-        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
-        add     x9,     x9,     $2                  // Calculate Offset += Base
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     $2                  // calculate Offset += Base
 
         ldr     $1,     [x29,   x9]
 ')
@@ -96,8 +96,8 @@ define(xreadArray, `
 define(xwriteArray, `
         mov     x9,     $3
         mov     x10,    $4
-        mul     x9,     x9,     x10                 // Calculate Offset = Size * Index
-        add     x9,     x9,     $2                  // Calculate Offset += Base
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     $2                  // calculate Offset += Base
 
         mov     x10,    $1
         str     x10,    [x29,   x9]
@@ -140,15 +140,15 @@ divert(`-1')
 // xmul(destination, param2, param3, ...)
 define(xmul, `
     define(`index', eval(`1'))
-        mov     x9,     1                       // Initialize x9 to 1
+        mov     x9,     1                       // initialize x9 to 1
     foreach(`t', `$@', `
         ifelse(index, `1', `', `format(`
-        mov     x10,    t                       // Move next multiplier to x10
-        mul     x9,     x9,     x10             // And multiplies x10 to x9
+        mov     x10,    t                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
         ')')
         define(`index', incr(index))
     ')
-        mov     $1,     x9                      // Result
+        mov     $1,     x9                      // result
 ')
 divert
 
@@ -187,46 +187,37 @@ define(xstruct, `
     define(`index', eval(`1'))
     foreach(`t', `$@', `
         ifelse(index, `1', `', `format(`
-        add     x9,     $1,     t               // Add the size
-        str     wzr,    [x29,   x9]             // Store value
+            xwriteStruct(wzr, $1, t)
         ')')
         define(`index', incr(index))
     ')
 ')
 // xreadStruct(value, base, attribute)
 define(xreadStruct, `
-        add     x9,     $2,     $3              // Add the size
-        ldr	    $1,     [x29,   x9]             // Load the value
+        mov     x10,    $2                      // base
+        mov     x11,    $3                      // attribute
+        add     x9,     x10,     x11            // base + attribute
+        ldr	    $1,    [x29,   x9]              // load the value
 ')
 // xwriteStruct(value, base, attribute)
 define(xwriteStruct, `
-        add     x9,     $2,     $3              // Add the size
-        mov     x10,    $1
-        str     x10,    [x29,   x9]             // And Adds x10 to x9
+        mov     x10,    $2                      // base
+        mov     x11,    $3                      // attribute
+        add     x9,     x10,    x11             // base + attribute
+        mov     w12,    $1
+        str     w12,    [x29,   x9]             // and adds x10 to x9
 ')
 divert
 
 divert(`-1')
 // xalloc(size)
 define(xalloc, `
-    format(`
-
-        cmp     $1,     xzr                     // Compare negative
-        b.gt    if_%s                           // Not negative
-        b       else_%s                         
-
-if_%s:  sub     $1,     xzr,    $1              // Negate the size
-else_%s:
-        and     $1,     $1,     -16             // And -16
-        add     sp,     sp,     $1              // Allocate on SP
-    
-    ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))    
-    g_count()
-
+        add     sp,     sp,     $1              // allocate on SP
 ')
 // xdealloc(size)
 define(xdealloc, `
-        sub     $1,     xzr,    $1              // Negate the size again to positive
-        add     sp,     sp,     $1              // dealloc on SP
+        mov     x9,     $1                      // move to x9
+        sub     x9,     xzr,    x9              // negate the size again to positive
+        add     sp,     sp,     x9              // dealloc on SP
 ')
 divert
