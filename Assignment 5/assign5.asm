@@ -4,7 +4,7 @@
 output: .string "%d, %d\n"
         
         // Equates for alloc & dealloc
-        alloc = -16
+        alloc = -(16+96) & -16
         dealloc = -alloc
 
         // Define register aliases
@@ -48,10 +48,8 @@ output: .string "%d, %d\n"
         .global main
         .balign 4
 
-main:   // Main function
-        // Saves state
-        stp     fp,     lr,     [sp, alloc]!    // store FP and LR on stack, and allocate space for local variables
-        mov     fp,     sp                      // update FP to current SP
+main:   // main()
+        xfunc()
 
         mov     x19,    5                       // int row = 5;
         mov     x20,    5                       // int col = 5;
@@ -82,10 +80,22 @@ main:   // Main function
         xreadArray(x23, st_arr_base, int, 4)
         xprint(output, x23, x23)
 
-        // Deallocate memory
-        xdealloc(st_size)                        // deallocate struct Table
+        mov     x24,    5
 
-        // Restores state
-        ldp     fp,     lr,     [sp], dealloc   // deallocate stack memory
-        ret                                     // return to calling code in OS
+        bl      initialize
+
+        xprint(output, x24, x24)
+
+
+        // Deallocate memory
+        xdealloc(st_size)                       // deallocate struct Table
+        xret()
+
+initialize: // initialize(struct Table* table)
+	xfunc()
+
+        mov     x24,    10
+        xprint(output, x24, x24)
+
+        xret()
 
