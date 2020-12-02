@@ -40,6 +40,7 @@ divert
 divert(`-1')
 // xadd(destination, param2, param3, ...) -> destination = param2 + param3 + ...
 define(xadd, `
+        // M4: ADD
     define(`index', eval(`1'))
         mov     x9,     0                       // initialize x9 to 0
     foreach(`t', `$@', `
@@ -53,25 +54,31 @@ define(xadd, `
 ')
 // xaddAdd(variable) -> variable ++;
 define(xaddAdd, `
+        // M4: ADD ADD
         add     $1, $1, 1
 ')
 // xaddEqual(variable, param2) -> variable += param2;
 define(xaddEqual, `
+        // M4: ADD EQUAL
         add     $1, $1, $2
 ')
 divert
 
 divert(`-1')
-// xarray(destination, element_amount, element_size)
+// xarray(base, element_amount, element_size)
 define(xarray, `
+        // M4: ARRAY
     format(`
         mov     x9,     0                           // loop Counter
 loop_%s:
-        cmp     x9,     $2
+        cmp     x9,     $2                          // if reach amount
         b.eq    loop_end_%s
 
-        mov     x10,    $3
-        mul     x10,    x10,    x9                  // calculate Offset
+        mov     x10,    $3                          // get element size
+        mul     x10,    x10,    x9                  // calculate element offset by index
+        
+        mov     x11,    $1                          // get base
+        add     x10,    x10,    x11                 // calculate total offset, offset in array + base
 
         str 	xzr,    [fp,    x10]                // initialize with 0
 
@@ -85,6 +92,7 @@ loop_end_%s:
 ')
 // xreadArray(destination, base, size, index)
 define(xreadArray, `
+        // M4: READ ARRAY
         mov     x9,     $3
         mov     x10,    $4
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
@@ -94,10 +102,12 @@ define(xreadArray, `
 ')
 // xwriteArray(value, base, size, index)
 define(xwriteArray, `
-        mov     x9,     $3
-        mov     x10,    $4
+        // M4: WRITE ARRAY
+        mov     x9,     $3                          // x9 - size
+        mov     x10,    $4                          // x10 - index
+        mov     x11,    $2                          // x11 - base
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
-        add     x9,     x9,     $2                  // calculate Offset += Base
+        add     x9,     x9,     x11                 // calculate Offset += Base
 
         mov     x10,    $1
         str     x10,    [x29,   x9]
@@ -107,6 +117,7 @@ divert
 divert(`-1')
 // xmin(destination, num1, num2)
 define(xmin, `
+        // M4: MIN
     format(`
         cmp     $2,     $3
         b.lt    if_%s
@@ -122,6 +133,7 @@ end_%s:
 
 // xmax(destination, num1, num2)
 define(xmax, `
+        // M4: MAX
     format(`
         cmp     $2,     $3
         b.gt    if_%s
@@ -139,6 +151,7 @@ divert
 divert(`-1')
 // xmul(destination, param2, param3, ...)
 define(xmul, `
+        // M4: MUL
     define(`index', eval(`1'))
         mov     x9,     1                       // initialize x9 to 1
     foreach(`t', `$@', `
@@ -155,6 +168,7 @@ divert
 divert(`-1')
 // xprint(string, param1, param2, ...) -> Just like how to use printf :)
 define(xprint, `
+        // M4: PRINT
     define(`index', eval(`0'))
     foreach(`t', `$@', `
         ifelse(index, `0', `', `format(`mov     x%s,    %s', eval(index), `t')')
@@ -168,6 +182,7 @@ divert
 divert(`-1')
 // xrandSeed()
 define(xrandSeed, `
+        // M4: RAND SEED
         mov     x0,     0                       // 1st parameter: 0
         bl      time                            // time(0);
         bl      srand                           // srand(time(0));
@@ -175,6 +190,7 @@ define(xrandSeed, `
 
 // xrand()
 define(xrand, `
+        // M4: RAND
         bl      rand                            // rand();
         and  	x9,     x0,     $2              // int x9 = rand() & $2;
         mov     $1,     x9                      // $1 = x9;
@@ -184,38 +200,46 @@ divert
 divert(`-1')
 // xstruct(base, attribute1, attribute2, ...)
 define(xstruct, `
+        // M4: STRUCT
     define(`index', eval(`1'))
     foreach(`t', `$@', `
         ifelse(index, `1', `', `format(`
-            xwriteStruct(wzr, $1, t)
+            xwriteStruct(xzr, $1, t)
         ')')
         define(`index', incr(index))
     ')
 ')
 // xreadStruct(value, base, attribute)
 define(xreadStruct, `
-        mov     x10,    $2                      // base
-        mov     x11,    $3                      // attribute
-        add     x9,     x10,     x11            // base + attribute
-        ldr	    $1,    [x29,   x9]              // load the value
+        // M4: READ STRUCT
+        mov     x11,    $2
+        mov     x12,    $3
+        add     x9,     x11,    x12             // add the size
+        sub     x9,     xzr,    x9              // negate offset
+        ldr	    $1,     [x29,   x9]             // load the value
 ')
+
 // xwriteStruct(value, base, attribute)
 define(xwriteStruct, `
-        mov     x10,    $2                      // base
-        mov     x11,    $3                      // attribute
-        add     x9,     x10,    x11             // base + attribute
-        mov     w12,    $1
-        str     w12,    [x29,   x9]             // and adds x10 to x9
+        // M4: WRITE STRUCT
+        mov     x11,    $2
+        mov     x12,    $3
+        add     x9,     x11,    x12             // add the size
+        sub     x9,     xzr,    x9              // negate offset
+        mov     x10,    $1
+        str     x10,    [x29,   x9]             // and Adds x10 to x9
 ')
 divert
 
 divert(`-1')
 // xalloc(size)
 define(xalloc, `
+        // M4: ALLOC
         add     sp,     sp,     $1              // allocate on SP
 ')
 // xdealloc(size)
 define(xdealloc, `
+        // M4: DEALLOC
         mov     x9,     $1                      // move to x9
         sub     x9,     xzr,    x9              // negate the size again to positive
         add     sp,     sp,     x9              // dealloc on SP
