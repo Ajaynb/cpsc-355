@@ -1,7 +1,7 @@
         include(`macros.m4')
 
         // Defining strings
-output: .string "st_row %d, st_col %d\n"
+output: .string "%d, %d\n"
         
         // Equates for alloc & dealloc
         alloc = -16
