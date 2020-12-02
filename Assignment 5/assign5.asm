@@ -4,7 +4,7 @@
 output: .string "%d, %d\n"
         
         // Equates for alloc & dealloc
-        alloc = -(16+96) & -16
+        alloc = -16
         dealloc = -alloc
 
         // Define register aliases
