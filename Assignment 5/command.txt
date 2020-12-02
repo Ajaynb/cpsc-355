@@ -1,0 +1,7 @@
+cd "Desktop/cpsc-355/Assignment 5/"
+
+m4 assign5.asm > assign5.s
+
+gcc assign5.s
+
+gdb ./a.out
