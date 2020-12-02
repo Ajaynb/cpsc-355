@@ -205,3 +205,28 @@ define(xwriteStruct, `
         str     x10,    [x29,   x9]             // And Adds x10 to x9
 ')
 divert
+
+divert(`-1')
+// xalloc(size)
+define(xalloc, `
+    format(`
+
+        cmp     $1,     xzr                     // Compare negative
+        b.gt    if_%s                           // Not negative
+        b       else_%s                         
+
+if_%s:  sub     $1,     xzr,    $1              // Negate the size
+else_%s:
+        and     $1,     $1,     -16             // And -16
+        add     sp,     sp,     $1              // Allocate on SP
+    
+    ', eval(g_counter), eval(g_counter), eval(g_counter), eval(g_counter))    
+    g_count()
+
+')
+// xdealloc(size)
+define(xdealloc, `
+        sub     $1,     xzr,    $1              // Negate the size again to positive
+        add     sp,     sp,     $1              // dealloc on SP
+')
+divert
