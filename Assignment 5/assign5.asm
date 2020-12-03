@@ -71,19 +71,22 @@ main:   // main()
         xwriteStruct(x19, st, st_row)           // write the reset row to struct
         xwriteStruct(x20, st, st_col)           // write the reset col to struct
 
+        xreadStruct(x21, st, st_row)
+        xreadStruct(x22, st, st_col)
+        xprint(output, x21, x22)
 
 
         xprint(allstr, alloc, sp, fp)
 
-        sub     x0,     fp,     st_row
-        sub     x1,     fp,     st_col
-        bl      initialize
 
 
         // Deallocate memory
         xdealloc(st_size)                       // deallocate struct Table
 
         xret()
+
+        xprint(allstr, alloc, sp, fp)
+
 
 
 
@@ -92,9 +95,10 @@ main:   // main()
 initialize: // initialize(struct Table* table)
 	xfunc()
 
-        
-        ldr     x19,    [x0]
-        ldr     x20,    [x1]
+        mov     x19,    x0
+        mov     x20,    x1
+        //ldr     x19,    [x0]
+        //ldr     x20,    [x1]
 
         xprint(output, x19, x20)
 

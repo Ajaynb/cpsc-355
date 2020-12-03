@@ -214,7 +214,7 @@ define(xreadStruct, `
         mov     x11,    $2                      // int base
         mov     x12,    $3                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        sub     x9,     xzr,    x9              // offset = 0 - offset, to negative value
+        add     x9,     x9,     dealloc         // add bytes for saved registers
         ldr	$1,     [fp,   x9]              // load the value
 ')
 
@@ -224,9 +224,9 @@ define(xwriteStruct, `
         mov     x11,    $2
         mov     x12,    $3
         add     x9,     x11,    x12             // add the size
-        sub     x9,     xzr,    x9              // negate offset
+        add     x9,     x9,     dealloc         // add bytes for saved registers
         mov     x10,    $1
-        str     x10,    [fp,   x9]             // and Adds x10 to x9
+        str     x10,    [fp,   x9]              // and Adds x10 to x9
 ')
 divert
 

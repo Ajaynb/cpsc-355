@@ -1,0 +1,372 @@
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Defining strings
+output: .string "%d, %d\n"
+allstr:  .string "alloc %d, sp %d, fp %d\n"
+        
+        // Equates for alloc & dealloc
+        alloc =  -(16 + 96) & -16
+        dealloc = -alloc
+
+        // Define register aliases
+        fp      .req    x29
+        lr      .req    x30
+
+        // Equates for constants
+        max_row = 20
+        max_col = 20
+        min_row = 5
+        min_col = 5
+
+        // Equantes for data types
+        int = 8
+
+        // Equates for struct Table
+        st = 0
+        st_row = 0
+        st_col = 8
+        st_arr = 16
+        st_arr_base = st + st_arr
+        st_arr_amount = max_row * max_col
+        st_arr_size = st_arr_amount * int
+        st_size = -(st_arr + st_arr_size + 16) & -16
+
+        // Equates for struct Word Frequency
+        wf = 0
+        wf_freqency = 0
+        wf_word = 8
+        wf_times = 16
+        wf_document = 24
+        wf_size = -(wf_document) & -16
+
+        // Equates for array of word frequency
+        wf_arr = (st_size + 16) & -16
+        wf_arr_size = -(max_row * max_col * wf_size) & -16
+
+
+
+        // Expose main function to OS and set balign
+        .global main
+        .balign 4
+
+main:   // main()
+        
+        // M4: FUNC
+        stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
+        mov     fp,     sp                              // update FP to current SP
+        
+        // Save registers
+        str 	x19,    [fp, 16]
+        str 	x20,    [fp, 24]
+        str 	x21,    [fp, 32]
+        str 	x22,    [fp, 40]
+        str 	x23,    [fp, 48]
+        str 	x24,    [fp, 56]
+        str 	x25,    [fp, 64]
+        str 	x26,    [fp, 72]
+        str 	x27,    [fp, 80]
+        str 	x28,    [fp, 88]
+
+
+        // Initialize values
+        mov     x19,    5                       // int row = 5;
+        mov     x20,    5                       // int col = 5;
+
+        // Rand seed
+        
+        // M4: RAND SEED
+        mov     x0,     0                       // 1st parameter: 0
+        bl      time                            // time(0);
+        bl      srand                           // srand(time(0));
+
+
+        // Limit the range of row and col as input validation
+        
+        // M4: MIN
+    
+        cmp     x19,     max_row
+        b.lt    if_0
+        b       else_0
+if_0:  mov    x19,     x19
+        b       end_0
+else_0:mov  x19,     max_row
+        b       end_0
+end_0:
+    
+    
+                 // row = min(row, max_row);
+        
+        // M4: MAX
+    
+        cmp     x19,     min_row
+        b.gt    if_1
+        b       else_1
+if_1:  mov    x19,     x19
+        b       end_1
+else_1:mov  x19,     min_row
+        b       end_1
+end_1:
+    
+    
+                 // row = max(row, min_row);
+        
+        // M4: MIN
+    
+        cmp     x20,     max_col
+        b.lt    if_2
+        b       else_2
+if_2:  mov    x20,     x20
+        b       end_2
+else_2:mov  x20,     max_col
+        b       end_2
+end_2:
+    
+    
+                 // col = min(col, max_col);
+        
+        // M4: MAX
+    
+        cmp     x20,     min_col
+        b.gt    if_3
+        b       else_3
+if_3:  mov    x20,     x20
+        b       end_3
+else_3:mov  x20,     min_col
+        b       end_3
+end_3:
+    
+    
+                 // col = max(col, min_col);
+
+        // Construct struct Table
+        
+        // M4: ALLOC
+        add     sp,     sp,     st_size              // allocate on SP
+                         // allocate for struct Table
+        
+        // M4: STRUCT
+    
+    
+        
+        
+    
+        
+            
+        // M4: WRITE STRUCT
+        //mov     x11,    st
+        //mov     x12,    st_row
+        //add     x9,     x11,    x12             // add the size
+        // sub     x9,     xzr,    x9              // negate offset
+        mov     x10,    xzr
+        str     x10,    [fp,   st_row]             // and Adds x10 to x9
+
+        
+        
+    
+        
+            
+        // M4: WRITE STRUCT
+        //mov     x11,    st
+        //mov     x12,    st_col
+        //add     x9,     x11,    x12             // add the size
+        // sub     x9,     xzr,    x9              // negate offset
+        //mov     x10,    xzr
+        //str     x10,    [fp,   st_col]             // and Adds x10 to x9
+
+        ldr x0, =output
+        add x1, fp, st_row
+        add x2, fp, st_col
+        bl printf
+
+        
+        
+    
+             // init struct Table attributes with 0
+
+
+
+        
+        // M4: PRINT
+    
+    
+        
+        
+    
+        mov     x1,    alloc
+        
+    
+        mov     x2,    sp
+        
+    
+        mov     x3,    fp
+        
+    
+        ldr     x0,     =allstr
+        bl      printf
+
+
+
+
+        // Deallocate memory
+        
+        // M4: DEALLOC
+        mov     x9,     st_size                      // move to x9
+        sub     x9,     xzr,    x9              // negate the size again to positive
+        add     sp,     sp,     x9              // dealloc on SP
+                       // deallocate struct Table
+
+        
+        // M4: RET
+
+        // Restore registers
+        ldr 	x19,    [fp, 16]
+        ldr 	x20,    [fp, 24]
+        ldr 	x21,    [fp, 32]
+        ldr 	x22,    [fp, 30]
+        ldr 	x23,    [fp, 48]
+        ldr 	x24,    [fp, 56]
+        ldr 	x25,    [fp, 64]
+        ldr 	x26,    [fp, 72]
+        ldr 	x27,    [fp, 80]
+        ldr 	x28,    [fp, 88]
+
+        ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
+        ret
+
+
+
+
+        
+        // M4: PRINT
+    
+    
+        
+        
+    
+        mov     x1,    alloc
+        
+    
+        mov     x2,    sp
+        
+    
+        mov     x3,    fp
+        
+    
+        ldr     x0,     =allstr
+        bl      printf
+
+
+
+
+
+
+
+initialize: // initialize(struct Table* table)
+	
+        // M4: FUNC
+        stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
+        mov     fp,     sp                              // update FP to current SP
+        
+        // Save registers
+        str 	x19,    [fp, 16]
+        str 	x20,    [fp, 24]
+        str 	x21,    [fp, 32]
+        str 	x22,    [fp, 40]
+        str 	x23,    [fp, 48]
+        str 	x24,    [fp, 56]
+        str 	x25,    [fp, 64]
+        str 	x26,    [fp, 72]
+        str 	x27,    [fp, 80]
+        str 	x28,    [fp, 88]
+
+
+        mov     x19,    x0
+        mov     x20,    x1
+        //ldr     x19,    [x0]
+        //ldr     x20,    [x1]
+
+        
+        // M4: PRINT
+    
+    
+        
+        
+    
+        mov     x1,    x19
+        
+    
+        mov     x2,    x20
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+
+
+        
+        // M4: PRINT
+    
+    
+        
+        
+    
+        mov     x1,    alloc
+        
+    
+        mov     x2,    sp
+        
+    
+        mov     x3,    fp
+        
+    
+        ldr     x0,     =allstr
+        bl      printf
+
+
+
+        
+        // M4: RET
+
+        // Restore registers
+        ldr 	x19,    [fp, 16]
+        ldr 	x20,    [fp, 24]
+        ldr 	x21,    [fp, 32]
+        ldr 	x22,    [fp, 30]
+        ldr 	x23,    [fp, 48]
+        ldr 	x24,    [fp, 56]
+        ldr 	x25,    [fp, 64]
+        ldr 	x26,    [fp, 72]
+        ldr 	x27,    [fp, 80]
+        ldr 	x28,    [fp, 88]
+
+        ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
+        ret
+
+
+
+
