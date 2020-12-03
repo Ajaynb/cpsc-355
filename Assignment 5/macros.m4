@@ -213,7 +213,7 @@ define(xstruct, `
 define(xreadStruct, `
         // M4: READ STRUCT
         mov     x11,    $2                      // int base
-        mov     x12,    $3                      // int attribute's offset
+        mov     x12,    $3                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
         sub     x9,     xzr,    x9              // offset = 0 - offset, to negative value
         ldr	$1,     [fp,   x9]              // load the value
