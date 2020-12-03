@@ -68,12 +68,10 @@ main:   // main()
         // Construct struct Table
         xalloc(st_size)                         // allocate for struct Table
         xstruct(st, st_row, st_col)             // init struct Table attributes with 0
-        xwriteStruct(x19, st, st_row)
-        xwriteStruct(x20, st, st_col)
+        xwriteStruct(x19, st, st_row)           // write the reset row to struct
+        xwriteStruct(x20, st, st_col)           // write the reset col to struct
 
 
-        mov     x19,    123
-        mov     x20,    123
 
         xprint(allstr, alloc, sp, fp)
 

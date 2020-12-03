@@ -93,8 +93,8 @@ loop_end_%s:
 // xreadArray(destination, base, size, index)
 define(xreadArray, `
         // M4: READ ARRAY
-        mov     x9,     $3
-        mov     x10,    $4
+        mov     x9,     $3                          // x9 - size
+        mov     x10,    $4                          // x10 - index
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     $2                  // calculate Offset += Base
 
@@ -105,9 +105,8 @@ define(xwriteArray, `
         // M4: WRITE ARRAY
         mov     x9,     $3                          // x9 - size
         mov     x10,    $4                          // x10 - index
-        mov     x11,    $2                          // x11 - base
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
-        add     x9,     x9,     x11                 // calculate Offset += Base
+        add     x9,     x9,     $2                  // calculate Offset += Base
 
         mov     x10,    $1
         str     x10,    [fp,   x9]
@@ -251,9 +250,10 @@ divert(`-1')
 // xfunc()
 define(xfunc, `
         // M4: FUNC
-        stp     fp,     lr,     [sp, alloc]!                // store FP and LR on stack, and allocate space for local variables
+        stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
         mov     fp,     sp                              // update FP to current SP
         
+        // Save registers
         str 	x19,    [fp, 16]
         str 	x20,    [fp, 24]
         str 	x21,    [fp, 32]
@@ -270,6 +270,7 @@ define(xfunc, `
 define(xret, `
         // M4: RET
 
+        // Restore registers
         ldr 	x19,    [fp, 16]
         ldr 	x20,    [fp, 24]
         ldr 	x21,    [fp, 32]
@@ -282,7 +283,7 @@ define(xret, `
         ldr 	x28,    [fp, 88]
 
         ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
-    ret
+        ret
 
 
 ')
