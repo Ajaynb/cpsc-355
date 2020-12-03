@@ -98,7 +98,7 @@ define(xreadArray, `
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     $2                  // calculate Offset += Base
 
-        ldr     $1,     [x29,   x9]
+        ldr     $1,     [fp,   x9]
 ')
 // xwriteArray(value, base, size, index)
 define(xwriteArray, `
@@ -110,7 +110,7 @@ define(xwriteArray, `
         add     x9,     x9,     x11                 // calculate Offset += Base
 
         mov     x10,    $1
-        str     x10,    [x29,   x9]
+        str     x10,    [fp,   x9]
 ')
 divert
 
@@ -215,8 +215,9 @@ define(xreadStruct, `
         mov     x11,    $2
         mov     x12,    $3
         add     x9,     x11,    x12             // add the size
+        add     x9,     x9,     #112            // add callee-saved space offset
         sub     x9,     xzr,    x9              // negate offset
-        ldr	    $1,     [x29,   x9]             // load the value
+        ldr	    $1,     [fp,   x9]             // load the value
 ')
 
 // xwriteStruct(value, base, attribute)
@@ -225,9 +226,10 @@ define(xwriteStruct, `
         mov     x11,    $2
         mov     x12,    $3
         add     x9,     x11,    x12             // add the size
+        add     x9,     x9,     #112            // add callee-saved space offset
         sub     x9,     xzr,    x9              // negate offset
         mov     x10,    $1
-        str     x10,    [x29,   x9]             // and Adds x10 to x9
+        str     x10,    [fp,   x9]             // and Adds x10 to x9
 ')
 divert
 
@@ -236,6 +238,7 @@ divert(`-1')
 define(xalloc, `
         // M4: ALLOC
         add     sp,     sp,     $1              // allocate on SP
+        // mov     fp,     sp                              // update FP to current SP
 ')
 // xdealloc(size)
 define(xdealloc, `
@@ -243,6 +246,7 @@ define(xdealloc, `
         mov     x9,     $1                      // move to x9
         sub     x9,     xzr,    x9              // negate the size again to positive
         add     sp,     sp,     x9              // dealloc on SP
+        // mov     fp,     sp                              // update FP to current SP
 ')
 divert
 

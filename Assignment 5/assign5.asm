@@ -2,9 +2,10 @@
 
         // Defining strings
 output: .string "%d, %d\n"
+allstr:  .string "alloc %d, sp %d, fp %d\n"
         
         // Equates for alloc & dealloc
-        alloc = -16
+        alloc =  -(16 + 96) & -16
         dealloc = -alloc
 
         // Define register aliases
@@ -72,20 +73,21 @@ main:   // main()
         xreadStruct(x21, st, st_row)
         xreadStruct(x22, st, st_col)
 
-        xprint(output, x21, x22)
-
-        xprint(output, st_size, st_arr_size)
 
         xarray(st_arr_base, st_arr_amount, int)
         xreadArray(x23, st_arr_base, int, 4)
         xprint(output, x23, x23)
 
-        mov     x24,    5
+        mov     x19,    5
+        xprint(output, x19, x19)
+
+        xprint(allstr, alloc, sp, fp)
 
         bl      initialize
 
-        xprint(output, x24, x24)
-
+        xprint(allstr, alloc, sp, fp)
+        
+exit:
 
         // Deallocate memory
         xdealloc(st_size)                       // deallocate struct Table
@@ -94,8 +96,12 @@ main:   // main()
 initialize: // initialize(struct Table* table)
 	xfunc()
 
-        mov     x24,    10
-        xprint(output, x24, x24)
+        mov     x19,    10
+        xprint(output, x19, alloc)
+
+        xprint(allstr, alloc, sp, fp)
+
+intiializein:
 
         xret()
 

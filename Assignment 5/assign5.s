@@ -28,7 +28,7 @@
 output: .string "%d, %d\n"
         
         // Equates for alloc & dealloc
-        alloc = -16
+        alloc =  -(16 + 96) & -16
         dealloc = -alloc
 
         // Define register aliases
@@ -179,7 +179,7 @@ end_3:
         add     x9,     x11,    x12             // add the size
         sub     x9,     xzr,    x9              // negate offset
         mov     x10,    xzr
-        str     x10,    [x29,   x9]             // and Adds x10 to x9
+        str     x10,    [fp,   x9]             // and Adds x10 to x9
 
         
         
@@ -192,7 +192,7 @@ end_3:
         add     x9,     x11,    x12             // add the size
         sub     x9,     xzr,    x9              // negate offset
         mov     x10,    xzr
-        str     x10,    [x29,   x9]             // and Adds x10 to x9
+        str     x10,    [fp,   x9]             // and Adds x10 to x9
 
         
         
@@ -205,7 +205,7 @@ end_3:
         add     x9,     x11,    x12             // add the size
         sub     x9,     xzr,    x9              // negate offset
         mov     x10,    x19
-        str     x10,    [x29,   x9]             // and Adds x10 to x9
+        str     x10,    [fp,   x9]             // and Adds x10 to x9
 
         
         // M4: WRITE STRUCT
@@ -214,7 +214,7 @@ end_3:
         add     x9,     x11,    x12             // add the size
         sub     x9,     xzr,    x9              // negate offset
         mov     x10,    x20
-        str     x10,    [x29,   x9]             // and Adds x10 to x9
+        str     x10,    [fp,   x9]             // and Adds x10 to x9
 
         
         
@@ -223,7 +223,7 @@ end_3:
         mov     x12,    st_row
         add     x9,     x11,    x12             // add the size
         sub     x9,     xzr,    x9              // negate offset
-        ldr	    x21,     [x29,   x9]             // load the value
+        ldr	    x21,     [fp,   x9]             // load the value
 
         
         // M4: READ STRUCT
@@ -231,7 +231,7 @@ end_3:
         mov     x12,    st_col
         add     x9,     x11,    x12             // add the size
         sub     x9,     xzr,    x9              // negate offset
-        ldr	    x22,     [x29,   x9]             // load the value
+        ldr	    x22,     [fp,   x9]             // load the value
 
 
         
@@ -299,7 +299,7 @@ loop_end_4:
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     st_arr_base                  // calculate Offset += Base
 
-        ldr     x23,     [x29,   x9]
+        ldr     x23,     [fp,   x9]
 
         
         // M4: PRINT
@@ -319,6 +319,22 @@ loop_end_4:
 
 
         mov     x24,    5
+        
+        // M4: PRINT
+    
+    
+        
+        
+    
+        mov     x1,    x24
+        
+    
+        mov     x2,    x24
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
 
         bl      initialize
 
@@ -347,7 +363,6 @@ loop_end_4:
         sub     x9,     xzr,    x9              // negate the size again to positive
         add     sp,     sp,     x9              // dealloc on SP
                        // deallocate struct Table
-
         
         // M4: RET
 
@@ -397,7 +412,7 @@ initialize: // initialize(struct Table* table)
         mov     x1,    x24
         
     
-        mov     x2,    x24
+        mov     x2,    alloc
         
     
         ldr     x0,     =output
