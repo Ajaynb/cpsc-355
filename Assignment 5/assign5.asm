@@ -22,7 +22,7 @@ allstr:  .string "alloc %d, sp %d, fp %d\n"
         int = 8
 
         // Equates for struct Table
-        st = 0
+        st = -alloc + 0
         st_row = 0
         st_col = 8
         st_arr = 16
@@ -32,7 +32,6 @@ allstr:  .string "alloc %d, sp %d, fp %d\n"
         st_size = -(st_arr + st_arr_size + 16) & -16
 
         // Equates for struct Word Frequency
-        wf = 0
         wf_freqency = 0
         wf_word = 8
         wf_times = 16
@@ -40,7 +39,7 @@ allstr:  .string "alloc %d, sp %d, fp %d\n"
         wf_size = -(wf_document) & -16
 
         // Equates for array of word frequency
-        wf_arr = (st_size + 16) & -16
+        wf_arr = (st + st_size + 16) & -16
         wf_arr_size = -(max_row * max_col * wf_size) & -16
 
 
@@ -83,6 +82,13 @@ main:   // main()
         xprint(output, x23, x24)
 
 
+        add     x0,     fp,     st_col
+        add     x0,     x0,     st
+
+        add     x1,     fp,     st_row
+        add     x1,     x1,     st
+        bl      initialize
+
         xprint(allstr, alloc, sp, fp)
 
 
@@ -102,10 +108,8 @@ main:   // main()
 initialize: // initialize(struct Table* table)
 	xfunc()
 
-        mov     x19,    x0
-        mov     x20,    x1
-        //ldr     x19,    [x0]
-        //ldr     x20,    [x1]
+        ldr     x19,    [x0]
+        ldr     x20,    [x1]
 
         xprint(output, x19, x20)
 
