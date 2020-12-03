@@ -163,6 +163,7 @@ loop_%s:
         
         mov     x11,    $1                          // get base
         add     x10,    x10,    x11                 // calculate total offset, offset in array + base
+        add     x10,    x10,    dealloc             // add bytes for saved registers
 
         str 	xzr,    [fp,    x10]                // initialize with 0
 
@@ -181,6 +182,7 @@ define(xreadArray, `
         mov     x10,    $4                          // x10 - index
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     $2                  // calculate Offset += Base
+        add     x9,     x9,     dealloc             // add bytes for saved registers
 
         ldr     $1,     [fp,   x9]
 ')
@@ -191,6 +193,7 @@ define(xwriteArray, `
         mov     x10,    $4                          // x10 - index
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     $2                  // calculate Offset += Base
+        add     x9,     x9,     dealloc             // add bytes for saved registers
 
         mov     x10,    $1
         str     x10,    [fp,   x9]
