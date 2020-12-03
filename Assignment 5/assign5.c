@@ -153,7 +153,7 @@ void topRelevantDocs(struct Table* table, int index, int top) {
         // printf("Word %02d in ", words[t].word); // Uncomment if neccessary
         printf("Document %02d: ", words[t].document);
         printf("Occurence of %d and ", words[t].times);
-        printf("Frequency of %.1f%% ", words[t].frequency * 100);
+        printf("Frequency of %.1f%% ", words[t].frequency);
         printf("\n");
     }
 
