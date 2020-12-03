@@ -179,7 +179,7 @@ define(xwriteArray, `
         str     x10,    [fp,   x9]
 ')
 
-// struct(base, attribute1, attribute2, ...)
+// xstruct(base, attribute1, attribute2, ...)
 define(xstruct, `
         // M4: STRUCT
     define(`index', eval(`1'))
@@ -191,7 +191,7 @@ define(xstruct, `
     ')
 ')
 
-// readStruct(value, base, attribute)
+// xreadStruct(value, base, attribute)
 define(xreadStruct, `
         // M4: READ STRUCT
         mov     x11,    $2                      // int base
@@ -200,7 +200,7 @@ define(xreadStruct, `
         ldr	$1,     [fp,   x9]              // load the value
 ')
 
-// writeStruct(value, base, attribute)
+// xwriteStruct(value, base, attribute)
 define(xwriteStruct, `
         // M4: WRITE STRUCT
         mov     x11,    $2
@@ -264,5 +264,7 @@ define(xret, `
 
 
 ')
+
+// 
 
 divert
