@@ -26,6 +26,7 @@
 
         // Defining strings
 output: .string "%d, %d\n"
+allstr:  .string "alloc %d, sp %d, fp %d\n"
         
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
@@ -90,79 +91,15 @@ main:   // main()
         str 	x28,    [fp, 88]
 
 
-        mov     x19,    5                       // int row = 5;
-        mov     x20,    5                       // int col = 5;
+        mov     x19,    5
+        mov     x20,    5
 
-        // Rand seed
-        
-        // M4: RAND SEED
-        mov     x0,     0                       // 1st parameter: 0
-        bl      time                            // time(0);
-        bl      srand                           // srand(time(0));
-
-
-        // Limit the range of row and col as input validation
-        
-        // M4: MIN
-    
-        cmp     x19,     max_row
-        b.lt    if_0
-        b       else_0
-if_0:  mov    x19,     x19
-        b       end_0
-else_0:mov  x19,     max_row
-        b       end_0
-end_0:
-    
-    
-                 // row = min(row, max_row);
-        
-        // M4: MAX
-    
-        cmp     x19,     min_row
-        b.gt    if_1
-        b       else_1
-if_1:  mov    x19,     x19
-        b       end_1
-else_1:mov  x19,     min_row
-        b       end_1
-end_1:
-    
-    
-                 // row = max(row, min_row);
-        
-        // M4: MIN
-    
-        cmp     x20,     max_col
-        b.lt    if_2
-        b       else_2
-if_2:  mov    x20,     x20
-        b       end_2
-else_2:mov  x20,     max_col
-        b       end_2
-end_2:
-    
-    
-                 // col = min(col, max_col);
-        
-        // M4: MAX
-    
-        cmp     x20,     min_col
-        b.gt    if_3
-        b       else_3
-if_3:  mov    x20,     x20
-        b       end_3
-else_3:mov  x20,     min_col
-        b       end_3
-end_3:
-    
-    
-                 // col = max(col, min_col);
 
         // Construct struct Table
         
         // M4: ALLOC
         add     sp,     sp,     st_size              // allocate on SP
+        // mov     fp,     sp                              // update FP to current SP
                          // allocate for struct Table
         
         // M4: STRUCT
@@ -216,23 +153,10 @@ end_3:
         mov     x10,    x20
         str     x10,    [fp,   x9]             // and Adds x10 to x9
 
-        
-        
-        // M4: READ STRUCT
-        mov     x11,    st
-        mov     x12,    st_row
-        add     x9,     x11,    x12             // add the size
-        sub     x9,     xzr,    x9              // negate offset
-        ldr	    x21,     [fp,   x9]             // load the value
 
-        
-        // M4: READ STRUCT
-        mov     x11,    st
-        mov     x12,    st_col
-        add     x9,     x11,    x12             // add the size
-        sub     x9,     xzr,    x9              // negate offset
-        ldr	    x22,     [fp,   x9]             // load the value
 
+        mov     x19,    123
+        mov     x20,    123
 
         
         // M4: PRINT
@@ -241,16 +165,21 @@ end_3:
         
         
     
-        mov     x1,    x21
+        mov     x1,    alloc
         
     
-        mov     x2,    x22
+        mov     x2,    sp
         
     
-        ldr     x0,     =output
+        mov     x3,    fp
+        
+    
+        ldr     x0,     =allstr
         bl      printf
 
 
+        add     x0,     fp,     st_row
+        add     x1,     fp,     st_col
         
         // M4: PRINT
     
@@ -258,78 +187,10 @@ end_3:
         
         
     
-        mov     x1,    st_size
+        mov     x1,    x0
         
     
-        mov     x2,    st_arr_size
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
-
-        
-        // M4: ARRAY
-    
-        mov     x9,     0                           // loop Counter
-loop_4:
-        cmp     x9,     st_arr_amount                          // if reach amount
-        b.eq    loop_end_4
-
-        mov     x10,    int                          // get element size
-        mul     x10,    x10,    x9                  // calculate element offset by 3
-        
-        mov     x11,    st_arr_base                          // get base
-        add     x10,    x10,    x11                 // calculate total offset, offset in array + base
-
-        str 	xzr,    [fp,    x10]                // initialize with 0
-
-        add     x9,     x9,     1                   // increment
-        b       loop_4
-
-loop_end_4:
-
-    
-    
-
-        
-        // M4: READ ARRAY
-        mov     x9,     int
-        mov     x10,    4
-        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
-        add     x9,     x9,     st_arr_base                  // calculate Offset += Base
-
-        ldr     x23,     [fp,   x9]
-
-        
-        // M4: PRINT
-    
-    
-        
-        
-    
-        mov     x1,    x23
-        
-    
-        mov     x2,    x23
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
-
-        mov     x24,    5
-        
-        // M4: PRINT
-    
-    
-        
-        
-    
-        mov     x1,    x24
-        
-    
-        mov     x2,    x24
+        mov     x2,    x1
         
     
         ldr     x0,     =output
@@ -339,30 +200,16 @@ loop_end_4:
         bl      initialize
 
         
-        // M4: PRINT
-    
-    
-        
-        
-    
-        mov     x1,    x24
-        
-    
-        mov     x2,    x24
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
-
-
+exit:
         // Deallocate memory
         
         // M4: DEALLOC
         mov     x9,     st_size                      // move to x9
         sub     x9,     xzr,    x9              // negate the size again to positive
         add     sp,     sp,     x9              // dealloc on SP
+        // mov     fp,     sp                              // update FP to current SP
                        // deallocate struct Table
+
         
         // M4: RET
 
@@ -379,6 +226,10 @@ loop_end_4:
 
         ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
     ret
+
+
+
+
 
 
 
@@ -401,7 +252,6 @@ initialize: // initialize(struct Table* table)
         str 	x28,    [fp, 88]
 
 
-        mov     x24,    10
         
         // M4: PRINT
     
@@ -409,15 +259,25 @@ initialize: // initialize(struct Table* table)
         
         
     
-        mov     x1,    x24
+        mov     x1,    alloc
         
     
-        mov     x2,    alloc
+        mov     x2,    sp
         
     
-        ldr     x0,     =output
+        mov     x3,    fp
+        
+    
+        ldr     x0,     =allstr
         bl      printf
 
+
+
+        //ldr     x19,    [x0]
+        //ldr     x20,    [x1]
+
+
+intiializein:
 
         
         // M4: RET

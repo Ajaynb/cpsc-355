@@ -198,7 +198,7 @@ define(xrand, `
 divert
 
 divert(`-1')
-// xstruct(base, attribute1, attribute2, ...)
+// struct(base, attribute1, attribute2, ...)
 define(xstruct, `
         // M4: STRUCT
     define(`index', eval(`1'))
@@ -209,24 +209,22 @@ define(xstruct, `
         define(`index', incr(index))
     ')
 ')
-// xreadStruct(value, base, attribute)
+// readStruct(value, base, attribute)
 define(xreadStruct, `
         // M4: READ STRUCT
-        mov     x11,    $2
-        mov     x12,    $3
-        add     x9,     x11,    x12             // add the size
-        add     x9,     x9,     #112            // add callee-saved space offset
-        sub     x9,     xzr,    x9              // negate offset
-        ldr	    $1,     [fp,   x9]             // load the value
+        mov     x11,    $2                      // int base
+        mov     x12,    $3                      // int attribute's offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        sub     x9,     xzr,    x9              // offset = 0 - offset, to negative value
+        ldr	$1,     [fp,   x9]              // load the value
 ')
 
-// xwriteStruct(value, base, attribute)
+// writeStruct(value, base, attribute)
 define(xwriteStruct, `
         // M4: WRITE STRUCT
         mov     x11,    $2
         mov     x12,    $3
         add     x9,     x11,    x12             // add the size
-        add     x9,     x9,     #112            // add callee-saved space offset
         sub     x9,     xzr,    x9              // negate offset
         mov     x10,    $1
         str     x10,    [fp,   x9]             // and Adds x10 to x9

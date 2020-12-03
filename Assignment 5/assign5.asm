@@ -52,54 +52,55 @@ allstr:  .string "alloc %d, sp %d, fp %d\n"
 main:   // main()
         xfunc()
 
-        mov     x19,    5                       // int row = 5;
-        mov     x20,    5                       // int col = 5;
+        mov     x19,    5
+        mov     x20,    5
 
-        // Rand seed
-        xrandSeed()
-
-        // Limit the range of row and col as input validation
-        xmin(x19, x19, max_row)                 // row = min(row, max_row);
-        xmax(x19, x19, min_row)                 // row = max(row, min_row);
-        xmin(x20, x20, max_col)                 // col = min(col, max_col);
-        xmax(x20, x20, min_col)                 // col = max(col, min_col);
 
         // Construct struct Table
         xalloc(st_size)                         // allocate for struct Table
         xstruct(st, st_row, st_col)             // init struct Table attributes with 0
         xwriteStruct(x19, st, st_row)
         xwriteStruct(x20, st, st_col)
-        
-        xreadStruct(x21, st, st_row)
-        xreadStruct(x22, st, st_col)
 
 
-        xarray(st_arr_base, st_arr_amount, int)
-        xreadArray(x23, st_arr_base, int, 4)
-        xprint(output, x23, x23)
-
-        mov     x19,    5
-        xprint(output, x19, x19)
+        mov     x19,    123
+        mov     x20,    123
 
         xprint(allstr, alloc, sp, fp)
 
+        sub     x0,     fp,     st_row
+        sub     x1,     fp,     st_col
         bl      initialize
 
-        xprint(allstr, alloc, sp, fp)
         
 exit:
-
         // Deallocate memory
         xdealloc(st_size)                       // deallocate struct Table
+
         xret()
+
+
+
+
 
 initialize: // initialize(struct Table* table)
 	xfunc()
 
-        mov     x19,    10
-        xprint(output, x19, alloc)
+        
+        ldr     x19,    [x0]
+        ldr     x20,    [x1]
+
+        mov     x1,     x19
+        mov     x2,     x20
+        ldr     x0,     =output
+        bl      printf
+
+
 
         xprint(allstr, alloc, sp, fp)
+
+
+
 
 intiializein:
 
