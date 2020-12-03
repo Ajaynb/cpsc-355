@@ -75,6 +75,13 @@ main:   // main()
         xreadStruct(x22, st, st_col)
         xprint(output, x21, x22)
 
+        xarray(st_arr_base, st_arr_amount, int)
+        xwriteArray(x19, st_arr_base, int, 4)
+        xwriteArray(x20, st_arr_base, int, 10)
+        xreadArray(x23, st_arr_base, int, 4)
+        xreadArray(x24, st_arr_base, int, 10)
+        xprint(output, x23, x24)
+
 
         xprint(allstr, alloc, sp, fp)
 
