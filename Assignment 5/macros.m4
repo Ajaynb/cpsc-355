@@ -65,55 +65,6 @@ define(xaddEqual, `
 divert
 
 divert(`-1')
-// xarray(base, element_amount, element_size)
-define(xarray, `
-        // M4: ARRAY
-    format(`
-        mov     x9,     0                           // loop Counter
-loop_%s:
-        cmp     x9,     $2                          // if reach amount
-        b.eq    loop_end_%s
-
-        mov     x10,    $3                          // get element size
-        mul     x10,    x10,    x9                  // calculate element offset by index
-        
-        mov     x11,    $1                          // get base
-        add     x10,    x10,    x11                 // calculate total offset, offset in array + base
-
-        str 	xzr,    [fp,    x10]                // initialize with 0
-
-        add     x9,     x9,     1                   // increment
-        b       loop_%s
-
-loop_end_%s:
-
-    ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
-    xcount()
-')
-// xreadArray(destination, base, size, index)
-define(xreadArray, `
-        // M4: READ ARRAY
-        mov     x9,     $3                          // x9 - size
-        mov     x10,    $4                          // x10 - index
-        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
-        add     x9,     x9,     $2                  // calculate Offset += Base
-
-        ldr     $1,     [fp,   x9]
-')
-// xwriteArray(value, base, size, index)
-define(xwriteArray, `
-        // M4: WRITE ARRAY
-        mov     x9,     $3                          // x9 - size
-        mov     x10,    $4                          // x10 - index
-        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
-        add     x9,     x9,     $2                  // calculate Offset += Base
-
-        mov     x10,    $1
-        str     x10,    [fp,   x9]
-')
-divert
-
-divert(`-1')
 // xmin(destination, num1, num2)
 define(xmin, `
         // M4: MIN
@@ -195,6 +146,57 @@ define(xrand, `
         mov     $1,     x9                      // $1 = x9;
 ')
 divert
+
+
+divert(`-1')
+// xarray(base, element_amount, element_size)
+define(xarray, `
+        // M4: ARRAY
+    format(`
+        mov     x9,     0                           // loop Counter
+loop_%s:
+        cmp     x9,     $2                          // if reach amount
+        b.eq    loop_end_%s
+
+        mov     x10,    $3                          // get element size
+        mul     x10,    x10,    x9                  // calculate element offset by index
+        
+        mov     x11,    $1                          // get base
+        add     x10,    x10,    x11                 // calculate total offset, offset in array + base
+
+        str 	xzr,    [fp,    x10]                // initialize with 0
+
+        add     x9,     x9,     1                   // increment
+        b       loop_%s
+
+loop_end_%s:
+
+    ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+    xcount()
+')
+// xreadArray(destination, base, size, index)
+define(xreadArray, `
+        // M4: READ ARRAY
+        mov     x9,     $3                          // x9 - size
+        mov     x10,    $4                          // x10 - index
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     $2                  // calculate Offset += Base
+
+        ldr     $1,     [fp,   x9]
+')
+// xwriteArray(value, base, size, index)
+define(xwriteArray, `
+        // M4: WRITE ARRAY
+        mov     x9,     $3                          // x9 - size
+        mov     x10,    $4                          // x10 - index
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     $2                  // calculate Offset += Base
+
+        mov     x10,    $1
+        str     x10,    [fp,   x9]
+')
+divert
+
 
 divert(`-1')
 // struct(base, attribute1, attribute2, ...)
