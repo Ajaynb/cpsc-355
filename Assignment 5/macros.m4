@@ -146,7 +146,6 @@ loop_%s:
         
         mov     x11,    $1                          // get base
         add     x10,    x10,    x11                 // calculate total offset, offset in array + base
-        add     x9,     x9,     dealloc             // add saved register space
 
         str 	xzr,    [fp,    x10]                // initialize with 0
 
@@ -165,7 +164,6 @@ define(xreadArray, `
         mov     x10,    $4                          // x10 - index
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     $2                  // calculate Offset += Base
-        add     x9,     x9,     dealloc             // add saved register space
 
         ldr     $1,     [fp,   x9]
 ')
@@ -176,7 +174,6 @@ define(xwriteArray, `
         mov     x10,    $4                          // x10 - index
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     $2                  // calculate Offset += Base
-        add     x9,     x9,     dealloc             // add saved register space
 
         mov     x10,    $1
         str     x10,    [fp,   x9]
@@ -200,7 +197,6 @@ define(xreadStruct, `
         mov     x11,    $2                      // int base
         mov     x12,    $3                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        add     x9,     x9,     dealloc         // add saved register space
         ldr	$1,     [fp,   x9]              // load the value
 ')
 
@@ -210,7 +206,6 @@ define(xwriteStruct, `
         mov     x11,    $2
         mov     x12,    $3
         add     x9,     x11,    x12             // add the size
-        add     x9,     x9,     dealloc         // add saved register space
         mov     x10,    $1
         str     x10,    [fp,   x9]              // and Adds x10 to x9
 ')
@@ -246,18 +241,6 @@ define(xfunc, `
         str 	x26,    [fp, 72]
         str 	x27,    [fp, 80]
         str 	x28,    [fp, 88]
-
-        mov     x19,    xzr
-        mov     x20,    xzr
-        mov     x21,    xzr
-        mov     x22,    xzr
-        mov     x23,    xzr
-        mov     x24,    xzr
-        mov     x25,    xzr
-        mov     x26,    xzr
-        mov     x27,    xzr
-        mov     x28,    xzr
-
 ')
 
 // xret()
@@ -282,11 +265,6 @@ define(xret, `
 
 ')
 
-// xpointer(destination, base, attribute)
-define(xpointer, `
-        xadd(x11, $2, $3)
-        add     x9,     fp,     x11
-        mov     $1,     x9
-')
+// 
 
 divert
