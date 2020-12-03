@@ -22,7 +22,7 @@ allstr:  .string "alloc %d, sp %d, fp %d\n"
         int = 8
 
         // Equates for struct Table
-        st = 0
+        st = -alloc + 0
         st_row = 0
         st_col = 8
         st_arr = 16
@@ -74,6 +74,20 @@ main:   // main()
         xreadStruct(x22, st, st_col)
         xprint(output, x21, x22)
 
+        xarray(st_arr_base, st_arr_amount, int)
+        xwriteArray(x19, st_arr_base, int, 4)
+        xwriteArray(x20, st_arr_base, int, 10)
+        xreadArray(x23, st_arr_base, int, 4)
+        xreadArray(x24, st_arr_base, int, 10)
+        xprint(output, x23, x24)
+
+
+        add     x0,     fp,     st_col
+        add     x0,     x0,     st
+
+        add     x1,     fp,     st_row
+        add     x1,     x1,     st
+        bl      initialize
 
         xprint(allstr, alloc, sp, fp)
 
@@ -81,11 +95,10 @@ main:   // main()
 
         // Deallocate memory
         xdealloc(st_size)                       // deallocate struct Table
-        xprint(allstr, alloc, sp, fp)
-
 
         xret()
 
+        xprint(allstr, alloc, sp, fp)
 
 
 
@@ -94,6 +107,11 @@ main:   // main()
 
 initialize: // initialize(struct Table* table)
 	xfunc()
+
+        ldr     x19,    [x0]
+        ldr     x20,    [x1]
+
+        xprint(output, x19, x20)
 
 
 
