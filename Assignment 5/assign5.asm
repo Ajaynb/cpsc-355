@@ -1,11 +1,14 @@
-        include(`macros.m4')
-
         // Defining strings
 output: .string "%d, %d\n"
-allstr:  .string "alloc %d, sp %d, fp %d\n"
+allstr: .string "alloc %d, sp %d, fp %d\n"
+
+
+        // Expose main function to OS and set balign
+        .global main
+        .balign 4
         
         // Equates for alloc & dealloc
-        alloc =  -(16 + 96) & -16
+        alloc = -16
         dealloc = -alloc
 
         // Define register aliases
@@ -26,97 +29,38 @@ allstr:  .string "alloc %d, sp %d, fp %d\n"
         st_row = 0
         st_col = 8
         st_arr = 16
-        st_arr_base = st + st_arr
         st_arr_amount = max_row * max_col
         st_arr_size = st_arr_amount * int
         st_size = -(st_arr + st_arr_size + 16) & -16
 
-        // Equates for struct Word Frequency
-        wf_freqency = 0
-        wf_word = 8
-        wf_times = 16
-        wf_document = 24
-        wf_size = -(wf_document) & -16
-
-        // Equates for array of word frequency
-        wf_arr = (st + st_size + 16) & -16
-        wf_arr_size = -(max_row * max_col * wf_size) & -16
 
 
+main: 
+        stp fp, lr, [sp, alloc]!					//Store FP and LR on stack, and allocate space for local variables
+        mov fp, sp									//Update FP to current SP
 
-        // Expose main function to OS and set balign
-        .global main
-        .balign 4
+        // allocate the required space for struct
+		add 	sp,			sp, 	st_size
 
-main:   // main()
-        xfunc()
+        bl initialize
 
-        // Initialize values
-        mov     x19,    5                       // int row = 5;
-        mov     x20,    5                       // int col = 5;
+        
+        //deallocate struct
+		sub 	x9, 	xzr, 	st_size
+		add		sp, 		sp, 	x9
 
-        // Rand seed
-        xrandSeed()
-
-        // Limit the range of row and col as input validation
-        xmin(x19, x19, max_row)                 // row = min(row, max_row);
-        xmax(x19, x19, min_row)                 // row = max(row, min_row);
-        xmin(x20, x20, max_col)                 // col = min(col, max_col);
-        xmax(x20, x20, min_col)                 // col = max(col, min_col);
-
-        // Construct struct Table
-        xalloc(st_size)                         // allocate for struct Table
-        xstruct(st, st_row, st_col)             // init struct Table attributes with 0
-        xwriteStruct(x19, st, st_row)           // write the reset row to struct
-        xwriteStruct(x20, st, st_col)           // write the reset col to struct
-
-        xreadStruct(x21, st, st_row)
-        xreadStruct(x22, st, st_col)
-        xprint(output, x21, x22)
-
-        xarray(st_arr_base, st_arr_amount, int)
-        xwriteArray(x19, st_arr_base, int, 4)
-        xwriteArray(x20, st_arr_base, int, 10)
-        xreadArray(x23, st_arr_base, int, 4)
-        xreadArray(x24, st_arr_base, int, 10)
-        xprint(output, x23, x24)
-
-
-        add     x0,     fp,     st_col
-        add     x0,     x0,     st
-
-        add     x1,     fp,     st_row
-        add     x1,     x1,     st
-        bl      initialize
-
-        xprint(allstr, alloc, sp, fp)
+        mov x0, 0
+        ldp fp, lr, [sp], dealloc				    //Deallocate stack memory
+        ret
 
 
 
-        // Deallocate memory
-        xdealloc(st_size)                       // deallocate struct Table
+initialize:
+        stp fp, lr, [sp, alloc]!						//Store FP and LR on stack, and allocate space for local variables
+        mov fp, sp									//Update FP to current SP
+        
+        
 
-        xret()
-
-        xprint(allstr, alloc, sp, fp)
-
-
-
-
-
-
-initialize: // initialize(struct Table* table)
-	xfunc()
-
-        ldr     x19,    [x0]
-        ldr     x20,    [x1]
-
-        xprint(output, x19, x20)
-
-
-
-        xprint(allstr, alloc, sp, fp)
-
-
-        xret()
+        ldp fp, lr, [sp], dealloc						//Deallocate stack memory
+        ret			
 
