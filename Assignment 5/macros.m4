@@ -236,7 +236,6 @@ divert(`-1')
 define(xalloc, `
         // M4: ALLOC
         add     sp,     sp,     $1              // allocate on SP
-        // mov     fp,     sp                              // update FP to current SP
 ')
 // xdealloc(size)
 define(xdealloc, `
@@ -244,7 +243,6 @@ define(xdealloc, `
         mov     x9,     $1                      // move to x9
         sub     x9,     xzr,    x9              // negate the size again to positive
         add     sp,     sp,     x9              // dealloc on SP
-        // mov     fp,     sp                              // update FP to current SP
 ')
 divert
 
