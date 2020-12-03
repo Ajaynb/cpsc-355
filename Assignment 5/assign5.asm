@@ -52,9 +52,18 @@ allstr:  .string "alloc %d, sp %d, fp %d\n"
 main:   // main()
         xfunc()
 
-        mov     x19,    5
-        mov     x20,    5
+        // Initialize values
+        mov     x19,    5                       // int row = 5;
+        mov     x20,    5                       // int col = 5;
 
+        // Rand seed
+        xrandSeed()
+
+        // Limit the range of row and col as input validation
+        xmin(x19, x19, max_row)                 // row = min(row, max_row);
+        xmax(x19, x19, min_row)                 // row = max(row, min_row);
+        xmin(x20, x20, max_col)                 // col = min(col, max_col);
+        xmax(x20, x20, min_col)                 // col = max(col, min_col);
 
         // Construct struct Table
         xalloc(st_size)                         // allocate for struct Table
@@ -72,8 +81,7 @@ main:   // main()
         sub     x1,     fp,     st_col
         bl      initialize
 
-        
-exit:
+
         // Deallocate memory
         xdealloc(st_size)                       // deallocate struct Table
 
@@ -90,19 +98,12 @@ initialize: // initialize(struct Table* table)
         ldr     x19,    [x0]
         ldr     x20,    [x1]
 
-        mov     x1,     x19
-        mov     x2,     x20
-        ldr     x0,     =output
-        bl      printf
+        xprint(output, x19, x20)
 
 
 
         xprint(allstr, alloc, sp, fp)
 
-
-
-
-intiializein:
 
         xret()
 
