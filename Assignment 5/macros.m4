@@ -1,9 +1,7 @@
 divert(`-1')
 define(`xcounter',`0')dnl
 define(`xcount',`define(`xcounter',eval(xcounter+1))')dnl
-divert
 
-divert(`-1')
 # quote(args) - convert args to single-quoted string
 define(`quote', `ifelse(`$#', `0', `', ``$*'')')
 # dquote(args) - convert args to quoted list of quoted strings
@@ -11,9 +9,7 @@ define(`dquote', ``$@'')
 # dquote_elt(args) - convert args to list of double-quoted strings
 define(`dquote_elt', `ifelse(`$#', `0', `', `$#', `1', ```$1''',
                              ```$1'',$0(shift($@))')')
-divert
 
-divert(`-1')
 # foreach(x, (item_1, item_2, ..., item_n), stmt)
 #   parenthesized list, improved version
 define(`foreach', `pushdef(`$1')_$0(`$1',
@@ -21,9 +17,7 @@ define(`foreach', `pushdef(`$1')_$0(`$1',
 define(`_arg1', `$1')
 define(`_foreach', `ifelse(`$2', `(`')', `',
   `define(`$1', _arg1$2)$3`'$0(`$1', (dquote(shift$2)), `$3')')')
-divert
 
-divert(`-1')
 # forloop_arg(from, to, macro) - invoke MACRO(value) for
 #   each value between FROM and TO, without define overhead
 define(`forloop_arg', `ifelse(eval(`($1) <= ($2)'), `1',
@@ -35,9 +29,7 @@ define(`forloop', `ifelse(eval(`($2) <= ($3)'), `1',
 define(`_forloop',
   `$3`$1'$4`'ifelse(`$1', `$2', `',
     `$0(incr(`$1'), `$2', `$3', `$4')')')
-divert
 
-divert(`-1')
 // xadd(destination, param2, param3, ...) -> destination = param2 + param3 + ...
 define(xadd, `
         // M4: ADD
@@ -52,19 +44,19 @@ define(xadd, `
     ')
         mov     $1,     x9                      // result
 ')
+
 // xaddAdd(variable) -> variable ++;
 define(xaddAdd, `
         // M4: ADD ADD
         add     $1, $1, 1
 ')
+
 // xaddEqual(variable, param2) -> variable += param2;
 define(xaddEqual, `
         // M4: ADD EQUAL
         add     $1, $1, $2
 ')
-divert
 
-divert(`-1')
 // xmin(destination, num1, num2)
 define(xmin, `
         // M4: MIN
@@ -96,9 +88,7 @@ end_%s:
     ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
     xcount()
 ')
-divert
 
-divert(`-1')
 // xmul(destination, param2, param3, ...)
 define(xmul, `
         // M4: MUL
@@ -113,9 +103,7 @@ define(xmul, `
     ')
         mov     $1,     x9                      // result
 ')
-divert
 
-divert(`-1')
 // xprint(string, param1, param2, ...) -> Just like how to use printf :)
 define(xprint, `
         // M4: PRINT
@@ -127,9 +115,7 @@ define(xprint, `
         ldr     x0,     =$1
         bl      printf
 ')
-divert
 
-divert(`-1')
 // xrandSeed()
 define(xrandSeed, `
         // M4: RAND SEED
@@ -145,10 +131,7 @@ define(xrand, `
         and  	x9,     x0,     $2              // int x9 = rand() & $2;
         mov     $1,     x9                      // $1 = x9;
 ')
-divert
 
-
-divert(`-1')
 // xarray(base, element_amount, element_size)
 define(xarray, `
         // M4: ARRAY
@@ -195,10 +178,7 @@ define(xwriteArray, `
         mov     x10,    $1
         str     x10,    [fp,   x9]
 ')
-divert
 
-
-divert(`-1')
 // struct(base, attribute1, attribute2, ...)
 define(xstruct, `
         // M4: STRUCT
@@ -210,6 +190,7 @@ define(xstruct, `
         define(`index', incr(index))
     ')
 ')
+
 // readStruct(value, base, attribute)
 define(xreadStruct, `
         // M4: READ STRUCT
@@ -228,9 +209,7 @@ define(xwriteStruct, `
         mov     x10,    $1
         str     x10,    [fp,   x9]              // and Adds x10 to x9
 ')
-divert
 
-divert(`-1')
 // xalloc(size)
 define(xalloc, `
         // M4: ALLOC
@@ -243,9 +222,7 @@ define(xdealloc, `
         sub     x9,     xzr,    x9              // negate the size again to positive
         add     sp,     sp,     x9              // dealloc on SP
 ')
-divert
 
-divert(`-1')
 
 // xfunc()
 define(xfunc, `
