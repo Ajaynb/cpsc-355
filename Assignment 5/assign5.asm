@@ -4,6 +4,7 @@
 output:         .string "%d, %d\n"
 output_float:   .string "%f, %f\n"
 allstr:         .string "alloc %d, sp %d, fp %d\n"
+test_out:       .string "frq: %f, word: %d\n"
 
 str_table_head: .string "===== Table =====\n"
 str_occ:        .string " %d "
@@ -375,8 +376,6 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
 
         topdoc_bubble_row:
 
-                xprint(output, x25, x22)
-
                 // Check for t - current index of row
                 cmp     x25,    x22                     // if (t >= table.row)
                 b.ge    topdoc_bubble_row_end           // {end}
@@ -417,26 +416,24 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                                 xwriteStruct(d27, x28, wf_freqency)
 
                                 // Swap document
-                                xreadStruct(x18, x27, wf_document)
-                                xreadStruct(x17, x28, wf_document)
+                                xreadStruct(x17, x27, wf_document)
+                                xreadStruct(x18, x28, wf_document)
                                 xwriteStruct(x17, x28, wf_document)
                                 xwriteStruct(x18, x27, wf_document)
                                 
                                 // Swap occurence
-                                xreadStruct(x18, x27, wf_occurence)
-                                xreadStruct(x17, x28, wf_occurence)
+                                xreadStruct(x17, x27, wf_occurence)
+                                xreadStruct(x18, x28, wf_occurence)
                                 xwriteStruct(x17, x28, wf_occurence)
                                 xwriteStruct(x18, x27, wf_occurence)
                                 
                                 // Swap word
-                                xreadStruct(x18, x27, wf_word)
-                                xreadStruct(x17, x28, wf_word)
+                                xreadStruct(x17, x27, wf_word)
+                                xreadStruct(x18, x28, wf_word)
                                 xwriteStruct(x17, x28, wf_word)
                                 xwriteStruct(x18, x27, wf_word)
 
                         topdoc_bubble_swap_end:
-
-                        
                         
                         // Increment and loop
                         xaddAdd(x26)                    // r ++;
@@ -450,6 +447,36 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                 b       topdoc_bubble_row               // go back to loop top
 
         topdoc_bubble_row_end:
+
+
+        // Print result
+        mov     x25,    0                               // int t = 0;
+        mov     x24,    0                               // int offset = 0;
+        topdoc_print:
+
+                // Check for t - current index of row
+                cmp     x25,    x22                     // if (t >= table.row)
+                b.ge    topdoc_print_end                // {end}
+
+                
+                xmul(x24, x25, -wf_size)                // int offset = r * sizeof(struct WordFrequency)
+                add     x24,    x24,    wf_arr          // offset += base
+                
+                xreadStruct(x26, x24, wf_occurence)
+                xreadStruct(d27, x24, wf_freqency)
+
+                xprint(test_out, d27, x26)
+
+                
+
+
+                
+                // Increment and loop
+                xaddAdd(x25)                            // t ++;
+                b       topdoc_print                    // go back to loop top
+
+
+        topdoc_print_end:
         
 
         xprint(allstr, alloc, sp, fp)
