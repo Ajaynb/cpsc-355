@@ -1,8 +1,13 @@
         include(`macros.m4')
 
         // Defining strings
-output: .string "%d, %d\n"
-allstr: .string "alloc %d, sp %d, fp %d\n"
+output:         .string "%d, %d\n"
+allstr:         .string "alloc %d, sp %d, fp %d\n"
+
+str_table_head: .string "===== Table =====\n"
+str_occ:        .string " %d "
+str_linebr:     .string "\n"
+str_test:       .string "table[%d][%d](%d): %d\n"
         
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
@@ -79,25 +84,18 @@ main:   // main()
         xwriteArray(19, st_arr_base, int, 1)
         
 
-        mov     x11,    st                      // int base
-        mov     x12,    st_row                  // int attribute offset
-        add     x9,     x11,    x12             // int offset = base + attribute
-        add     x9,     x9,     fp              // offset += fp
-
-        mov     x0,     x9
-        bl      initialize
-
-        
-        xreadStruct(x24, st, st_row)
-        xreadStruct(x25, st, st_col)
-        xprint(output, x24, x25)
+        // struct Table table;                  // x28
+        mov     x28,    st                      // base
+        add     x28,    x28,    fp              // offset = base + fp
 
 
-        xreadArray(x27, st_arr_base, int, 0)
-        xreadArray(x28, st_arr_base, int, 1)
-        xprint(output, x27, x28)
+        // Initialize table
+        mov     x0,     x28
+        bl      initialize                      // initialize(&table)
 
-
+        // Display table
+        mov     x0,     x28
+        bl      display                         // display(&table)
 
         // Deallocate memory
         xdealloc(st_size)                       // deallocate struct Table
@@ -111,7 +109,7 @@ main:   // main()
 
 
 
-initialize: // initialize(struct Table* table)
+initialize:     // initialize(struct Table* table)
 	xfunc()
 
         // Save pointer of table
@@ -120,7 +118,6 @@ initialize: // initialize(struct Table* table)
         // Read row and column from table struct
         xreadStruct(x20, x19, st_row, true)             // int row = table.row;
         xreadStruct(x21, x19, st_col, true)             // int column = table.column;
-        xprint(output, x20, x21)
 
         // Save pointer of table.array
         add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
@@ -150,12 +147,11 @@ initialize: // initialize(struct Table* table)
         initialize_array_end:
 
 
-
         xret()
 
 
 
-randomNum: // randomNum(m, n)
+randomNum:      // randomNum(m, n)
 	xfunc()
 
         mov     x19,    x0                      // int m;
@@ -170,7 +166,7 @@ randomNum: // randomNum(m, n)
 
         // Calculate range
         sub     x21,    x27,    x28             // int range = upper - lower
-        xaddAdd(x21)                             // range += 1;
+        xaddAdd(x21)                            // range += 1;
 
         // Generate random number
         bl      rand
@@ -185,3 +181,69 @@ randomNum: // randomNum(m, n)
         randomNum_end:
         xret()
 
+
+
+
+display:        // display(struct Table* table)
+        xfunc()
+
+        // Save pointer of table
+        mov     x19,    x0                              // int pointer;
+        
+        // Read row and column from table struct
+        xreadStruct(x20, x19, st_row, true)             // int row = table.row;
+        xreadStruct(x21, x19, st_col, true)             // int column = table.column;
+
+        // Save pointer of table.array
+        add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
+
+        // Counters
+        mov     x23,    0                               // int t = 0; current row index
+        mov     x24,    0                               // int r = 0; current col index
+
+        // Print table head
+        xprint(str_table_head)
+
+        // For loop of row
+        display_array_row:
+
+                // Check for t - current index of row
+                cmp     x23,    x20                     // if (t >= table.row)
+                b.ge    display_array_row_end           // {end}
+
+
+                mov     x24,    0                       // int r = 0; current col index
+
+                // For loop of column
+                display_array_col:
+
+                        // Check for r - current index of column
+                        cmp     x24,    x21             // if (r >= table.col)
+                        b.ge    display_array_col_end   // {end}
+
+                        // Calculate current index: (t * table.row) + r
+                        xmul(x26, x23, x20)
+                        xaddEqual(x26, x24)
+
+                        // Read from array
+                        xreadArray(x25, x19, int, x26, true)
+                        xprint(str_occ, x25)
+
+                        // Increment and loop
+                        xaddAdd(x24)                    // r ++;
+                        b       display_array_col       // go back to loop top
+
+                display_array_col_end:
+
+
+                // Print line break
+                xprint(str_linebr)
+
+                // Increment and loop
+                xaddAdd(x23)                            // t ++;
+                b       display_array_row               // go back to loop top
+
+        display_array_row_end:
+
+
+        xret()

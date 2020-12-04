@@ -1,8 +1,13 @@
         
 
         // Defining strings
-output: .string "%d, %d\n"
-allstr: .string "alloc %d, sp %d, fp %d\n"
+output:         .string "%d, %d\n"
+allstr:         .string "alloc %d, sp %d, fp %d\n"
+
+str_table_head: .string "===== Table =====\n"
+str_occ:        .string " %d "
+str_linebr:     .string "\n"
+str_test:       .string "table[%d][%d](%d): %d\n"
         
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
@@ -65,6 +70,18 @@ main:   // main()
         str 	x26,    [fp, 72]
         str 	x27,    [fp, 80]
         str 	x28,    [fp, 88]
+
+        // Reset registers to 0
+        mov     x19,    0
+        mov     x20,    0
+        mov     x21,    0
+        mov     x22,    0
+        mov     x23,    0
+        mov     x24,    0
+        mov     x25,    0
+        mov     x26,    0
+        mov     x27,    0
+        mov     x28,    0
 
 
         // Initialize values
@@ -245,93 +262,18 @@ loop_end_0:
 
         
 
-        mov     x11,    st                      // int base
-        mov     x12,    st_row                  // int attribute offset
-        add     x9,     x11,    x12             // int offset = base + attribute
-        add     x9,     x9,     fp              // offset += fp
-
-        mov     x0,     x9
-        bl      initialize
-
-        
-        
-        // M4: READ STRUCT
-        mov     x11,    st                      // int base
-        mov     x12,    st_row                      // int attribute offset
-        add     x9,     x11,    x12             // int offset = base + attribute
-
-        
-        ldr	x24,     [fp,   x9]              // load the value
-        
-
-        
-        // M4: READ STRUCT
-        mov     x11,    st                      // int base
-        mov     x12,    st_col                      // int attribute offset
-        add     x9,     x11,    x12             // int offset = base + attribute
-
-        
-        ldr	x25,     [fp,   x9]              // load the value
-        
-
-        
-        // M4: PRINT
-    
-    
-        
-        
-    
-        mov     x1,    x24
-        
-    
-        mov     x2,    x25
-        
-    
-        ldr     x0,     =output
-        bl      printf
+        // struct Table table;                  // x28
+        mov     x28,    st                      // base
+        add     x28,    x28,    fp              // offset = base + fp
 
 
+        // Initialize table
+        mov     x0,     x28
+        bl      initialize                      // initialize(&table)
 
-        
-        // M4: READ ARRAY
-        mov     x9,     int                          // x9 - size
-        mov     x10,    0                          // x10 - 3
-        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
-        add     x9,     x9,     st_arr_base                  // calculate Offset += Base
-
-        
-        ldr     x27,     [fp,   x9]
-             
-
-        
-        // M4: READ ARRAY
-        mov     x9,     int                          // x9 - size
-        mov     x10,    1                          // x10 - 3
-        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
-        add     x9,     x9,     st_arr_base                  // calculate Offset += Base
-
-        
-        ldr     x28,     [fp,   x9]
-             
-
-        
-        // M4: PRINT
-    
-    
-        
-        
-    
-        mov     x1,    x27
-        
-    
-        mov     x2,    x28
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
-
-
+        // Display table
+        mov     x0,     x28
+        bl      display                         // display(&table)
 
         // Deallocate memory
         
@@ -387,7 +329,7 @@ loop_end_0:
 
 
 
-initialize: // initialize(struct Table* table)
+initialize:     // initialize(struct Table* table)
 	
         // M4: FUNC
         stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
@@ -405,8 +347,20 @@ initialize: // initialize(struct Table* table)
         str 	x27,    [fp, 80]
         str 	x28,    [fp, 88]
 
+        // Reset registers to 0
+        mov     x19,    0
+        mov     x20,    0
+        mov     x21,    0
+        mov     x22,    0
+        mov     x23,    0
+        mov     x24,    0
+        mov     x25,    0
+        mov     x26,    0
+        mov     x27,    0
+        mov     x28,    0
 
-        // Save pointer
+
+        // Save pointer of table
         mov     x19,    x0                              // int pointer;
         
         // Read row and column from table struct
@@ -430,50 +384,30 @@ initialize: // initialize(struct Table* table)
         ldr	x21,     [x9]                    // load the value
         
              // int column = table.column;
-        
-        // M4: PRINT
-    
-    
-        
-        
-    
-        mov     x1,    x20
-        
-    
-        mov     x2,    x21
-        
-    
-        ldr     x0,     =output
-        bl      printf
 
+        // Save pointer of table.array
+        add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
 
-        // Save pointer for table.array
-        add     x19,    x19,    st_arr                  // int array_base; get array base offset
-
-        // Calculate actual size
-        mul     x26,    x20,    x21                     // int size = row * column;
-        
         // For loop
-        mov     x23,    0                               // int t = 0; current 3
+        mov     x23,    0                               // int t = 0; current 4
+        mul     x26,    x20,    x21                     // int size = row * column;
 
         initialize_array:
 
                 cmp     x23,    x26                     // if (t >= size)
                 b.ge    initialize_array_end            // {end}
 
+                // Generate random number
                 mov     x0,     0
                 mov     x1,     9
-                bl      randomNum
-                
+                bl      randomNum                       // randomNum(0, 9)
 
+                // Write random number to array
                 mov     x25,    x0                      // int random = rand()
-
-                
-
                 
         // M4: WRITE ARRAY
         mov     x9,     int                          // x9 - size
-        mov     x10,    x23                          // x10 - 3
+        mov     x10,    x23                          // x10 - 4
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     x19                  // calculate Offset += Base
 
@@ -484,22 +418,14 @@ initialize: // initialize(struct Table* table)
         
    // table.array[t] = random
 
-
-
-
+                // Increment and loop
                 
         // M4: ADD ADD
         add     x23, x23, 1
                             // t ++;
-
-                b       initialize_array
+                b       initialize_array                // go back to loop top
 
         initialize_array_end:
-
-        
-
-
-
 
 
         
@@ -525,7 +451,7 @@ initialize: // initialize(struct Table* table)
 
 
 
-randomNum: // randomNum(m, n)
+randomNum:      // randomNum(m, n)
 	
         // M4: FUNC
         stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
@@ -543,27 +469,21 @@ randomNum: // randomNum(m, n)
         str 	x27,    [fp, 80]
         str 	x28,    [fp, 88]
 
+        // Reset registers to 0
+        mov     x19,    0
+        mov     x20,    0
+        mov     x21,    0
+        mov     x22,    0
+        mov     x23,    0
+        mov     x24,    0
+        mov     x25,    0
+        mov     x26,    0
+        mov     x27,    0
+        mov     x28,    0
+
 
         mov     x19,    x0                      // int m;
         mov     x20,    x1                      // int n;
-
-        
-        // M4: PRINT
-    
-    
-        
-        
-    
-        mov     x1,    x19
-        
-    
-        mov     x2,    x20
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
-
 
         cmp     x19,    x20                     // if (m == n)
         b.eq    randomNum_end                   // {skip everything to the end}, to return m itself
@@ -573,22 +493,21 @@ randomNum: // randomNum(m, n)
         // M4: MAX
         mov     x9,     x19
         mov     x10,    x20
-        csel    x19,     x9,     x10,    ge
+        csel    x27,     x9,     x10,    ge
                      // int upper = max(m, n)
         
         // M4: MIN
         mov     x9,     x19
         mov     x10,    x20
-        csel    x20,     x9,     x10,    le
+        csel    x28,     x9,     x10,    le
                      // int lower = min(m, n)
 
-
         // Calculate range
-        sub     x21,    x19,    x20             // int range = upper - lower
+        sub     x21,    x27,    x28             // int range = upper - lower
         
         // M4: ADD ADD
         add     x21, x21, 1
-                             // range += 1;
+                            // range += 1;
 
         // Generate random number
         bl      rand
@@ -620,5 +539,205 @@ randomNum: // randomNum(m, n)
         ret
 
 
+
+
+
+
+
+display:        // display(struct Table* table)
+        
+        // M4: FUNC
+        stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
+        mov     fp,     sp                              // update FP to current SP
+        
+        // Save registers
+        str 	x19,    [fp, 16]
+        str 	x20,    [fp, 24]
+        str 	x21,    [fp, 32]
+        str 	x22,    [fp, 40]
+        str 	x23,    [fp, 48]
+        str 	x24,    [fp, 56]
+        str 	x25,    [fp, 64]
+        str 	x26,    [fp, 72]
+        str 	x27,    [fp, 80]
+        str 	x28,    [fp, 88]
+
+        // Reset registers to 0
+        mov     x19,    0
+        mov     x20,    0
+        mov     x21,    0
+        mov     x22,    0
+        mov     x23,    0
+        mov     x24,    0
+        mov     x25,    0
+        mov     x26,    0
+        mov     x27,    0
+        mov     x28,    0
+
+
+        // Save pointer of table
+        mov     x19,    x0                              // int pointer;
+        
+        // Read row and column from table struct
+        
+        // M4: READ STRUCT
+        mov     x11,    x19                      // int base
+        mov     x12,    st_row                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x20,     [x9]                    // load the value
+        
+             // int row = table.row;
+        
+        // M4: READ STRUCT
+        mov     x11,    x19                      // int base
+        mov     x12,    st_col                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x21,     [x9]                    // load the value
+        
+             // int column = table.column;
+
+        // Save pointer of table.array
+        add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
+
+        // Counters
+        mov     x23,    0                               // int t = 0; current row 4
+        mov     x24,    0                               // int r = 0; current col 4
+
+        // Print table head
+        
+        // M4: PRINT
+    
+    
+        
+        
+    
+        ldr     x0,     =str_table_head
+        bl      printf
+
+
+        // For loop of row
+        display_array_row:
+
+                // Check for t - current 1 of row
+                cmp     x23,    x20                     // if (t >= table.row)
+                b.ge    display_array_row_end           // {end}
+
+
+                mov     x24,    0                       // int r = 0; current col 1
+
+                // For loop of column
+                display_array_col:
+
+                        // Check for r - current 1 of column
+                        cmp     x24,    x21             // if (r >= table.col)
+                        b.ge    display_array_col_end   // {end}
+
+                        // Calculate current 1: (t * table.row) + r
+                        
+        // M4: MUL
+    
+        mov     x9,     1                       // initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x23                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    x20                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        mov     x26,     x9                      // result
+
+                        
+        // M4: ADD EQUAL
+        add     x26, x26, x24
+
+
+                        // Read from array
+                        
+        // M4: READ ARRAY
+        mov     x9,     int                          // x9 - size
+        mov     x10,    x26                          // x10 - 4
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     x19                  // calculate Offset += Base
+
+        
+        ldr     x25,     [x9]
+             
+
+                        
+        // M4: PRINT
+    
+    
+        
+        
+    
+        mov     x1,    x25
+        
+    
+        ldr     x0,     =str_occ
+        bl      printf
+
+
+                        // Increment and loop
+                        
+        // M4: ADD ADD
+        add     x24, x24, 1
+                    // r ++;
+                        b       display_array_col       // go back to loop top
+
+                display_array_col_end:
+
+
+                // Print line break
+                
+        // M4: PRINT
+    
+    
+        
+        
+    
+        ldr     x0,     =str_linebr
+        bl      printf
+
+
+                // Increment and loop
+                
+        // M4: ADD ADD
+        add     x23, x23, 1
+                            // t ++;
+                b       display_array_row               // go back to loop top
+
+        display_array_row_end:
+
+
+        
+        // M4: RET
+
+        // Restore registers
+        ldr 	x19,    [fp, 16]
+        ldr 	x20,    [fp, 24]
+        ldr 	x21,    [fp, 32]
+        ldr 	x22,    [fp, 30]
+        ldr 	x23,    [fp, 48]
+        ldr 	x24,    [fp, 56]
+        ldr 	x25,    [fp, 64]
+        ldr 	x26,    [fp, 72]
+        ldr 	x27,    [fp, 80]
+        ldr 	x28,    [fp, 88]
+
+        ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
+        ret
 
 
