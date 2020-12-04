@@ -152,11 +152,15 @@ end_3:
         
             
         // M4: WRITE STRUCT
-        mov     x11,    st
-        mov     x12,    st_row
-        add     x9,     x11,    x12             // add the size
-        mov     x10,    xzr
-        str     x10,    [fp,   x9]              // and Adds x10 to x9
+        mov     x11,    st                      // int base
+        mov     x12,    st_row                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        mov     x10,    xzr                      // int value
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+        
 
         
         
@@ -164,11 +168,15 @@ end_3:
         
             
         // M4: WRITE STRUCT
-        mov     x11,    st
-        mov     x12,    st_col
-        add     x9,     x11,    x12             // add the size
-        mov     x10,    xzr
-        str     x10,    [fp,   x9]              // and Adds x10 to x9
+        mov     x11,    st                      // int base
+        mov     x12,    st_col                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        mov     x10,    xzr                      // int value
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+        
 
         
         
@@ -176,19 +184,27 @@ end_3:
              // init struct Table attributes with 0
         
         // M4: WRITE STRUCT
-        mov     x11,    st
-        mov     x12,    st_row
-        add     x9,     x11,    x12             // add the size
-        mov     x10,    x19
-        str     x10,    [fp,   x9]              // and Adds x10 to x9
+        mov     x11,    st                      // int base
+        mov     x12,    st_row                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        mov     x10,    x19                      // int value
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+        
            // write the reset row to struct
         
         // M4: WRITE STRUCT
-        mov     x11,    st
-        mov     x12,    st_col
-        add     x9,     x11,    x12             // add the size
-        mov     x10,    x20
-        str     x10,    [fp,   x9]              // and Adds x10 to x9
+        mov     x11,    st                      // int base
+        mov     x12,    st_col                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        mov     x10,    x20                      // int value
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+        
            // write the reset col to struct
 
         
@@ -247,7 +263,11 @@ loop_end_4:
         add     x9,     x9,     st_arr_base                  // calculate Offset += Base
 
         mov     x10,    18
+
+        
         str     x10,    [fp,   x9]
+        
+        
 
         
         // M4: WRITE ARRAY
@@ -257,27 +277,13 @@ loop_end_4:
         add     x9,     x9,     st_arr_base                  // calculate Offset += Base
 
         mov     x10,    19
+
+        
         str     x10,    [fp,   x9]
+        
+        
 
         
-        // M4: READ ARRAY
-        mov     x9,     int                          // x9 - size
-        mov     x10,    0                          // x10 - 4
-        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
-        add     x9,     x9,     st_arr_base                  // calculate Offset += Base
-
-        ldr     x23,     [fp,   x9]
-
-        
-        // M4: READ ARRAY
-        mov     x9,     int                          // x9 - size
-        mov     x10,    1                          // x10 - 4
-        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
-        add     x9,     x9,     st_arr_base                  // calculate Offset += Base
-
-        ldr     x24,     [fp,   x9]
-
-
 
         mov     x11,    st                      // int base
         mov     x12,    st_row                  // int attribute offset
@@ -288,22 +294,83 @@ loop_end_4:
         bl      initialize
 
         
+        
+        // M4: READ STRUCT
+        mov     x11,    st                      // int base
+        mov     x12,    st_row                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x24,     [fp,   x9]              // load the value
+        
+
+
+        
+        // M4: READ STRUCT
+        mov     x11,    st                      // int base
+        mov     x12,    st_col                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x25,     [fp,   x9]              // load the value
+        
+
+
+        
         // M4: PRINT
     
     
         
         
     
-        mov     x1,    alloc
+        mov     x1,    x24
         
     
-        mov     x2,    sp
+        mov     x2,    x25
         
     
-        mov     x3,    fp
+        ldr     x0,     =output
+        bl      printf
+
+
+
+        
+        // M4: READ ARRAY
+        mov     x9,     int                          // x9 - size
+        mov     x10,    0                          // x10 - 3
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     st_arr_base                  // calculate Offset += Base
+
+        
+        ldr     x19,     [fp,   x9]
+        
+
+        
+
+        
+        // M4: READ ARRAY
+        mov     x9,     int                          // x9 - size
+        mov     x10,    1                          // x10 - 3
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     st_arr_base                  // calculate Offset += Base
+
+        
+        ldr     x28,     [fp,   x9]
+        
+
+        
+
+        
+        // M4: PRINT
+    
+    
+        
         
     
-        ldr     x0,     =allstr
+        mov     x1,    x28
+        
+    
+        ldr     x0,     =x27
         bl      printf
 
 
@@ -391,7 +458,7 @@ initialize: // initialize(struct Table* table)
         add     x9,     x11,    x12             // int offset = base + attribute
 
         
-        ldr	x20,     [x9]              // load the value
+        ldr	x20,     [x9]                    // load the value
         
 
 
@@ -402,7 +469,7 @@ initialize: // initialize(struct Table* table)
         add     x9,     x11,    x12             // int offset = base + attribute
 
         
-        ldr	x20,     [x9]              // load the value
+        ldr	x21,     [x9]                    // load the value
         
 
 
@@ -424,8 +491,30 @@ initialize: // initialize(struct Table* table)
         ldr     x0,     =output
         bl      printf
 
+
+        mov     x21,    20
+        
+        // M4: WRITE STRUCT
+        mov     x11,    x19                      // int base
+        mov     x12,    st_col                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        mov     x10,    x21                      // int value
+        
+        
+        str	x10,    [x9]                    // store the value
+        
         
 
+        
+        
+        // M4: READ STRUCT
+        mov     x11,    x19                      // int base
+        mov     x12,    st_col                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x24,     [x9]                    // load the value
+        
 
 
         
@@ -435,17 +524,97 @@ initialize: // initialize(struct Table* table)
         
         
     
-        mov     x1,    alloc
+        mov     x1,    x21
         
     
-        mov     x2,    sp
+        mov     x2,    x24
         
     
-        mov     x3,    fp
-        
-    
-        ldr     x0,     =allstr
+        ldr     x0,     =output
         bl      printf
+
+
+
+
+        add     x19,    x19,    st_arr
+
+        
+        // M4: READ ARRAY
+        mov     x9,     int                          // x9 - size
+        mov     x10,    0                          // x10 - 3
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     x19                  // calculate Offset += Base
+
+        
+        ldr     x25,     [x9]
+        
+
+        
+
+        
+        // M4: READ ARRAY
+        mov     x9,     int                          // x9 - size
+        mov     x10,    1                          // x10 - 3
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     x19                  // calculate Offset += Base
+
+        
+        ldr     x26,     [x9]
+        
+
+        
+
+        
+        // M4: PRINT
+    
+    
+        
+        
+    
+        mov     x1,    x25
+        
+    
+        mov     x2,    x26
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+        add     x25,    x25,    10
+        add     x26,    x26,    10
+
+        
+        // M4: WRITE ARRAY
+        mov     x9,     int                          // x9 - size
+        mov     x10,    0                          // x10 - 3
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     x19                  // calculate Offset += Base
+
+        mov     x10,    x25
+
+        
+        str     x10,    [x9]
+        
+        
+
+        
+        // M4: WRITE ARRAY
+        mov     x9,     int                          // x9 - size
+        mov     x10,    1                          // x10 - 3
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     x19                  // calculate Offset += Base
+
+        mov     x10,    x26
+
+        
+        str     x10,    [x9]
+        
+        
+
+        
+
+
 
 
 

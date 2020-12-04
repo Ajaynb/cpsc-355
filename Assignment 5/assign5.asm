@@ -77,9 +77,7 @@ main:   // main()
         xarray(st_arr_base, st_arr_amount, int)
         xwriteArray(18, st_arr_base, int, 0)
         xwriteArray(19, st_arr_base, int, 1)
-        xreadArray(x23, st_arr_base, int, 0)
-        xreadArray(x24, st_arr_base, int, 1)
-
+        
 
         mov     x11,    st                      // int base
         mov     x12,    st_row                  // int attribute offset
@@ -92,9 +90,12 @@ main:   // main()
         
         xreadStruct(x24, st, st_row)
         xreadStruct(x25, st, st_col)
-        xprint(output, x24,x25)
+        xprint(output, x24, x25)
 
-        xprint(allstr, alloc, sp, fp)
+
+        xreadArray(x27, st_arr_base, int, 0)
+        xreadArray(x28, st_arr_base, int, 1)
+        xprint(output, x27, x28)
 
 
 
@@ -135,10 +136,15 @@ initialize: // initialize(struct Table* table)
         xreadArray(x26, x19, int, 1, true)
         xprint(output, x25, x26)
 
+        add     x25,    x25,    10
+        add     x26,    x26,    10
+
+        xwriteArray(x25, x19, int, 0, true)
+        xwriteArray(x26, x19, int, 1, true)
+        
 
 
 
-        xprint(allstr, alloc, sp, fp)
 
 
         xret()

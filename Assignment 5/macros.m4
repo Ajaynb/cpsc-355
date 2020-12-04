@@ -166,9 +166,9 @@ define(xreadArray, `
         add     x9,     x9,     $2                  // calculate Offset += Base
 
         ifelse(`$#', `5', `
-                ldr     $1,     [x9]
+        ldr     $1,     [x9]
         ', `
-                ldr     $1,     [fp,   x9]
+        ldr     $1,     [fp,   x9]
         ')
 
         
@@ -182,7 +182,13 @@ define(xwriteArray, `
         add     x9,     x9,     $2                  // calculate Offset += Base
 
         mov     x10,    $1
+
+        ifelse(`$#', `5', `
+        str     x10,    [x9]
+        ', `
         str     x10,    [fp,   x9]
+        ')
+        
 ')
 
 // xstruct(base, attribute1, attribute2, ...)
