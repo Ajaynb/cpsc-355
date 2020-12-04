@@ -43,7 +43,7 @@ str_test:       .string "table[%d][%d](%d): %d\n"
         wf_document = 24
         wf_size = -(wf_document) & -16
 
-        wf_arr_size = -(max_row * wf_size) & -16
+        wf_arr_size = -(max_row * -wf_size) & -16
 
 
 
@@ -75,6 +75,9 @@ main:   // main()
 
         xreadStruct(x21, st, st_row)
         xreadStruct(x22, st, st_col)
+
+        
+        xprint(allstr, alloc, sp, fp)
         
 
         xarray(st_arr_base, st_arr_amount, int)
@@ -105,9 +108,11 @@ main:   // main()
         // Deallocate memory
         xdealloc(st_size)                       // deallocate struct Table
 
+        xprint(allstr, alloc, sp, fp)
+
+
         xret()
 
-        xprint(allstr, alloc, sp, fp)
 
 
 
@@ -319,8 +324,6 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                 topdoc_wq_struct_col_end:
 
 
-                xprint(output, x27, x27)
-
 
 
                 
@@ -332,6 +335,8 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
         topdoc_wq_struct_row_end:
         
         xprint(output, wf_arr_size, wf_arr_size)
+
+        xprint(allstr, alloc, sp, fp)
        
         // Dealloc WordFrequency array
         xdealloc(wf_arr_size)
