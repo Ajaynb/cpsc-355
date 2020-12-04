@@ -199,21 +199,27 @@ define(xreadStruct, `
         add     x9,     x11,    x12             // int offset = base + attribute
 
         ifelse(`$#', `4', `
-        ldr	$1,     [x9]              // load the value
+        ldr	$1,     [x9]                    // load the value
         ', `
         ldr	$1,     [fp,   x9]              // load the value
         ')
 
 ')
 
-// xwriteStruct(value, base, attribute)
+// xwriteStruct(value, base, attribute, ignore_fp = true)
 define(xwriteStruct, `
         // M4: WRITE STRUCT
-        mov     x11,    $2
-        mov     x12,    $3
-        add     x9,     x11,    x12             // add the size
-        mov     x10,    $1
-        str     x10,    [fp,   x9]              // and Adds x10 to x9
+        mov     x11,    $2                      // int base
+        mov     x12,    $3                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        mov     x10,    $1                      // int value
+        
+        ifelse(`$#', `4', `
+        str	x10,    [x9]                    // store the value
+        ', `
+        str	x10,    [fp,   x9]              // store the value
+        ')
+        
 ')
 
 

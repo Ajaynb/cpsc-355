@@ -111,11 +111,17 @@ initialize: // initialize(struct Table* table)
         mov     x19,    x0
         
         xreadStruct(x20, x19, st_row, true)
-        xreadStruct(x20, x19, st_col, true)
+        xreadStruct(x21, x19, st_col, true)
 
 
         xprint(output, x20, x21)
+
+        mov     x21,    20
+        xwriteStruct(x21, x19, st_col, true)
         
+        xreadStruct(x24, x19, st_col, true)
+        xprint(output, x21, x24)
+
 
 
 
