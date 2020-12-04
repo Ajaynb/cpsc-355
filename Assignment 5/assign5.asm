@@ -89,6 +89,11 @@ main:   // main()
         mov     x0,     x9
         bl      initialize
 
+        
+        xreadStruct(x24, st, st_row)
+        xreadStruct(x25, st, st_col)
+        xprint(output, x24,x25)
+
         xprint(allstr, alloc, sp, fp)
 
 
