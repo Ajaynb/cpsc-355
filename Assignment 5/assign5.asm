@@ -79,17 +79,15 @@ main:   // main()
         xwriteArray(19, st_arr_base, int, 10)
         xreadArray(x23, st_arr_base, int, 0)
         xreadArray(x24, st_arr_base, int, 10)
-        xprint(output, x23, x24)
 
 
-        add     x0,     fp,     st_col
-        add     x0,     x0,     st
+        mov     x11,    st                      // int base
+        mov     x12,    st_row                  // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        add     x9,     x9,     fp
 
-        add     x1,     fp,     st_row
-        add     x1,     x1,     st
 
-        add     x2,     fp,     st_arr
-        add     x2,     x1,     st
+        mov     x0,     x9
         bl      initialize
 
         xprint(allstr, alloc, sp, fp)
@@ -111,11 +109,33 @@ main:   // main()
 initialize: // initialize(struct Table* table)
 	xfunc()
 
-        ldr     x19,    [x0]
-        ldr     x20,    [x1]
-        ldr     x21,    [x2]
+        mov     x19,    x0
+        ldr     x20,    [x19]
+
+        xprint(output, x19, x19)
+
+
+        add     x19,    x19,    8
+        ldr     x21,    [x19]
+
+        xprint(output, x19, x19)
+
+
+        add     x19,    x19,    8
+        ldr     x22,    [x19]
+
+        xprint(output, x19, x19)
+
+        
+        add     x19,    x19,    8
+        ldr     x23,    [x19]
+
+        xprint(output, x19, x19)
+        
+
 
         xprint(output, x20, x21)
+        xprint(output, x22, x23)
 
 
 

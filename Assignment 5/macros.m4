@@ -210,6 +210,7 @@ define(xwriteStruct, `
         str     x10,    [fp,   x9]              // and Adds x10 to x9
 ')
 
+
 // xalloc(size)
 define(xalloc, `
         // M4: ALLOC
