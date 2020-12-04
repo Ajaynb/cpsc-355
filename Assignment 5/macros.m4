@@ -246,6 +246,18 @@ define(xfunc, `
         str 	x26,    [fp, 72]
         str 	x27,    [fp, 80]
         str 	x28,    [fp, 88]
+
+        // Reset registers to 0
+        mov     x19,    0
+        mov     x20,    0
+        mov     x21,    0
+        mov     x22,    0
+        mov     x23,    0
+        mov     x24,    0
+        mov     x25,    0
+        mov     x26,    0
+        mov     x27,    0
+        mov     x28,    0
 ')
 
 // xret()
