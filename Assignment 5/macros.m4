@@ -57,6 +57,12 @@ define(xaddEqual, `
         add     $1, $1, $2
 ')
 
+// xminusEqual(variable, param2) -> variable += param2;
+define(xminusEqual, `
+        // M4: MINUS EQUAL
+        sub     $1, $1, $2
+')
+
 // xmin(destination, x, y)
 define(xmin, `
         // M4: MIN
