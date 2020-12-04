@@ -250,6 +250,7 @@ define(xreadStruct, `
 // xwriteStruct(value, base, attribute, ignore_fp = true)
 define(xwriteStruct, `
         define(`register_type', substr($1, 0, 1))
+        define(`register_store', `x10')
 
         // M4: WRITE STRUCT
         mov     x11,    $2                      // int base
@@ -258,14 +259,16 @@ define(xwriteStruct, `
         
         ifelse(register_type, `d', `
                 fmov    d10,    $1              // float value
+                define(`register_store', `d10')
         ', `
                 mov     x10,    $1              // int value
+                define(`register_store', `x10')
         ')
         
         ifelse(`$#', `4', `
-        str	x10,    [x9]                    // store the value
+        str	register_store,    [x9]                    // store the value
         ', `
-        str	x10,    [fp,   x9]              // store the value
+        str	register_store,    [fp,   x9]              // store the value
         ')
 ')
 
