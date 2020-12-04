@@ -352,18 +352,12 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                 
                 fdiv    d18,    d18,    d27             // int frequency = occurence / totalOccurence;
                 
-                fmov    d0,     d18
-                fmov    d1,     d18
-                ldr     x0,     =output_float
-                // bl      printf
-
+                
                 xwriteStruct(d18, x28, wf_freqency)
                 xreadStruct(d17, x28, wf_freqency)
-                fmov    d0,     d17
-                fmov    d1,     d17
-                ldr     x0,     =output_float
-                bl      printf
                 
+                xprint(output_float, d18, d17)
+
                 // Increment and loop
                 xaddAdd(x25)                            // t ++;
                 b       topdoc_wq_struct_row            // go back to loop top

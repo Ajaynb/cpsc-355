@@ -2,6 +2,7 @@
 
         // Defining strings
 output:         .string "%d, %d\n"
+output_float:   .string "%f, %f\n"
 allstr:         .string "alloc %d, sp %d, fp %d\n"
 
 str_table_head: .string "===== Table =====\n"
@@ -39,9 +40,12 @@ str_test:       .string "table[%d][%d](%d): %d\n"
         // Equates for struct Word Frequency
         wf_freqency = 0
         wf_word = 8
-        wf_times = 16
+        wf_occurence = 16
         wf_document = 24
         wf_size = -(wf_document) & -16
+
+        wf_arr = -alloc + 0
+        wf_arr_size = -(max_row * -wf_size) & -16
 
 
 
@@ -192,11 +196,16 @@ end_3:
     
         
             
+        
+
         // M4: WRITE STRUCT
         mov     x11,    st                      // int base
         mov     x12,    st_row                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        mov     x10,    xzr                      // int value
+        
+        
+                mov     x10,    xzr              // int value
+        
         
         
         str	x10,    [fp,   x9]              // store the value
@@ -207,11 +216,16 @@ end_3:
     
         
             
+        
+
         // M4: WRITE STRUCT
         mov     x11,    st                      // int base
         mov     x12,    st_col                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        mov     x10,    xzr                      // int value
+        
+        
+                mov     x10,    xzr              // int value
+        
         
         
         str	x10,    [fp,   x9]              // store the value
@@ -222,22 +236,32 @@ end_3:
     
              // init struct Table attributes with 0
         
+        
+
         // M4: WRITE STRUCT
         mov     x11,    st                      // int base
         mov     x12,    st_row                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        mov     x10,    x19                      // int value
+        
+        
+                mov     x10,    x19              // int value
+        
         
         
         str	x10,    [fp,   x9]              // store the value
         
            // write the reset row to struct
         
+        
+
         // M4: WRITE STRUCT
         mov     x11,    st                      // int base
         mov     x12,    st_col                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        mov     x10,    x20                      // int value
+        
+        
+                mov     x10,    x20              // int value
+        
         
         
         str	x10,    [fp,   x9]              // store the value
@@ -263,6 +287,54 @@ end_3:
         
         ldr	x22,     [fp,   x9]              // load the value
         
+
+
+        
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    alloc
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    sp
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x3,    fp
+                
+        
+
+        
+    
+        ldr     x0,     =allstr
+        bl      printf
 
         
 
@@ -347,6 +419,54 @@ loop_end_4:
                        // deallocate struct Table
 
         
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    alloc
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    sp
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x3,    fp
+                
+        
+
+        
+    
+        ldr     x0,     =allstr
+        bl      printf
+
+
+
+        
         // M4: RET
 
         // Restore registers
@@ -366,25 +486,6 @@ loop_end_4:
 
 
 
-
-        
-        // M4: PRINT
-    
-    
-        
-        
-    
-        mov     x1,    alloc
-        
-    
-        mov     x2,    sp
-        
-    
-        mov     x3,    fp
-        
-    
-        ldr     x0,     =allstr
-        bl      printf
 
 
 
@@ -705,7 +806,16 @@ display:        // display(struct Table* table)
         // M4: PRINT
     
     
+    
+
+    
         
+        
+        
+                
+                
+        
+
         
     
         ldr     x0,     =str_table_head
@@ -773,10 +883,25 @@ display:        // display(struct Table* table)
         // M4: PRINT
     
     
+    
+
+    
         
+        
+        
+                
+                
+        
+
         
     
-        mov     x1,    x25
+        
+        
+        
+                mov     x1,    x25
+                
+        
+
         
     
         ldr     x0,     =str_occ
@@ -798,7 +923,16 @@ display:        // display(struct Table* table)
         // M4: PRINT
     
     
+    
+
+    
         
+        
+        
+                
+                
+        
+
         
     
         ldr     x0,     =str_linebr
@@ -988,8 +1122,27 @@ end_10:
         // Save pointer of table.array
         add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
 
-        // Calculate memory alloc for WordFrequency array
+
+        // Build WordFrequency array
         
+        // M4: ALLOC
+        add     sp,     sp,     wf_arr_size              // allocate on SP
+
+        mov     x25,    0                               // int t = 0;
+        mov     x26,    0                               // int r = 0;
+        
+        topdoc_wq_struct_row:
+
+                // Check for t - current 1 of row
+                cmp     x25,    x22                     // if (t >= table.row)
+                b.ge    topdoc_wq_struct_row_end        // {end}
+
+                // Reset local variables
+                mov     x26,    0                       // int r = 0;
+                mov     x27,    0                       // int totalOccurence = 0;
+
+                // Calculate array offset
+                
         // M4: MUL
     
         mov     x9,     1                       // initialize x9 to 1
@@ -998,53 +1151,61 @@ end_10:
         
     
         
-        mov     x10,    x22                       // move next multiplier to x10
+        mov     x10,    x25                       // move next multiplier to x10
         mul     x9,     x9,     x10             // and multiplies x10 to x9
         
         
     
         
-        mov     x10,    wf_size                       // move next multiplier to x10
+        mov     x10,    -wf_size                       // move next multiplier to x10
         mul     x9,     x9,     x10             // and multiplies x10 to x9
         
         
     
+        mov     x28,     x9                      // result
+                // int offset = t * sizeof(struct WordFrequency)
+                add     x28,    x28,    wf_arr          // offset += base
+                
         
-        mov     x10,    -1                       // move next multiplier to x10
-        mul     x9,     x9,     x10             // and multiplies x10 to x9
+
+        // M4: WRITE STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_document                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
         
         
-    
-        mov     x24,     x9                      // result
-                     // int size = row * sizeof(struct WordFrequency) * -1
-        and     x24,    x24,    -16                     // size = size & -16
-
-
-        // Build WordFrequency array
+                mov     x10,    x25              // int value
         
-        // M4: ALLOC
-        add     sp,     sp,     x24              // allocate on SP
-
-        mov     x25,    0                               // int t = 0;
-        mov     x26,    0                               // int r = 0;
         
-        topdoc_wq_struct_row:
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+     // array[t].document = t;
+                
+        
 
-                // Check for t - current 5 of row
-                cmp     x25,    x22                     // if (t >= table.row)
-                b.ge    topdoc_wq_struct_row_end        // {end}
+        // M4: WRITE STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_word                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                mov     x10,    x20              // int value
+        
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+         // array[t].word = 4;
 
-                // Reset local variables
-                mov     x26,    0                       // int r = 0;
-                mov     x27,    0                       // int totalOccurence = 0;
 
                 topdoc_wq_struct_col:
 
-                        // Check for r - current 5 of column
+                        // Check for r - current 4 of column
                         cmp     x26,    x23             // if (r >= table.col)
                         b.ge    topdoc_wq_struct_col_end// {end}
                         
-                        // Calculate current 5: (t * table.row) + r
+                        // Calculate current 4: (t * table.row) + r
                         
         // M4: MUL
     
@@ -1091,6 +1252,30 @@ end_10:
         add     x27, x27, x18
              // totalOccurence += occurence;
                         
+                        // Store 4's occurence
+                        cmp     x26,    x20             // if (r == 4)
+                        b.eq    topdoc_write_occ        // {write}
+                        b       topdoc_write_occ_end    // {do nothing}
+
+                        topdoc_write_occ:
+                                // array[t].occurence = occurence;
+                                
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_occurence                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                mov     x10,    x18              // int value
+        
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+
+                        topdoc_write_occ_end:
 
                         // Increment and loop
                         
@@ -1102,26 +1287,128 @@ end_10:
                 topdoc_wq_struct_col_end:
 
 
+                // Get occurence
+                
+        // M4: READ STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_occurence                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x18,     [fp,   x9]              // load the value
+        
+
                 
         // M4: PRINT
     
     
+    
+
+    
         
+        
+        
+                
+                
+        
+
         
     
-        mov     x1,    x27
+        
+        
+        
+                mov     x1,    x18
+                
+        
+
         
     
-        mov     x2,    x27
+        
+        
+        
+                mov     x2,    x18
+                
+        
+
         
     
         ldr     x0,     =output
         bl      printf
 
 
+                scvtf   d18,    x18
+                scvtf   d27,    x27
+    
+                
+                fdiv    d18,    d18,    d27             // int frequency = occurence / totalOccurence;
+                
+                
+                
+                
+        
 
+        // M4: WRITE STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_freqency                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                fmov    d10,    d18              // float value
+        
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
 
                 
+        // M4: READ STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_freqency                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	d17,     [fp,   x9]              // load the value
+        
+
+                
+                
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                fmov     d0,    d18
+                
+        
+
+        
+    
+        
+        
+        
+                fmov     d1,    d17
+                
+        
+
+        
+    
+        ldr     x0,     =output_float
+        bl      printf
+
+
                 // Increment and loop
                 
         // M4: ADD ADD
@@ -1131,13 +1418,97 @@ end_10:
 
         
         topdoc_wq_struct_row_end:
+        
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    wf_arr_size
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    wf_arr_size
+                
+        
+
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    alloc
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    sp
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x3,    fp
+                
+        
+
+        
+    
+        ldr     x0,     =allstr
+        bl      printf
 
 
        
         // Dealloc WordFrequency array
         
         // M4: DEALLOC
-        mov     x9,     x24                      // move to x9
+        mov     x9,     wf_arr_size                      // move to x9
         sub     x9,     xzr,    x9              // negate the size again to positive
         add     sp,     sp,     x9              // dealloc on SP
 
