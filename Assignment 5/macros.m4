@@ -173,7 +173,7 @@ define(xreadArray, `
 
         
 ')
-// xwriteArray(value, base, size, index)
+// xwriteArray(value, base, size, index, ignore_fp = false)
 define(xwriteArray, `
         // M4: WRITE ARRAY
         mov     x9,     $3                          // x9 - size
