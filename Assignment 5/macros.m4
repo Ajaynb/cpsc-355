@@ -62,7 +62,22 @@ define(xmin, `
         // M4: MIN
         mov     x9,     $2
         mov     x10,    $3
-        csel    $1,     x9,     x10,    le
+        // csel    $1,     x9,     x10,    le
+
+        format(`
+
+        cmp     x9,     x10
+        b.lt    if_%s
+        b       else_%s
+if_%s:  mov     $1,     x9
+        b       end_%s
+else_%s:mov     $1,     x10
+        b       end_%s
+end_%s:
+
+        ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+        
+        xcount()
 ')
 
 // xmax(destination, x, y)
@@ -70,7 +85,22 @@ define(xmax, `
         // M4: MAX
         mov     x9,     $2
         mov     x10,    $3
-        csel    $1,     x9,     x10,    ge
+        // csel    $1,     x9,     x10,    ge
+
+        format(`
+
+        cmp     x9,     x10
+        b.gt    if_%s
+        b       else_%s
+if_%s:  mov     $1,     x9
+        b       end_%s
+else_%s:mov     $1,     x10
+        b       end_%s
+end_%s:
+
+        ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+        
+        xcount()
 ')
 
 // xmul(destination, param2, param3, ...)
