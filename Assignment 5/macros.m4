@@ -128,8 +128,20 @@ define(xmul, `
 define(xprint, `
         // M4: PRINT
     define(`index', eval(`0'))
+    define(`register_x_index', eval(`0'))
+    define(`register_d_index', eval(`0'))
+
     foreach(`t', `$@', `
-        ifelse(index, `0', `', `format(`mov     x%s,    %s', eval(index), `t')')
+        define(`register_type', substr(t, 0, 1))
+        
+        ifelse(register_type, `d', `
+                ifelse(index, `0', `', `format(`fmov     d%s,    %s', eval(register_d_index), `t')')
+                define(`register_d_index', incr(register_d_index))
+        ', `
+                ifelse(index, `0', `', `format(`mov     x%s,    %s', eval(register_x_index), `t')')
+                define(`register_x_index', incr(register_x_index))
+        ')
+
         define(`index', incr(index))
     ')
         ldr     x0,     =$1
