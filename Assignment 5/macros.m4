@@ -249,11 +249,18 @@ define(xreadStruct, `
 
 // xwriteStruct(value, base, attribute, ignore_fp = true)
 define(xwriteStruct, `
+        define(`register_type', substr($1, 0, 1))
+
         // M4: WRITE STRUCT
         mov     x11,    $2                      // int base
         mov     x12,    $3                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        mov     x10,    $1                      // int value
+        
+        ifelse(register_type, `d', `
+                fmov    d10,    $1                      // int value
+        ', `
+                mov     x10,    $1                      // int value
+        ')
         
         ifelse(`$#', `4', `
         str	x10,    [x9]                    // store the value
