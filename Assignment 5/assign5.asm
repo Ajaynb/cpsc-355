@@ -97,6 +97,13 @@ main:   // main()
         mov     x0,     x28
         bl      display                         // display(&table)
 
+        // Top Docs
+        mov     x0,     x28
+        mov     x1,     -2
+        mov     x2,     22
+        bl      topRelevantDocs
+
+
         // Deallocate memory
         xdealloc(st_size)                       // deallocate struct Table
 
@@ -222,8 +229,8 @@ display:        // display(struct Table* table)
                         b.ge    display_array_col_end   // {end}
 
                         // Calculate current index: (t * table.row) + r
-                        xmul(x26, x23, x20)
-                        xaddEqual(x26, x24)
+                        xmul(x26, x23, x20)             // int index = t * table.row
+                        xaddEqual(x26, x24)             // index += r
 
                         // Read from array
                         xreadArray(x25, x19, int, x26, true)
@@ -246,4 +253,33 @@ display:        // display(struct Table* table)
         display_array_row_end:
 
 
+        xret()
+
+
+
+
+topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int top)
+        xfunc()
+
+        // Save pointer of table and other two parameters
+        mov     x19,    x0                              // int pointer;
+        mov     x20,    x1                              // int index;
+        mov     x21,    x2                              // int top;
+
+        // Read row and column from table struct
+        xreadStruct(x22, x19, st_row, true)             // int row = table.row;
+        xreadStruct(x23, x19, st_col, true)             // int column = table.column;
+
+        // Preventing invalid user input. Index cannot be greater than the table size or smaller than 0.
+        // If smaller than 0, set to 0. If greater than table size, set to table size.
+        xmin(x20, x20, x23)
+        xmax(x20, x20, 0)
+        xmin(x21, x21, x22)
+        xmax(x21, x21, 0)
+
+        // Build WordFrequency array
+        
+
+
+       
         xret()

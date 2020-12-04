@@ -101,25 +101,85 @@ main:   // main()
         // M4: MIN
         mov     x9,     x19
         mov     x10,    max_row
-        csel    x19,     x9,     x10,    le
+        // csel    x19,     x9,     x10,    le
+
+        
+
+        cmp     x9,     x10
+        b.lt    if_0
+        b       else_0
+if_0:  mov     x19,     x9
+        b       end_0
+else_0:mov     x19,     x10
+        b       end_0
+end_0:
+
+        
+        
+        
                  // row = min(row, max_row);
         
         // M4: MAX
         mov     x9,     x19
         mov     x10,    min_row
-        csel    x19,     x9,     x10,    ge
+        // csel    x19,     x9,     x10,    ge
+
+        
+
+        cmp     x9,     x10
+        b.gt    if_1
+        b       else_1
+if_1:  mov     x19,     x9
+        b       end_1
+else_1:mov     x19,     x10
+        b       end_1
+end_1:
+
+        
+        
+        
                  // row = max(row, min_row);
         
         // M4: MIN
         mov     x9,     x20
         mov     x10,    max_col
-        csel    x20,     x9,     x10,    le
+        // csel    x20,     x9,     x10,    le
+
+        
+
+        cmp     x9,     x10
+        b.lt    if_2
+        b       else_2
+if_2:  mov     x20,     x9
+        b       end_2
+else_2:mov     x20,     x10
+        b       end_2
+end_2:
+
+        
+        
+        
                  // col = min(col, max_col);
         
         // M4: MAX
         mov     x9,     x20
         mov     x10,    min_col
-        csel    x20,     x9,     x10,    ge
+        // csel    x20,     x9,     x10,    ge
+
+        
+
+        cmp     x9,     x10
+        b.gt    if_3
+        b       else_3
+if_3:  mov     x20,     x9
+        b       end_3
+else_3:mov     x20,     x10
+        b       end_3
+end_3:
+
+        
+        
+        
                  // col = max(col, min_col);
 
         // Construct struct Table
@@ -214,9 +274,9 @@ main:   // main()
         // M4: ARRAY
     
         mov     x9,     0                           // loop Counter
-loop_0:
+loop_4:
         cmp     x9,     st_arr_amount                          // if reach amount
-        b.eq    loop_end_0
+        b.eq    loop_end_4
 
         mov     x10,    int                          // get element size
         mul     x10,    x10,    x9                  // calculate element offset by 4
@@ -227,9 +287,9 @@ loop_0:
         str 	xzr,    [fp,    x10]                // initialize with 0
 
         add     x9,     x9,     1                   // increment
-        b       loop_0
+        b       loop_4
 
-loop_end_0:
+loop_end_4:
 
     
     
@@ -274,6 +334,13 @@ loop_end_0:
         // Display table
         mov     x0,     x28
         bl      display                         // display(&table)
+
+        // Top Docs
+        mov     x0,     x28
+        mov     x1,     -2
+        mov     x2,     22
+        bl      topRelevantDocs
+
 
         // Deallocate memory
         
@@ -493,13 +560,43 @@ randomNum:      // randomNum(m, n)
         // M4: MAX
         mov     x9,     x19
         mov     x10,    x20
-        csel    x27,     x9,     x10,    ge
+        // csel    x27,     x9,     x10,    ge
+
+        
+
+        cmp     x9,     x10
+        b.gt    if_5
+        b       else_5
+if_5:  mov     x27,     x9
+        b       end_5
+else_5:mov     x27,     x10
+        b       end_5
+end_5:
+
+        
+        
+        
                      // int upper = max(m, n)
         
         // M4: MIN
         mov     x9,     x19
         mov     x10,    x20
-        csel    x28,     x9,     x10,    le
+        // csel    x28,     x9,     x10,    le
+
+        
+
+        cmp     x9,     x10
+        b.lt    if_6
+        b       else_6
+if_6:  mov     x28,     x9
+        b       end_6
+else_6:mov     x28,     x10
+        b       end_6
+end_6:
+
+        
+        
+        
                      // int lower = min(m, n)
 
         // Calculate range
@@ -658,11 +755,11 @@ display:        // display(struct Table* table)
         
     
         mov     x26,     x9                      // result
-
+             // int 4 = t * table.row
                         
         // M4: ADD EQUAL
         add     x26, x26, x24
-
+             // 4 += r
 
                         // Read from array
                         
@@ -722,6 +819,253 @@ display:        // display(struct Table* table)
         display_array_row_end:
 
 
+        
+        // M4: RET
+
+        // Restore registers
+        ldr 	x19,    [fp, 16]
+        ldr 	x20,    [fp, 24]
+        ldr 	x21,    [fp, 32]
+        ldr 	x22,    [fp, 30]
+        ldr 	x23,    [fp, 48]
+        ldr 	x24,    [fp, 56]
+        ldr 	x25,    [fp, 64]
+        ldr 	x26,    [fp, 72]
+        ldr 	x27,    [fp, 80]
+        ldr 	x28,    [fp, 88]
+
+        ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
+        ret
+
+
+
+
+
+
+
+topRelevantDocs:        // topRelevantDocs(struct Table* table, int 1, int top)
+        
+        // M4: FUNC
+        stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
+        mov     fp,     sp                              // update FP to current SP
+        
+        // Save registers
+        str 	x19,    [fp, 16]
+        str 	x20,    [fp, 24]
+        str 	x21,    [fp, 32]
+        str 	x22,    [fp, 40]
+        str 	x23,    [fp, 48]
+        str 	x24,    [fp, 56]
+        str 	x25,    [fp, 64]
+        str 	x26,    [fp, 72]
+        str 	x27,    [fp, 80]
+        str 	x28,    [fp, 88]
+
+        // Reset registers to 0
+        mov     x19,    0
+        mov     x20,    0
+        mov     x21,    0
+        mov     x22,    0
+        mov     x23,    0
+        mov     x24,    0
+        mov     x25,    0
+        mov     x26,    0
+        mov     x27,    0
+        mov     x28,    0
+
+
+        // Save pointer of table and other two parameters
+        mov     x19,    x0                              // int pointer;
+        mov     x20,    x1                              // int 1;
+        mov     x21,    x2                              // int top;
+
+        // Read row and column from table struct
+        
+        // M4: READ STRUCT
+        mov     x11,    x19                      // int base
+        mov     x12,    st_row                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x22,     [x9]                    // load the value
+        
+             // int row = table.row;
+        
+        // M4: READ STRUCT
+        mov     x11,    x19                      // int base
+        mov     x12,    st_col                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x23,     [x9]                    // load the value
+        
+             // int column = table.column;
+
+        // Preventing invalid user input. Index cannot be greater than the table size or smaller than 0.
+        // If smaller than 0, set to 0. If greater than table size, set to table size.
+        
+        // M4: MIN
+        mov     x9,     x20
+        mov     x10,    x23
+        // csel    x20,     x9,     x10,    le
+
+        
+
+        cmp     x9,     x10
+        b.lt    if_7
+        b       else_7
+if_7:  mov     x20,     x9
+        b       end_7
+else_7:mov     x20,     x10
+        b       end_7
+end_7:
+
+        
+        
+        
+
+        
+        // M4: MAX
+        mov     x9,     x20
+        mov     x10,    0
+        // csel    x20,     x9,     x10,    ge
+
+        
+
+        cmp     x9,     x10
+        b.gt    if_8
+        b       else_8
+if_8:  mov     x20,     x9
+        b       end_8
+else_8:mov     x20,     x10
+        b       end_8
+end_8:
+
+        
+        
+        
+
+        
+        // M4: MIN
+        mov     x9,     x21
+        mov     x10,    x22
+        // csel    x21,     x9,     x10,    le
+
+        
+
+        cmp     x9,     x10
+        b.lt    if_9
+        b       else_9
+if_9:  mov     x21,     x9
+        b       end_9
+else_9:mov     x21,     x10
+        b       end_9
+end_9:
+
+        
+        
+        
+
+        
+        // M4: MAX
+        mov     x9,     x21
+        mov     x10,    0
+        // csel    x21,     x9,     x10,    ge
+
+        
+
+        cmp     x9,     x10
+        b.gt    if_10
+        b       else_10
+if_10:  mov     x21,     x9
+        b       end_10
+else_10:mov     x21,     x10
+        b       end_10
+end_10:
+
+        
+        
+        
+
+
+        
+        // M4: PRINT
+    
+    
+        
+        
+    
+        mov     x1,    x20
+        
+    
+        mov     x2,    x21
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+        
+        // M4: MIN
+        mov     x9,     -5
+        mov     x10,    5
+        // csel    x24,     x9,     x10,    le
+
+        
+
+        cmp     x9,     x10
+        b.lt    if_11
+        b       else_11
+if_11:  mov     x24,     x9
+        b       end_11
+else_11:mov     x24,     x10
+        b       end_11
+end_11:
+
+        
+        
+        
+
+        
+        // M4: MAX
+        mov     x9,     -5
+        mov     x10,    5
+        // csel    x25,     x9,     x10,    ge
+
+        
+
+        cmp     x9,     x10
+        b.gt    if_12
+        b       else_12
+if_12:  mov     x25,     x9
+        b       end_12
+else_12:mov     x25,     x10
+        b       end_12
+end_12:
+
+        
+        
+        
+
+        
+        // M4: PRINT
+    
+    
+        
+        
+    
+        mov     x1,    x24
+        
+    
+        mov     x2,    x25
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+
+       
         
         // M4: RET
 
