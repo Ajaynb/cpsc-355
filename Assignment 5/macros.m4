@@ -257,9 +257,9 @@ define(xwriteStruct, `
         add     x9,     x11,    x12             // int offset = base + attribute
         
         ifelse(register_type, `d', `
-                fmov    d10,    $1                      // int value
+                fmov    d10,    $1              // float value
         ', `
-                mov     x10,    $1                      // int value
+                mov     x10,    $1              // int value
         ')
         
         ifelse(`$#', `4', `
