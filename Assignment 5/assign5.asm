@@ -2,6 +2,7 @@
 
         // Defining strings
 output:         .string "%d, %d\n"
+output_float:   .string "%f, %f\n"
 allstr:         .string "alloc %d, sp %d, fp %d\n"
 
 str_table_head: .string "===== Table =====\n"
@@ -39,10 +40,11 @@ str_test:       .string "table[%d][%d](%d): %d\n"
         // Equates for struct Word Frequency
         wf_freqency = 0
         wf_word = 8
-        wf_times = 16
+        wf_occurence = 16
         wf_document = 24
         wf_size = -(wf_document) & -16
 
+        wf_arr = -alloc + 0
         wf_arr_size = -(max_row * -wf_size) & -16
 
 
@@ -300,6 +302,13 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                 mov     x26,    0                       // int r = 0;
                 mov     x27,    0                       // int totalOccurence = 0;
 
+                // Calculate array offset
+                xmul(x28, x25, -wf_size)                // int offset = t * sizeof(struct WordFrequency)
+                add     x28,    x28,    wf_arr          // offset += base
+                xwriteStruct(x25, x28, wf_document)     // array[t].document = t;
+                xwriteStruct(x20, x28, wf_word)         // array[t].word = index;
+
+
                 topdoc_wq_struct_col:
 
                         // Check for r - current index of column
@@ -316,6 +325,15 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                         // Add to totalOccurence
                         xaddEqual(x27, x18)             // totalOccurence += occurence;
                         
+                        // Store index's occurence
+                        cmp     x26,    x20             // if (r == index)
+                        b.eq    topdoc_write_occ        // {write}
+                        b       topdoc_write_occ_end    // {do nothing}
+
+                        topdoc_write_occ:
+                                // array[t].occurence = occurence;
+                                xwriteStruct(x18, x28, wf_occurence)
+                        topdoc_write_occ_end:
 
                         // Increment and loop
                         xaddAdd(x26)                    // r ++;
@@ -324,8 +342,27 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                 topdoc_wq_struct_col_end:
 
 
+                // Get occurence
+                xreadStruct(x18, x28, wf_occurence)
+                xprint(output, x18, x18)
 
+                scvtf   d18,    x18
+                scvtf   d27,    x27
+    
+                
+                fdiv    d18,    d18,    d27             // int frequency = occurence / totalOccurence;
+                
+                fmov    d0,     d18
+                fmov    d1,     d18
+                ldr     x0,     =output_float
+                // bl      printf
 
+                xwriteStruct(d18, x28, wf_freqency)
+                xreadStruct(d17, x28, wf_freqency)
+                fmov    d0,     d17
+                fmov    d1,     d17
+                ldr     x0,     =output_float
+                bl      printf
                 
                 // Increment and loop
                 xaddAdd(x25)                            // t ++;
@@ -337,6 +374,7 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
         xprint(output, wf_arr_size, wf_arr_size)
 
         xprint(allstr, alloc, sp, fp)
+
        
         // Dealloc WordFrequency array
         xdealloc(wf_arr_size)
