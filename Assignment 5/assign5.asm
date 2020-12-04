@@ -114,7 +114,7 @@ main:   // main()
 initialize: // initialize(struct Table* table)
 	xfunc()
 
-        // Save pointer
+        // Save pointer of table
         mov     x19,    x0                              // int pointer;
         
         // Read row and column from table struct
@@ -122,43 +122,32 @@ initialize: // initialize(struct Table* table)
         xreadStruct(x21, x19, st_col, true)             // int column = table.column;
         xprint(output, x20, x21)
 
-        // Save pointer for table.array
-        add     x19,    x19,    st_arr                  // int array_base; get array base offset
+        // Save pointer of table.array
+        add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
 
-        // Calculate actual size
-        mul     x26,    x20,    x21                     // int size = row * column;
-        
         // For loop
         mov     x23,    0                               // int t = 0; current index
+        mul     x26,    x20,    x21                     // int size = row * column;
 
         initialize_array:
 
                 cmp     x23,    x26                     // if (t >= size)
                 b.ge    initialize_array_end            // {end}
 
+                // Generate random number
                 mov     x0,     0
                 mov     x1,     9
-                bl      randomNum
+                bl      randomNum                       // randomNum(0, 9)
 
-
+                // Write random number to array
                 mov     x25,    x0                      // int random = rand()
-
-                xprint(output, x23, x25)
-
                 xwriteArray(x25, x19, int, x23, true)   // table.array[t] = random
 
-
-
-
+                // Increment and loop
                 xaddAdd(x23)                            // t ++;
-
-                b       initialize_array
+                b       initialize_array                // go back to loop top
 
         initialize_array_end:
-
-        
-
-
 
 
 
