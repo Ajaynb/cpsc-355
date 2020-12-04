@@ -8,9 +8,6 @@ allstr: .string "alloc %d, sp %d, fp %d\n"
         alloc =  -(16 + 96) & -16
         dealloc = -alloc
 
-        alloc2 = alloc
-        dealloc2 = -alloc2
-
         // Define register aliases
         fp      .req    x29
         lr      .req    x30
@@ -246,14 +243,6 @@ loop_end_0:
         str     x10,    [fp,   x9]
         
 
-
-
-        // PRINT ALLOC
-        mov     x1,    alloc2
-        mov     x2,    sp
-        mov     x3,    fp
-        ldr     x0,     =allstr
-        bl      printf
         
 
         mov     x11,    st                      // int base
@@ -415,21 +404,11 @@ initialize: // initialize(struct Table* table)
         str 	x26,    [fp, 72]
         str 	x27,    [fp, 80]
         str 	x28,    [fp, 88]
-        
 
 
         // Save pointer
         mov     x19,    x0                              // int pointer;
         
-
-
-        // PRINT ALLOC
-        mov     x1,    alloc2
-        mov     x2,    sp
-        mov     x3,    fp
-        ldr     x0,     =allstr
-        bl      printf
-
         // Read row and column from table struct
         
         // M4: READ STRUCT
@@ -454,7 +433,6 @@ initialize: // initialize(struct Table* table)
         
         // M4: PRINT
     
-
     
         
         
@@ -475,21 +453,10 @@ initialize: // initialize(struct Table* table)
         // Calculate actual size
         mul     x26,    x20,    x21                     // int size = row * column;
         
-        mov     x1,     1233
-        mov     x2,     x26
-        ldr     x0,     =output
-        bl      printf
-
-
         // For loop
         mov     x23,    0                               // int t = 0; current 3
 
         initialize_array:
-
-                ldr     x0,     =output
-                mov     x1,     x26
-                mov     x2,     x23
-                bl      printf
 
                 cmp     x23,    x26                     // if (t >= size)
                 b.ge    initialize_array_end            // {end}
@@ -497,8 +464,12 @@ initialize: // initialize(struct Table* table)
                 mov     x0,     0
                 mov     x1,     9
                 bl      randomNum
+                
 
-                mov     x25,    903                     // int random = rand()
+                mov     x25,    x0                      // int random = rand()
+
+                
+
                 
         // M4: WRITE ARRAY
         mov     x9,     int                          // x9 - size
@@ -557,7 +528,7 @@ initialize: // initialize(struct Table* table)
 randomNum: // randomNum(m, n)
 	
         // M4: FUNC
-        stp     fp,     lr,     [sp, alloc2]!            // store FP and LR on stack, and allocate space for local variables
+        stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
         mov     fp,     sp                              // update FP to current SP
         
         // Save registers
@@ -572,16 +543,67 @@ randomNum: // randomNum(m, n)
         str 	x27,    [fp, 80]
         str 	x28,    [fp, 88]
 
-        
-        // PRINT ALLOC
-        mov     x1,    alloc2
-        mov     x2,    sp
-        mov     x3,    fp
-        ldr     x0,     =allstr
-        // bl      printf
 
+        mov     x19,    x0                      // int m;
+        mov     x20,    x1                      // int n;
 
         
+        // M4: PRINT
+    
+    
+        
+        
+    
+        mov     x1,    x19
+        
+    
+        mov     x2,    x20
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+
+        cmp     x19,    x20                     // if (m == n)
+        b.eq    randomNum_end                   // {skip everything to the end}, to return m itself
+
+        // For protection, check again the lower and upper bound
+        
+        // M4: MAX
+        mov     x9,     x19
+        mov     x10,    x20
+        csel    x19,     x9,     x10,    ge
+                     // int upper = max(m, n)
+        
+        // M4: MIN
+        mov     x9,     x19
+        mov     x10,    x20
+        csel    x20,     x9,     x10,    le
+                     // int lower = min(m, n)
+
+
+        // Calculate range
+        sub     x21,    x19,    x20             // int range = upper - lower
+        
+        // M4: ADD ADD
+        add     x21, x21, 1
+                             // range += 1;
+
+        // Generate random number
+        bl      rand
+
+        // Limit range
+        udiv    x22,    x0,     x21             // int quotient = rand / range;
+        mul     x23,    x22,    x21             // int product = quotient * range
+        sub     x24,    x0,     x23             // int remainder = rand - product
+
+        mov     x0,     x24                     // return the remainder as the generated random number
+       
+        randomNum_end:
+        
+        // M4: RET
+
         // Restore registers
         ldr 	x19,    [fp, 16]
         ldr 	x20,    [fp, 24]
@@ -593,9 +615,8 @@ randomNum: // randomNum(m, n)
         ldr 	x26,    [fp, 72]
         ldr 	x27,    [fp, 80]
         ldr 	x28,    [fp, 88]
-        
 
-        ldp     fp,     lr,     [sp], dealloc2            // deallocate stack memory
+        ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
         ret
 
 

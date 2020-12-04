@@ -60,33 +60,17 @@ define(xaddEqual, `
 // xmin(destination, num1, num2)
 define(xmin, `
         // M4: MIN
-    format(`
-        cmp     $2,     $3
-        b.lt    if_%s
-        b       else_%s
-if_%s:  mov    $1,     $2
-        b       end_%s
-else_%s:mov  $1,     $3
-        b       end_%s
-end_%s:
-    ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
-    xcount()
+        mov     x9,     $2
+        mov     x10,    $3
+        csel    $1,     x9,     x10,    le
 ')
 
 // xmax(destination, num1, num2)
 define(xmax, `
         // M4: MAX
-    format(`
-        cmp     $2,     $3
-        b.gt    if_%s
-        b       else_%s
-if_%s:  mov    $1,     $2
-        b       end_%s
-else_%s:mov  $1,     $3
-        b       end_%s
-end_%s:
-    ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
-    xcount()
+        mov     x9,     $2
+        mov     x10,    $3
+        csel    $1,     x9,     x10,    ge
 ')
 
 // xmul(destination, param2, param3, ...)
@@ -124,7 +108,7 @@ define(xrandSeed, `
         bl      srand                           // srand(time(0));
 ')
 
-// xrand()
+// xrand(destination, and)
 define(xrand, `
         // M4: RAND
         bl      rand                            // rand();
