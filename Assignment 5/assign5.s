@@ -43,10 +43,6 @@ str_test:       .string "table[%d][%d](%d): %d\n"
         wf_document = 24
         wf_size = -(wf_document) & -16
 
-        // Equates for array of word frequency
-        wf_arr = (st + st_size + 16) & -16
-        wf_arr_size = -(max_row * max_col * wf_size) & -16
-
 
 
         // Expose main function to OS and set balign
@@ -878,6 +874,93 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int 1, int top)
         mov     x19,    x0                              // int pointer;
         mov     x20,    x1                              // int 1;
         mov     x21,    x2                              // int top;
+        
+        // Preventing invalid user input. Index cannot be greater than the table size or smaller than 0.
+        // If smaller than 0, set to 0. If greater than table size, set to table size.
+        
+        // M4: MIN
+        mov     x9,     x20
+        mov     x10,    x23
+        // csel    x20,     x9,     x10,    le
+
+        
+
+        cmp     x9,     x10
+        b.lt    if_7
+        b       else_7
+if_7:  mov     x20,     x9
+        b       end_7
+else_7:mov     x20,     x10
+        b       end_7
+end_7:
+
+        
+        
+        
+                             // 1 = min(1, table.column)
+        
+        // M4: MAX
+        mov     x9,     x20
+        mov     x10,    0
+        // csel    x20,     x9,     x10,    ge
+
+        
+
+        cmp     x9,     x10
+        b.gt    if_8
+        b       else_8
+if_8:  mov     x20,     x9
+        b       end_8
+else_8:mov     x20,     x10
+        b       end_8
+end_8:
+
+        
+        
+        
+                               // 1 = max(1, 0)
+        
+        // M4: MIN
+        mov     x9,     x21
+        mov     x10,    x22
+        // csel    x21,     x9,     x10,    le
+
+        
+
+        cmp     x9,     x10
+        b.lt    if_9
+        b       else_9
+if_9:  mov     x21,     x9
+        b       end_9
+else_9:mov     x21,     x10
+        b       end_9
+end_9:
+
+        
+        
+        
+                             // top = min(top, table.row)
+        
+        // M4: MAX
+        mov     x9,     x21
+        mov     x10,    0
+        // csel    x21,     x9,     x10,    ge
+
+        
+
+        cmp     x9,     x10
+        b.gt    if_10
+        b       else_10
+if_10:  mov     x21,     x9
+        b       end_10
+else_10:mov     x21,     x10
+        b       end_10
+end_10:
+
+        
+        
+        
+                               // top = max(top, 0)
 
         // Read row and column from table struct
         
@@ -901,171 +984,164 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int 1, int top)
         
              // int column = table.column;
 
-        // Preventing invalid user input. Index cannot be greater than the table size or smaller than 0.
-        // If smaller than 0, set to 0. If greater than table size, set to table size.
-        
-        // M4: MIN
-        mov     x9,     x20
-        mov     x10,    x23
-        // csel    x20,     x9,     x10,    le
 
-        
+        // Save pointer of table.array
+        add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
 
-        cmp     x9,     x10
-        b.lt    if_7
-        b       else_7
-if_7:  mov     x20,     x9
-        b       end_7
-else_7:mov     x20,     x10
-        b       end_7
-end_7:
-
+        // Calculate memory alloc for WordFrequency array
+        
+        // M4: MUL
+    
+        mov     x9,     1                       // initialize x9 to 1
+    
         
         
+    
         
-
-        
-        // M4: MAX
-        mov     x9,     x20
-        mov     x10,    0
-        // csel    x20,     x9,     x10,    ge
-
-        
-
-        cmp     x9,     x10
-        b.gt    if_8
-        b       else_8
-if_8:  mov     x20,     x9
-        b       end_8
-else_8:mov     x20,     x10
-        b       end_8
-end_8:
-
+        mov     x10,    x22                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
         
         
+    
         
-
-        
-        // M4: MIN
-        mov     x9,     x21
-        mov     x10,    x22
-        // csel    x21,     x9,     x10,    le
-
-        
-
-        cmp     x9,     x10
-        b.lt    if_9
-        b       else_9
-if_9:  mov     x21,     x9
-        b       end_9
-else_9:mov     x21,     x10
-        b       end_9
-end_9:
-
+        mov     x10,    wf_size                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
         
         
+    
         
-
-        
-        // M4: MAX
-        mov     x9,     x21
-        mov     x10,    0
-        // csel    x21,     x9,     x10,    ge
-
-        
-
-        cmp     x9,     x10
-        b.gt    if_10
-        b       else_10
-if_10:  mov     x21,     x9
-        b       end_10
-else_10:mov     x21,     x10
-        b       end_10
-end_10:
-
+        mov     x10,    -1                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
         
         
-        
+    
+        mov     x24,     x9                      // result
+                     // int size = row * sizeof(struct WordFrequency) * -1
+        and     x24,    x24,    -16                     // size = size & -16
 
 
+        // Build WordFrequency array
         
+        // M4: ALLOC
+        add     sp,     sp,     x24              // allocate on SP
+
+        mov     x25,    0                               // int t = 0;
+        mov     x26,    0                               // int r = 0;
+        
+        topdoc_wq_struct_row:
+
+                // Check for t - current 5 of row
+                cmp     x25,    x22                     // if (t >= table.row)
+                b.ge    topdoc_wq_struct_row_end        // {end}
+
+                // Reset local variables
+                mov     x26,    0                       // int r = 0;
+                mov     x27,    0                       // int totalOccurence = 0;
+
+                topdoc_wq_struct_col:
+
+                        // Check for r - current 5 of column
+                        cmp     x26,    x23             // if (r >= table.col)
+                        b.ge    topdoc_wq_struct_col_end// {end}
+                        
+                        // Calculate current 5: (t * table.row) + r
+                        
+        // M4: MUL
+    
+        mov     x9,     1                       // initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x25                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    x22                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        mov     x17,     x9                      // result
+             // int 4 = t * table.row
+                        
+        // M4: ADD EQUAL
+        add     x17, x17, x26
+             // 4 += r
+
+                        // Read from array
+                        
+        // M4: READ ARRAY
+        mov     x9,     int                          // x9 - size
+        mov     x10,    x17                          // x10 - 4
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     x19                  // calculate Offset += Base
+
+        
+        ldr     x18,     [x9]
+             
+
+
+                        // Add to totalOccurence
+                        
+        // M4: ADD EQUAL
+        add     x27, x27, x18
+             // totalOccurence += occurence;
+                        
+
+                        // Increment and loop
+                        
+        // M4: ADD ADD
+        add     x26, x26, 1
+                    // r ++;
+                        b       topdoc_wq_struct_col    // go back to loop top
+
+                topdoc_wq_struct_col_end:
+
+
+                
         // M4: PRINT
     
     
         
         
     
-        mov     x1,    x20
+        mov     x1,    x27
         
     
-        mov     x2,    x21
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
-
-        
-        // M4: MIN
-        mov     x9,     -5
-        mov     x10,    5
-        // csel    x24,     x9,     x10,    le
-
-        
-
-        cmp     x9,     x10
-        b.lt    if_11
-        b       else_11
-if_11:  mov     x24,     x9
-        b       end_11
-else_11:mov     x24,     x10
-        b       end_11
-end_11:
-
-        
-        
-        
-
-        
-        // M4: MAX
-        mov     x9,     -5
-        mov     x10,    5
-        // csel    x25,     x9,     x10,    ge
-
-        
-
-        cmp     x9,     x10
-        b.gt    if_12
-        b       else_12
-if_12:  mov     x25,     x9
-        b       end_12
-else_12:mov     x25,     x10
-        b       end_12
-end_12:
-
-        
-        
-        
-
-        
-        // M4: PRINT
-    
-    
-        
-        
-    
-        mov     x1,    x24
-        
-    
-        mov     x2,    x25
+        mov     x2,    x27
         
     
         ldr     x0,     =output
         bl      printf
 
+
+
+
+                
+                // Increment and loop
+                
+        // M4: ADD ADD
+        add     x25, x25, 1
+                            // t ++;
+                b       topdoc_wq_struct_row            // go back to loop top
+
+        
+        topdoc_wq_struct_row_end:
 
 
        
+        // Dealloc WordFrequency array
+        
+        // M4: DEALLOC
+        mov     x9,     x24                      // move to x9
+        sub     x9,     xzr,    x9              // negate the size again to positive
+        add     sp,     sp,     x9              // dealloc on SP
+
+
         
         // M4: RET
 
