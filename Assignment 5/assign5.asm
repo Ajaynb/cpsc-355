@@ -320,10 +320,10 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                         xaddEqual(x17, x26)             // index += r
 
                         // Read from array
-                        xreadArray(x18, x19, int, x17, true)
+                        xreadArray(x24, x19, int, x17, true)
 
                         // Add to totalOccurence
-                        xaddEqual(x27, x18)             // totalOccurence += occurence;
+                        xaddEqual(x27, x24)             // totalOccurence += occurence;
                         
                         // Store index's occurence
                         cmp     x26,    x20             // if (r == index)
@@ -332,7 +332,7 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
 
                         topdoc_write_occ:
                                 // array[t].occurence = occurence;
-                                xwriteStruct(x18, x28, wf_occurence)
+                                xwriteStruct(x24, x28, wf_occurence)
                         topdoc_write_occ_end:
 
                         // Increment and loop
@@ -343,16 +343,16 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
 
 
                 // Get occurence
-                xreadStruct(x18, x28, wf_occurence)
-                xprint(output, x18, x18)
+                xreadStruct(x24, x28, wf_occurence)
+                xprint(output, x24, x24)
 
                 // Convert registers
-                scvtf   d18,    x18
+                scvtf   d24,    x24
                 scvtf   d27,    x27
     
                 // Calculate frequency and write to struct
-                fdiv    d18,    d18,    d27             // int frequency = occurence / totalOccurence;
-                xwriteStruct(d18, x28, wf_freqency)
+                fdiv    d24,    d24,    d27             // int frequency = occurence / totalOccurence;
+                xwriteStruct(d24, x28, wf_freqency)
 
 
                 // Increment and loop
@@ -361,8 +361,97 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
 
         
         topdoc_wq_struct_row_end:
+
+
+
+
+        // Bubble sort
+        mov     x25,    0                               // int t = 0;
+        mov     x26,    0                               // int r = 0;
+        mov     x27,    0                               // int base1 = 0;
+        mov     x28,    0                               // int base2 = 0;
+        fmov    d27,    xzr                             // double frequency1 = 0;
+        fmov    d28,    xzr                             // double frequency2 = 0;
+
+        topdoc_bubble_row:
+
+                xprint(output, x25, x22)
+
+                // Check for t - current index of row
+                cmp     x25,    x22                     // if (t >= table.row)
+                b.ge    topdoc_bubble_row_end           // {end}
+
+                // Reset local variables
+                mov     x26,    0                       // int r = 0;
+
+                topdoc_bubble_row2:
+
+                        // Check for r - current index of column
+                        sub     x18,    x23,    1       // table.row - 1
+                        cmp     x26,    x18             // if (r >= table.row - 1)
+                        b.ge    topdoc_bubble_row2_end  // {end}
+
+                        xprint(output, x25, x26)
+
+
+                        // Calculate array offset for rth struct WordFrequency
+                        xmul(x27, x26, -wf_size)                // int offset = r * sizeof(struct WordFrequency)
+                        add     x27,    x27,    wf_arr          // offset += base
+
+                        // Calculate array offset for (r + 1)th struct WordFrequency
+                        add     x18,    x26,    1
+                        xmul(x28, x18, -wf_size)                // int offset = (r + 1) * sizeof(struct WordFrequency)
+                        add     x28,    x28,    wf_arr          // offset += base
+                        
+                        xreadStruct(d27, x27, wf_freqency)      // frequency1 = array[r].frequency
+                        xreadStruct(d28, x28, wf_freqency)      // frequency2 = array[r + 1].frequency
+
+                        fcmp     d27,    d28                    // if (frequency1 < frequency2)
+                        b.lt    topdoc_bubble_swap              // {swap two structs}
+                        b       topdoc_bubble_swap_end          // {do nothing}
+
+                        topdoc_bubble_swap:
+                                
+                                // Swap frequency
+                                xwriteStruct(d28, x27, wf_freqency)
+                                xwriteStruct(d27, x28, wf_freqency)
+
+                                // Swap document
+                                xreadStruct(x18, x27, wf_document)
+                                xreadStruct(x17, x28, wf_document)
+                                xwriteStruct(x17, x28, wf_document)
+                                xwriteStruct(x18, x27, wf_document)
+                                
+                                // Swap occurence
+                                xreadStruct(x18, x27, wf_occurence)
+                                xreadStruct(x17, x28, wf_occurence)
+                                xwriteStruct(x17, x28, wf_occurence)
+                                xwriteStruct(x18, x27, wf_occurence)
+                                
+                                // Swap word
+                                xreadStruct(x18, x27, wf_word)
+                                xreadStruct(x17, x28, wf_word)
+                                xwriteStruct(x17, x28, wf_word)
+                                xwriteStruct(x18, x27, wf_word)
+
+                        topdoc_bubble_swap_end:
+
+                        
+                        
+                        // Increment and loop
+                        xaddAdd(x26)                    // r ++;
+                        b       topdoc_bubble_row2      // go back to loop top
+
+
+                topdoc_bubble_row2_end:
+
+                // Increment and loop
+                xaddAdd(x25)                            // t ++;
+                b       topdoc_bubble_row               // go back to loop top
+
+        topdoc_bubble_row_end:
         
-        
+
         xprint(allstr, alloc, sp, fp)
 
         
