@@ -157,7 +157,7 @@ loop_end_%s:
     ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
     xcount()
 ')
-// xreadArray(destination, base, size, index)
+// xreadArray(destination, base, size, index, ignore_fp = false)
 define(xreadArray, `
         // M4: READ ARRAY
         mov     x9,     $3                          // x9 - size
@@ -165,7 +165,13 @@ define(xreadArray, `
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     $2                  // calculate Offset += Base
 
-        ldr     $1,     [fp,   x9]
+        ifelse(`$#', `5', `
+                ldr     $1,     [x9]
+        ', `
+                ldr     $1,     [fp,   x9]
+        ')
+
+        
 ')
 // xwriteArray(value, base, size, index)
 define(xwriteArray, `

@@ -129,6 +129,14 @@ initialize: // initialize(struct Table* table)
 
 
 
+        add     x19,    x19,    st_arr
+
+        xreadArray(x25, x19, int, 0, true)
+        xreadArray(x26, x19, int, 1, true)
+        xprint(output, x25, x26)
+
+
+
 
         xprint(allstr, alloc, sp, fp)
 
