@@ -191,13 +191,19 @@ define(xstruct, `
     ')
 ')
 
-// xreadStruct(value, base, attribute)
+// xreadStruct(value, base, attribute, ignore_fp = false)
 define(xreadStruct, `
         // M4: READ STRUCT
         mov     x11,    $2                      // int base
         mov     x12,    $3                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
+
+        ifelse(`$#', `4', `
+        ldr	$1,     [x9]              // load the value
+        ', `
         ldr	$1,     [fp,   x9]              // load the value
+        ')
+
 ')
 
 // xwriteStruct(value, base, attribute)
