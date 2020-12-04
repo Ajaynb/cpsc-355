@@ -57,7 +57,7 @@ define(xaddEqual, `
         add     $1, $1, $2
 ')
 
-// xmin(destination, num1, num2)
+// xmin(destination, x, y)
 define(xmin, `
         // M4: MIN
         mov     x9,     $2
@@ -65,7 +65,7 @@ define(xmin, `
         csel    $1,     x9,     x10,    le
 ')
 
-// xmax(destination, num1, num2)
+// xmax(destination, x, y)
 define(xmax, `
         // M4: MAX
         mov     x9,     $2
