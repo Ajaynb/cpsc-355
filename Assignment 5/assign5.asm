@@ -76,9 +76,9 @@ main:   // main()
 
         xarray(st_arr_base, st_arr_amount, int)
         xwriteArray(18, st_arr_base, int, 0)
-        xwriteArray(19, st_arr_base, int, 10)
+        xwriteArray(19, st_arr_base, int, 1)
         xreadArray(x23, st_arr_base, int, 0)
-        xreadArray(x24, st_arr_base, int, 10)
+        xreadArray(x24, st_arr_base, int, 1)
 
 
         mov     x11,    st                      // int base
