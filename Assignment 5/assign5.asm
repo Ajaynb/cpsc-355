@@ -346,17 +346,14 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                 xreadStruct(x18, x28, wf_occurence)
                 xprint(output, x18, x18)
 
+                // Convert registers
                 scvtf   d18,    x18
                 scvtf   d27,    x27
     
-                
+                // Calculate frequency and write to struct
                 fdiv    d18,    d18,    d27             // int frequency = occurence / totalOccurence;
-                
-                
                 xwriteStruct(d18, x28, wf_freqency)
-                xreadStruct(d17, x28, wf_freqency)
-                
-                xprint(output_float, d18, d17)
+
 
                 // Increment and loop
                 xaddAdd(x25)                            // t ++;
@@ -365,11 +362,10 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
         
         topdoc_wq_struct_row_end:
         
-        xprint(output, wf_arr_size, wf_arr_size)
-
+        
         xprint(allstr, alloc, sp, fp)
 
-       
+        
         // Dealloc WordFrequency array
         xdealloc(wf_arr_size)
 
