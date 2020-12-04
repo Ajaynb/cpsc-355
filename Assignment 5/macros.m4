@@ -233,7 +233,7 @@ define(xstruct, `
     ')
 ')
 
-// xreadStruct(value, base, attribute, ignore_fp = false)
+// xreadStruct(destination, base, attribute, ignore_fp = false)
 define(xreadStruct, `
         // M4: READ STRUCT
         mov     x11,    $2                      // int base
