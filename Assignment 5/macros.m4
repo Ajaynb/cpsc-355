@@ -169,10 +169,9 @@ define(xreadArray, `
         ldr     $1,     [x9]
         ', `
         ldr     $1,     [fp,   x9]
-        ')
-
-        
+        ')     
 ')
+
 // xwriteArray(value, base, size, index, ignore_fp = false)
 define(xwriteArray, `
         // M4: WRITE ARRAY
@@ -188,7 +187,6 @@ define(xwriteArray, `
         ', `
         str     x10,    [fp,   x9]
         ')
-        
 ')
 
 // xstruct(base, attribute1, attribute2, ...)
@@ -215,7 +213,6 @@ define(xreadStruct, `
         ', `
         ldr	$1,     [fp,   x9]              // load the value
         ')
-
 ')
 
 // xwriteStruct(value, base, attribute, ignore_fp = true)
@@ -231,7 +228,6 @@ define(xwriteStruct, `
         ', `
         str	x10,    [fp,   x9]              // store the value
         ')
-        
 ')
 
 
