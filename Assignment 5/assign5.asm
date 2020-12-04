@@ -43,10 +43,6 @@ str_test:       .string "table[%d][%d](%d): %d\n"
         wf_document = 24
         wf_size = -(wf_document) & -16
 
-        // Equates for array of word frequency
-        wf_arr = (st + st_size + 16) & -16
-        wf_arr_size = -(max_row * max_col * wf_size) & -16
-
 
 
         // Expose main function to OS and set balign
@@ -265,21 +261,80 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
         mov     x19,    x0                              // int pointer;
         mov     x20,    x1                              // int index;
         mov     x21,    x2                              // int top;
+        
+        // Preventing invalid user input. Index cannot be greater than the table size or smaller than 0.
+        // If smaller than 0, set to 0. If greater than table size, set to table size.
+        xmin(x20, x20, x23)                             // index = min(index, table.column)
+        xmax(x20, x20, 0)                               // index = max(index, 0)
+        xmin(x21, x21, x22)                             // top = min(top, table.row)
+        xmax(x21, x21, 0)                               // top = max(top, 0)
 
         // Read row and column from table struct
         xreadStruct(x22, x19, st_row, true)             // int row = table.row;
         xreadStruct(x23, x19, st_col, true)             // int column = table.column;
 
-        // Preventing invalid user input. Index cannot be greater than the table size or smaller than 0.
-        // If smaller than 0, set to 0. If greater than table size, set to table size.
-        xmin(x20, x20, x23)
-        xmax(x20, x20, 0)
-        xmin(x21, x21, x22)
-        xmax(x21, x21, 0)
+
+        // Save pointer of table.array
+        add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
+
+        // Calculate memory alloc for WordFrequency array
+        xmul(x24, x22, x23, wf_size, -1)                // int size = row * column * sizeof(struct WordFrequency) * -1
+        and     x24,    x24,    -16                     // size = size & -16
 
         // Build WordFrequency array
+        xalloc(x24)
+        mov     x25,    0                               // int t = 0;
+        mov     x26,    0                               // int r = 0;
         
+        topdoc_wq_struct_row:
+
+                // Check for t - current index of row
+                cmp     x25,    x22                     // if (t >= table.row)
+                b.ge    topdoc_wq_struct_row_end        // {end}
+
+
+                mov     x26,    0                       // int r = 0;
+                mov     x27,    0                       // int totalOccurence = 0;
+
+                topdoc_wq_struct_col:
+
+                        // Check for r - current index of column
+                        cmp     x26,    x23             // if (r >= table.col)
+                        b.ge    topdoc_wq_struct_col_end// {end}
+
+                        
+                        // Calculate current index: (t * table.row) + r
+                        xmul(x17, x25, x22)             // int index = t * table.row
+                        xaddEqual(x17, x26)             // index += r
+
+                        // Read from array
+                        xreadArray(x18, x19, int, x17, true)
+
+                        // Add to totalOccurence
+                        xaddEqual(x27, x18)             // totalOccurence += occurence;
+                        
+
+
+                        // Increment and loop
+                        xaddAdd(x26)                    // r ++;
+                        b       topdoc_wq_struct_col    // go back to loop top
+
+                topdoc_wq_struct_col_end:
+
+
+                xprint(output, x27, x27)
+
+                
+                // Increment and loop
+                xaddAdd(x25)                            // t ++;
+                b       topdoc_wq_struct_row            // go back to loop top
+
+        
+        topdoc_wq_struct_row_end:
 
 
        
+        // Dealloc WordFrequency array
+        xdealloc(x24)
+
         xret()
