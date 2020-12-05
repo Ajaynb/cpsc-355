@@ -60,8 +60,28 @@ main:   // main()
         xfunc()
 
         // Initialize values
-        mov     x19,    5                       // int row = 5;
-        mov     x20,    5                       // int col = 5;
+        mov     x19,    min_row                 // int row = 5;
+        mov     x20,    min_col                 // int col = 5;
+
+        cmp     x0,     3                       // if (argc >= 3)
+        b.ge    command_param                   // {read argument from command line}
+        b       command_param_end               // {do nothing}
+
+        command_param:
+
+                // Store arguments
+                mov 	x21, x1
+                ldr 	x0, 	[x21, 8]
+                bl 	atoi
+                mov	x19, 	x0
+
+                ldr	x0, 	[x21, 16]
+                bl 	atoi
+                mov 	x20, 	x0
+
+        command_param_end:
+
+
 
         // Rand seed
         xrandSeed()
@@ -280,7 +300,8 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
         
         // Preventing invalid user input. Index cannot be greater than the table size or smaller than 0.
         // If smaller than 0, set to 0. If greater than table size, set to table size.
-        xmin(x20, x20, x23)                             // index = min(index, table.column)
+        sub     x18,    x23,    1                       // table.column - 1
+        xmin(x20, x20, x18)                             // index = min(index, table.column - 1)
         xmax(x20, x20, 0)                               // index = max(index, 0)
         xmin(x21, x21, x22)                             // top = min(top, table.row)
         xmax(x21, x21, 0)                               // top = max(top, 0)
