@@ -1,0 +1,371 @@
+Script started on 2020-12-05 10:53:55-07:00
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ m4 assign5.asm > assign5.s
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ m4 assign5.asm > assign5.s
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ gcc assign5.s
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ gdb --args ./a.out 6 6 occurences.bin
+GNU gdb (GDB) Fedora 8.1.1-4.fc28
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "aarch64-redhat-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+---Type <return> to continue, or q <return> to quit---
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./a.out...(no debugging symbols found)...done.
+(gdb) b initialize_array_file
+Breakpoint 1 at 0x400bec
+(gdb) r[Kignore 1 10
+Will ignore next 10 crossings of breakpoint 1.
+(gdb) r
+Starting program: /home/ugb/yunfan.yang1/Desktop/cpsc-355/Assignment 5/a.out 6 6 occurences.bin
+warning: the debug information found in "/usr/lib/debug//usr/lib64/ld-2.27.so.debug" does not match "/lib/ld-linux-aarch64.so.1" (CRC mismatch).
+
+Missing separate debuginfos, use: dnf debuginfo-install glibc-2.27-38.fc28.aarch64
+warning: the debug information found in "/usr/lib/debug//lib64/libc-2.27.so.debug" does not match "/lib64/libc.so.6" (CRC mismatch).
+
+warning: the debug information found in "/usr/lib/debug//usr/lib64/libc-2.27.so.debug" does not match "/lib64/libc.so.6" (CRC mismatch).
+
+
+Breakpoint 1, 0x0000000000400bec in initialize_array_file ()
+(gdb) x/g $x19
+0xfffffffff150:	3
+(gdb) x/g $x19[1@1[1@0
+0xfffffffff150:	3	6
+0xfffffffff160:	7	5
+0xfffffffff170:	3	5
+0xfffffffff180:	6	2
+0xfffffffff190:	9	1
+(gdb) x/10g $x19[C[1P[1@1
+0xfffffffff150:	3	6
+0xfffffffff160:	7	5
+0xfffffffff170:	3	5
+0xfffffffff180:	6	2
+0xfffffffff190:	9	1
+0xfffffffff1a0:	-1
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400bec in initialize_array_file ()
+(gdb) cx/11g $x19
+0xfffffffff150:	3	6
+0xfffffffff160:	7	5
+0xfffffffff170:	3	5
+0xfffffffff180:	6	2
+0xfffffffff190:	9	1
+0xfffffffff1a0:	2
+(gdb) x/11g $x19[C[C[C[C[C[C[Kc
+Continuing.
+
+Breakpoint 1, 0x0000000000400bec in initialize_array_file ()
+(gdb) x/12g $x19
+0xfffffffff150:	3	6
+0xfffffffff160:	7	5
+0xfffffffff170:	3	5
+0xfffffffff180:	6	2
+0xfffffffff190:	9	1
+0xfffffffff1a0:	2	7
+(gdb) ignore 1 1000000
+Will ignore next 1000000 crossings of breakpoint 1.
+(gdb) c
+Continuing.
+===== Table =====
+ 3  6  7  5  3  5 
+ 6  2  9  1  2  7 
+ 0  9  3  6  0  6 
+ 2  6  1  8  7  9 
+ 2  0  2  3  7  5 
+ 9  2  2  8  9  7 
+
+What is the index of the word you are searching for? 0
+How many top documents you want to retrieve? 2  
+
+The top documents are: 
+Document 05: Occurence of 9, Frequency of 0.243
+Document 01: Occurence of 6, Frequency of 0.222
+
+Do you want to search again? (0 = no / 1 = yes) 0
+
+Ended.
+
+[Inferior 1 (process 30015) exited with code 01]
+(gdb) q
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ gdb --args ./a.out 6 6
+GNU gdb (GDB) Fedora 8.1.1-4.fc28
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "aarch64-redhat-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+---Type <return> to continue, or q <return> to quit---
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./a.out...(no debugging symbols found)...done.
+(gdb) b initialize_array
+Breakpoint 1 at 0x400c54
+(gdb) r
+Starting program: /home/ugb/yunfan.yang1/Desktop/cpsc-355/Assignment 5/a.out 6 6
+warning: the debug information found in "/usr/lib/debug//usr/lib64/ld-2.27.so.debug" does not match "/lib/ld-linux-aarch64.so.1" (CRC mismatch).
+
+Missing separate debuginfos, use: dnf debuginfo-install glibc-2.27-38.fc28.aarch64
+warning: the debug information found in "/usr/lib/debug//lib64/libc-2.27.so.debug" does not match "/lib64/libc.so.6" (CRC mismatch).
+
+warning: the debug information found in "/usr/lib/debug//usr/lib64/libc-2.27.so.debug" does not match "/lib64/libc.so.6" (CRC mismatch).
+
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) x/d $x19
+0xfffffffff170:	18
+(gdb) p $x23
+$1 = 0
+(gdb) p $x26
+$2 = 36
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) p $x23
+$3 = 1
+(gdb) x/d $x19[1P $x19h $x19[1P $x19[1P $x19/ $x19g $x19
+0xfffffffff170:	9
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) p $x23
+$4 = 2
+(gdb) x/g $[K[K[K2g $x19
+0xfffffffff170:	9	9
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) p $x23
+$5 = 3
+(gdb) x/3g $x19
+0xfffffffff170:	9	9
+0xfffffffff180:	3
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) p $x23
+$6 = 4
+(gdb) x/4g $x2[K19
+0xfffffffff170:	9	9
+0xfffffffff180:	3	2
+(gdb) i[Kc
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) p $x26
+$7 = 36
+(gdb) x/36g $x19
+0xfffffffff170:	9	9
+0xfffffffff180:	3	2
+0xfffffffff190:	1	6
+0xfffffffff1a0:	9	2
+0xfffffffff1b0:	6	3
+0xfffffffff1c0:	7	7
+0xfffffffff1d0:	0	4195824
+0xfffffffff1e0:	0	0
+0xfffffffff1f0:	0	0
+0xfffffffff200:	0	0
+---Type <return> to continue, or q <return> to quit---
+0xfffffffff210:	0	281474976706912
+0xfffffffff220:	-6757384534036669543	5476436521416422517
+0xfffffffff230:	-6757384532952034415	0
+0xfffffffff240:	0	0
+0xfffffffff250:	0	0
+0xfffffffff260:	0	0
+0xfffffffff270:	0	0
+0xfffffffff280:	0	0
+(gdb) c
+Continuing.
+
+Breakpoint 1, 0x0000000000400c54 in initialize_array ()
+(gdb) $x[K[Kp $x26
+$8 = 36
+(gdb) p $x23
+$9 = 13
+(gdb) /[Kx/13g $x19
+0xfffffffff170:	9	9
+0xfffffffff180:	3	2
+0xfffffffff190:	1	6
+0xfffffffff1a0:	9	2
+0xfffffffff1b0:	6	3
+0xfffffffff1c0:	7	7
+0xfffffffff1d0:	1
+(gdb) ignore 1 1000000
+Will ignore next 1000000 crossings of breakpoint 1.
+(gdb) c
+Continuing.
+===== Table =====
+ 9  9  3  2  1  6 
+ 9  2  6  3  7  7 
+ 1  3  6  2  3  3 
+ 4  1  7  3  1  6 
+ 8  3  8  9  2  1 
+ 8  1  0  4  3  2 
+
+What is the index of the word you are searching for? 0
+How many top documents you want to retrieve? 2
+
+The top documents are: 
+Document 05: Occurence of 8, Frequency of 0.444
+Document 00: Occurence of 9, Frequency of 0.300
+
+Do you want to search again? (0 = no / 1 = yes) 0
+
+Ended.
+
+[Inferior 1 (process 30160) exited with code 01]
+(gdb) q
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ ./a.out
+===== Table =====
+ 8  6  3  4  3 
+ 4  0  0  3  8 
+ 6  1  8  0  0 
+ 8  1  2  6  6 
+ 7  1  5  3  6 
+
+What is the index of the word you are searching for? 3
+How many top documents you want to retrieve? 2
+
+The top documents are: 
+Document 03: Occurence of 6, Frequency of 0.261
+Document 01: Occurence of 3, Frequency of 0.200
+
+Do you want to search again? (0 = no / 1 = yes) 0
+
+Ended.
+
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ ./a.out 5 5
+===== Table =====
+ 2  2  3  3  5 
+ 9  0  9  1  4 
+ 7  1  6  0  5 
+ 4  6  7  0  3 
+ 1  5  7  4  6 
+
+What is the index of the word you are searching for? 0
+How many top documents you want to retrieve? 0
+
+The top documents are: 
+
+Do you want to search again? (0 = no / 1 = yes) 0
+
+Ended.
+
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ ./a.out -9999 -99999[K[K[K[K[K[K[K 999999
+===== Table =====
+ 4  8  5  2  6  6  3  3  0  5  0  0  5  1  8  7  6  7  2  6 
+ 6  3  3  0  5  0  0  5  1  8  7  6  7  2  6  6  1  9  2  6 
+ 0  0  5  1  8  7  6  7  2  6  6  1  9  2  6  1  4  7  3  4 
+ 7  6  7  2  6  6  1  9  2  6  1  4  7  3  4  6  0  2  2  4 
+ 6  1  9  2  6  1  4  7  3  4  6  0  2  2  4  1  0  7  6  2 
+
+What is the index of the word you are searching for? 0
+How many top documents you want to retrieve? - 0\ 
+
+The top documents are: 
+
+Do you want to search again? (0 = no / 1 = yes) 0
+
+Ended.
+
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ ./a.out 4 4 noexistfile.fi[K[Ktxt
+===== Table =====
+ 2  9  5  6  9 
+ 3  7  9  5  2 
+ 0  7  0  6  3 
+ 7  6  7  9  2 
+ 2  5  0  2  2 
+
+What is the index of the word you are searching for? 0
+How many top documents you want to retrieve? 0
+
+The top documents are: 
+
+Do you want to search again? (0 = no / 1 = yes) 1
+
+What is the index of the word you are searching for? 2
+How many top documents you want to retrieve? 99999999
+
+The top documents are: 
+Document 01: Occurence of 9, Frequency of 0.346
+Document 03: Occurence of 7, Frequency of 0.226
+Document 00: Occurence of 5, Frequency of 0.161
+Document 02: Occurence of 0, Frequency of 0.000
+Document 04: Occurence of 0, Frequency of 0.000
+
+Do you want to search again? (0 = no / 1 = yes) 0
+
+Ended.
+
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ ./a.out
+===== Table =====
+ 5  6  6  7  5 
+ 2  5  2  0  2 
+ 8  3  5  1  3 
+ 6  9  5  6  2 
+ 9  2  0  9  4 
+
+What is the index of the word you are searching for? 3333333333333333333
+How many top documents you want to retrieve? -9999999999
+
+The top documents are: 
+Document 01: Occurence of 2, Frequency of 0.182
+Document 00: Occurence of 5, Frequency of 0.172
+Document 04: Occurence of 4, Frequency of 0.167
+Document 02: Occurence of 3, Frequency of 0.150
+Document 03: Occurence of 2, Frequency of 0.071
+
+Do you want to search again? (0 = no / 1 = yes) 0
+
+Ended.
+
+]0;yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5yunfan.yang1@csa2:~/Desktop/cpsc-355/Assignment 5$ s[Kexit
+exit
+
+Script done on 2020-12-05 10:59:39-07:00
