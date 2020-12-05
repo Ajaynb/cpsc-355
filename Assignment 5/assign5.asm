@@ -269,10 +269,14 @@ display:        // display(struct Table* table)
 topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int top)
         xfunc()
 
-        // Save pointer of table and other two parameters
+        // Save pointer of table and other two integer parameters
         mov     x19,    x0                              // int pointer;
         mov     x20,    x1                              // int index;
         mov     x21,    x2                              // int top;
+
+        // Read row and column from table struct
+        xreadStruct(x22, x19, st_row, true)             // int row = table.row;
+        xreadStruct(x23, x19, st_col, true)             // int column = table.column;
         
         // Preventing invalid user input. Index cannot be greater than the table size or smaller than 0.
         // If smaller than 0, set to 0. If greater than table size, set to table size.
@@ -281,9 +285,6 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
         xmin(x21, x21, x22)                             // top = min(top, table.row)
         xmax(x21, x21, 0)                               // top = max(top, 0)
 
-        // Read row and column from table struct
-        xreadStruct(x22, x19, st_row, true)             // int row = table.row;
-        xreadStruct(x23, x19, st_col, true)             // int column = table.column;
 
 
         // Save pointer of table.array
@@ -310,8 +311,6 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                 add     x28,    x28,    wf_arr          // offset += base
                 xwriteStruct(x25, x28, wf_document)     // array[t].document = t;
                 xwriteStruct(x20, x28, wf_word)         // array[t].word = index;
-                xprint(output, 9999, x20)
-
 
                 topdoc_wq_struct_col:
 
@@ -348,7 +347,6 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
 
                 // Get occurence
                 xreadStruct(x24, x28, wf_occurence)
-                xprint(output, x24, x24)
 
                 // Convert registers
                 scvtf   d24,    x24
@@ -392,9 +390,6 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                         sub     x18,    x23,    1       // table.row - 1
                         cmp     x26,    x18             // if (r >= table.row - 1)
                         b.ge    topdoc_bubble_row2_end  // {end}
-
-                        xprint(output, x25, x26)
-
 
                         // Calculate array offset for rth struct WordFrequency
                         xmul(x27, x26, -wf_size)                // int offset = r * sizeof(struct WordFrequency)
