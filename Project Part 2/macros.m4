@@ -30,18 +30,6 @@ define(`_forloop',
   `$3`$1'$4`'ifelse(`$1', `$2', `',
     `$0(incr(`$1'), `$2', `$3', `$4')')')
 
-define(everything_needed`
-        // Equates for alloc & dealloc
-        alloc =  -(16 + 96) & -16
-        dealloc = -alloc
-
-        // Define register aliases
-        fp      .req    x29
-        lr      .req    x30
-')
-
-everything_needed()
-
 // xadd(destination, param2, param3, ...) -> destination = param2 + param3 + ...
 define(xadd, `
         // M4: ADD

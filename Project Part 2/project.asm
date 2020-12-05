@@ -61,11 +61,15 @@ output: .string "%d\n"
 main:   // main()
         xfunc()
 
+        // m and n
+
         mov     x0,     min_til
         mov     x1,     max_til
         bl      randomNum
 
         xprint(output, x0)
+
+        // m and n
 
 
         xret()
@@ -74,30 +78,50 @@ main:   // main()
 randomNum:      // randomNum(m, n)
         xfunc()
 
-        mov     x19,    x0                              // int m;
-        mov     x20,    x1                              // int n;
+        // Renaming
+        define(m, x19)
+        define(n, x20)
+        define(upper, x27)
+        define(lower, x28)
+        define(range, x21)
+        define(quotient, x22)
+        define(product, x23)
+        define(remainder, x24)
 
-        cmp     x19,    x20                             // if (m == n)
+        mov     m,      x0                              // int m;
+        mov     n,      x1                              // int n;
+
+        cmp     m,      n                               // if (m == n)
         b.eq    randomNum_end                           // {skip everything to the end}, to return m itself
 
         // For protection, check again the lower and upper bound
-        xmax(x27, x19, x20)                             // int upper = max(m, n)
-        xmin(x28, x19, x20)                             // int lower = min(m, n)
+        xmax(upper, m, n)                               // int upper = max(m, n)
+        xmin(lower, m, n)                               // int lower = min(m, n)
 
         // Calculate range
-        sub     x21,    x27,    x28                     // int range = upper - lower
-        xaddAdd(x21)                                    // range += 1;
+        sub     range,  upper,  lower                   // int range = upper - lower
+        xaddAdd(range)                                  // range += 1;
 
         // Generate random number
         bl      rand
 
         // Limit range
-        udiv    x22,    x0,     x21                     // int quotient = rand / range;
-        mul     x23,    x22,    x21                     // int product = quotient * range
-        sub     x24,    x0,     x23                     // int remainder = rand - product
+        udiv    quotient,       x0,     range           // int quotient = rand / range;
+        mul     product,        x22,    range           // int product = quotient * range
+        sub     remainder,      x0,     product         // int remainder = rand - product
 
-        mov     x0,     x24                             // return the remainder as the generated random number
+        mov     x0,     remainder                       // return the remainder as the generated random number
        
+
+        undefine(m, x19)
+        undefine(n, x20)
+        undefine(upper, x27)
+        undefine(lower, x28)
+        undefine(range, x21)
+        undefine(quotient, x22)
+        undefine(product, x23)
+        undefine(remainder, x24)
+
         randomNum_end:
         xret()
 
