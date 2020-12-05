@@ -3,12 +3,16 @@
         // Defining strings
 output:         .string "%d, %d\n"
 output_float:   .string "%f, %f\n"
+output_str:     .string "%s\n"
 allstr:         .string "alloc %d, sp %d, fp %d\n"
+test_out:       .string "frq: %f, occurence: %d, word %d\n"
 
 str_table_head: .string "===== Table =====\n"
 str_occ:        .string " %d "
 str_linebr:     .string "\n"
 str_test:       .string "table[%d][%d](%d): %d\n"
+str_top_head:   .string "The top documents are: \n"
+str_top_doc:    .string "Document %02d: Occurence of %d, Frequency of %.4f\n"
         
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
@@ -44,8 +48,15 @@ str_test:       .string "table[%d][%d](%d): %d\n"
         wf_document = 24
         wf_size = -(wf_document) & -16
 
+        // Array of WordFrequency
         wf_arr = -alloc + 0
         wf_arr_size = -(max_row * -wf_size) & -16
+
+        // File operations
+        AT_FDCWD = -100
+        buffer = -alloc + 0
+        buffer_size = 4
+
 
 
 
@@ -85,8 +96,66 @@ main:   // main()
 
 
         // Initialize values
-        mov     x19,    5                       // int row = 5;
-        mov     x20,    5                       // int col = 5;
+        mov     x19,    min_row                 // int row = 5;
+        mov     x20,    min_col                 // int col = 5;
+
+        // If command arguments contain row & col
+        cmp     x0,     3                       // if (argc >= 3)
+        b.ge    command_param                   // {read argument from command line}
+        b       command_param_end               // {do nothing}
+
+        command_param:
+                mov         x21, x1
+
+                // Store row
+                ldr         x0,         [x21, 8]
+                bl         atoi
+                mov        x19,         x0
+
+                // Store column
+                ldr        x0,         [x21, 16]
+                bl         atoi
+                mov         x20,         x0
+        command_param_end:
+
+        // If command arguments contain file name
+        cmp     x0,     4                       // if (argc >= 4)
+        b.ge    command_param_file              // {read argument from command line}
+        b       command_param_file_end          // {do nothing}
+
+        command_param_file:
+                // Store arguments
+                ldr x23, [x21, 24]              // char* file = argv[3]
+                
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    x23
+                
+        
+
+        
+    
+        ldr     x0,     =output_str
+        bl      printf
+
+        command_param_file_end:
+
 
         // Rand seed
         
@@ -396,6 +465,36 @@ loop_end_4:
         str     x10,    [fp,   x9]
         
 
+
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    x23
+                
+        
+
+        
+    
+        ldr     x0,     =output_str
+        bl      printf
+
+
         
 
         // struct Table table;                  // x28
@@ -403,9 +502,11 @@ loop_end_4:
         add     x28,    x28,    fp              // offset = base + fp
 
 
+
         // Initialize table
         mov     x0,     x28
-        bl      initialize                      // initialize(&table)
+        mov     x1,     x23
+        bl      initialize                      // initialize(&table, file)
 
         // Display table
         mov     x0,     x28
@@ -414,7 +515,7 @@ loop_end_4:
         // Top Docs
         mov     x0,     x28
         mov     x1,     -2
-        mov     x2,     22
+        mov     x2,     2
         bl      topRelevantDocs
 
 
@@ -501,8 +602,8 @@ loop_end_4:
 
 
 
-initialize:     // initialize(struct Table* table)
-	
+initialize:     // initialize(struct Table* table, char* file)
+        
         // M4: FUNC
         stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
         mov     fp,     sp                              // update FP to current SP
@@ -532,9 +633,12 @@ initialize:     // initialize(struct Table* table)
         mov     x28,    0
 
 
-        // Save pointer of table
+        // Save pointer of table & file name
         mov     x19,    x0                              // int pointer;
+        mov     x22,    x1                              // char* file;
         
+        test2:
+
         // Read row and column from table struct
         
         // M4: READ STRUCT
@@ -560,8 +664,125 @@ initialize:     // initialize(struct Table* table)
         // Save pointer of table.array
         add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
 
+        
+        // Try open file
+        mov     w0,     -100                            // 1st arg (cwd)
+        mov     x1,     x22                             // 2nd arg (pathname)        
+        mov     w2,     0                               // 3rd arg (read-only)
+        mov     w3,     0                               // 4th arg (not used)
+        mov     x8,     56                              // openat I/O request - to open a file
+        svc     0                                       // call system function
+        //mov     w18,    w0                              // int fd; Record FD
+        
+        
+        test:
+        // Check file opens
+        cmp     w0,    0                               // Check if File Descriptor = -1 (error occured)
+        b.ge    initialize_from_file                    // If no error branch over
+        b       initialize_from_random
+
+        
+        
+
+        // Initialize from given file
+        initialize_from_file:
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    2333
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    2333
+                
+        
+
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+        // add     x23,    fp,     16                      // int bufferBase = fp + 16; Calculate base address
+        /*mov     w0,     w19                             // 1st arg (fd)
+        mov     x1,     buffer                          // 2nd arg (buffer)
+        mov     w2,     buffer_size                     // 3rd arg (n) - how many bytes to read from buffer each time
+        mov     x8,     63                              // read I/O request
+        svc     0                                       // call system function
+        
+	mov w20, w0 // int actualSize; Record number of bytes actually read
+
+	cmp w20, buffer_size // if (nread != buffersize)
+        b.ne    initialize_end
+
+   	ldr x23, [sp, buffer] // 2nd arg (load string from buffer)
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    x23
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    x23
+                
+        
+
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+        b       initialize_from_file
+
+        */
+
+        // Initialize from random numbers
+        initialize_from_random:
+
         // For loop
-        mov     x23,    0                               // int t = 0; current 4
+        mov     x23,    0                               // int t = 0; current 3
         mul     x26,    x20,    x21                     // int size = row * column;
 
         initialize_array:
@@ -579,7 +800,7 @@ initialize:     // initialize(struct Table* table)
                 
         // M4: WRITE ARRAY
         mov     x9,     int                          // x9 - size
-        mov     x10,    x23                          // x10 - 4
+        mov     x10,    x23                          // x10 - 3
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     x19                  // calculate Offset += Base
 
@@ -600,6 +821,7 @@ initialize:     // initialize(struct Table* table)
         initialize_array_end:
 
 
+        initialize_end:
         
         // M4: RET
 
@@ -624,7 +846,7 @@ initialize:     // initialize(struct Table* table)
 
 
 randomNum:      // randomNum(m, n)
-	
+        
         // M4: FUNC
         stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
         mov     fp,     sp                              // update FP to current SP
@@ -806,8 +1028,8 @@ display:        // display(struct Table* table)
         add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
 
         // Counters
-        mov     x23,    0                               // int t = 0; current row 4
-        mov     x24,    0                               // int r = 0; current col 4
+        mov     x23,    0                               // int t = 0; current row 3
+        mov     x24,    0                               // int r = 0; current col 3
 
         // Print table head
         
@@ -1012,17 +1234,40 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int 1, int top)
         mov     x28,    0
 
 
-        // Save pointer of table and other two parameters
+        // Save pointer of table and other two integer parameters
         mov     x19,    x0                              // int pointer;
         mov     x20,    x1                              // int 1;
         mov     x21,    x2                              // int top;
+
+        // Read row and column from table struct
+        
+        // M4: READ STRUCT
+        mov     x11,    x19                      // int base
+        mov     x12,    st_row                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x22,     [x9]                    // load the value
+        
+             // int row = table.row;
+        
+        // M4: READ STRUCT
+        mov     x11,    x19                      // int base
+        mov     x12,    st_col                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x23,     [x9]                    // load the value
+        
+             // int column = table.column;
         
         // Preventing invalid user input. Index cannot be greater than the table size or smaller than 0.
         // If smaller than 0, set to 0. If greater than table size, set to table size.
+        sub     x18,    x23,    1                       // table.column - 1
         
         // M4: MIN
         mov     x9,     x20
-        mov     x10,    x23
+        mov     x10,    x18
         // csel    x20,     x9,     x10,    le
 
         
@@ -1039,7 +1284,7 @@ end_7:
         
         
         
-                             // 1 = min(1, table.column)
+                             // 1 = min(1, table.column - 1)
         
         // M4: MAX
         mov     x9,     x20
@@ -1104,27 +1349,6 @@ end_10:
         
                                // top = max(top, 0)
 
-        // Read row and column from table struct
-        
-        // M4: READ STRUCT
-        mov     x11,    x19                      // int base
-        mov     x12,    st_row                      // int attribute offset
-        add     x9,     x11,    x12             // int offset = base + attribute
-
-        
-        ldr	x22,     [x9]                    // load the value
-        
-             // int row = table.row;
-        
-        // M4: READ STRUCT
-        mov     x11,    x19                      // int base
-        mov     x12,    st_col                      // int attribute offset
-        add     x9,     x11,    x12             // int offset = base + attribute
-
-        
-        ldr	x23,     [x9]                    // load the value
-        
-             // int column = table.column;
 
 
         // Save pointer of table.array
@@ -1209,7 +1433,6 @@ end_10:
         str	x10,    [fp,   x9]              // store the value
         
          // array[t].word = 4;
-
 
                 topdoc_wq_struct_col:
 
@@ -1312,43 +1535,6 @@ end_10:
         ldr	x24,     [fp,   x9]              // load the value
         
 
-                
-        // M4: PRINT
-    
-    
-    
-
-    
-        
-        
-        
-                
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x1,    x24
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x2,    x24
-                
-        
-
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
 
                 // Convert registers
                 scvtf   d24,    x24
@@ -1399,17 +1585,19 @@ end_10:
 
         topdoc_bubble_row:
 
-                // Check for t - current 3 of row
+                // Check for t - current 4 of row
                 cmp     x25,    x22                     // if (t >= table.row)
                 b.ge    topdoc_bubble_row_end           // {end}
 
+                // Reset local variables
+                mov     x26,    0                       // int r = 0;
+
                 topdoc_bubble_row2:
 
-                        // Check for r - current 3 of column
+                        // Check for r - current 4 of column
                         sub     x18,    x23,    1       // table.row - 1
                         cmp     x26,    x18             // if (r >= table.row - 1)
                         b.ge    topdoc_bubble_row2_end  // {end}
-
 
                         // Calculate array offset for rth struct WordFrequency
                         
@@ -1435,7 +1623,6 @@ end_10:
         mov     x27,     x9                      // result
                 // int offset = r * sizeof(struct WordFrequency)
                         add     x27,    x27,    wf_arr          // offset += base
-                        //add     x27,    x27,    fp              // offset += fp
 
                         // Calculate array offset for (r + 1)th struct WordFrequency
                         add     x18,    x26,    1
@@ -1462,8 +1649,6 @@ end_10:
         mov     x28,     x9                      // result
                 // int offset = (r + 1) * sizeof(struct WordFrequency)
                         add     x28,    x28,    wf_arr          // offset += base
-                        //add     x28,    x28,    fp              // offset += fp
-                        
                         
                         
         // M4: READ STRUCT
@@ -1490,58 +1675,221 @@ end_10:
                         b.lt    topdoc_bubble_swap              // {swap two structs}
                         b       topdoc_bubble_swap_end          // {do nothing}
 
-                        
-                        
-        // M4: PRINT
-    
-    
-    
-
-    
-        
-        
-        
-                
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x1,    x27
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x2,    x28
-                
-        
-
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
-
-
                         topdoc_bubble_swap:
+                                
+                                // Swap frequency
+                                
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    x27                      // int base
+        mov     x12,    wf_freqency                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                fmov    d10,    d28              // float value
+                
+        
+        
+        
+        str	d10,    [fp,   x9]              // store the value
+        
 
                                 
-                                /*ldr     x17,    [x27]
-                                ldr     x18,    [x28]
-                                str     x27,    [x18]
-                                str     x28,    [x17]*/
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_freqency                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                fmov    d10,    d27              // float value
+                
+        
+        
+        
+        str	d10,    [fp,   x9]              // store the value
+        
+
+
+                                // Swap document
+                                
+        // M4: READ STRUCT
+        mov     x11,    x27                      // int base
+        mov     x12,    wf_document                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x17,     [fp,   x9]              // load the value
+        
+
+                                
+        // M4: READ STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_document                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x18,     [fp,   x9]              // load the value
+        
+
+                                
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_document                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                mov     x10,    x17              // int value
+                
+        
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+
+                                
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    x27                      // int base
+        mov     x12,    wf_document                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                mov     x10,    x18              // int value
+                
+        
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+
+                                
+                                // Swap occurence
+                                
+        // M4: READ STRUCT
+        mov     x11,    x27                      // int base
+        mov     x12,    wf_occurence                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x17,     [fp,   x9]              // load the value
+        
+
+                                
+        // M4: READ STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_occurence                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x18,     [fp,   x9]              // load the value
+        
+
+                                
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_occurence                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                mov     x10,    x17              // int value
+                
+        
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+
+                                
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    x27                      // int base
+        mov     x12,    wf_occurence                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                mov     x10,    x18              // int value
+                
+        
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+
+                                
+                                // Swap word
+                                
+        // M4: READ STRUCT
+        mov     x11,    x27                      // int base
+        mov     x12,    wf_word                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x17,     [fp,   x9]              // load the value
+        
+
+                                
+        // M4: READ STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_word                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x18,     [fp,   x9]              // load the value
+        
+
+                                
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    x28                      // int base
+        mov     x12,    wf_word                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                mov     x10,    x17              // int value
+                
+        
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
+
+                                
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    x27                      // int base
+        mov     x12,    wf_word                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                mov     x10,    x18              // int value
+                
+        
+        
+        
+        str	x10,    [fp,   x9]              // store the value
+        
 
 
                         topdoc_bubble_swap_end:
-
-                        
                         
                         // Increment and loop
                         
@@ -1561,6 +1909,150 @@ end_10:
                 b       topdoc_bubble_row               // go back to loop top
 
         topdoc_bubble_row_end:
+
+
+        // Print result
+        mov     x25,    0                               // int t = 0;
+        mov     x24,    0                               // int offset = 0;
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        ldr     x0,     =str_top_head
+        bl      printf
+                            // print header
+
+        topdoc_print:
+
+                // Check for t - current 1 of row
+                cmp     x25,    x21                     // if (t >= top)
+                b.ge    topdoc_print_end                // {end}
+
+                
+                
+        // M4: MUL
+    
+        mov     x9,     1                       // initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x25                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    -wf_size                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        mov     x24,     x9                      // result
+                // int offset = r * sizeof(struct WordFrequency)
+                add     x24,    x24,    wf_arr          // offset += base
+                
+                
+        // M4: READ STRUCT
+        mov     x11,    x24                      // int base
+        mov     x12,    wf_document                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x26,     [fp,   x9]              // load the value
+        
+
+                
+        // M4: READ STRUCT
+        mov     x11,    x24                      // int base
+        mov     x12,    wf_occurence                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	x27,     [fp,   x9]              // load the value
+        
+
+                
+        // M4: READ STRUCT
+        mov     x11,    x24                      // int base
+        mov     x12,    wf_freqency                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+
+        
+        ldr	d28,     [fp,   x9]              // load the value
+        
+
+
+                
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    x26
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    x27
+                
+        
+
+        
+    
+        
+        
+        
+                fmov     d0,    d28
+                
+        
+
+        
+    
+        ldr     x0,     =str_top_doc
+        bl      printf
+
+
+                
+                // Increment and loop
+                
+        // M4: ADD ADD
+        add     x25, x25, 1
+                            // t ++;
+                b       topdoc_print                    // go back to loop top
+
+
+        topdoc_print_end:
         
 
         

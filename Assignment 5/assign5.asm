@@ -3,6 +3,7 @@
         // Defining strings
 output:         .string "%d, %d\n"
 output_float:   .string "%f, %f\n"
+output_str:     .string "%s\n"
 allstr:         .string "alloc %d, sp %d, fp %d\n"
 test_out:       .string "frq: %f, occurence: %d, word %d\n"
 
@@ -47,8 +48,15 @@ str_top_doc:    .string "Document %02d: Occurence of %d, Frequency of %.4f\n"
         wf_document = 24
         wf_size = -(wf_document) & -16
 
+        // Array of WordFrequency
         wf_arr = -alloc + 0
         wf_arr_size = -(max_row * -wf_size) & -16
+
+        // File operations
+        AT_FDCWD = -100
+        buffer = -alloc + 0
+        buffer_size = 4
+
 
 
 
@@ -63,24 +71,35 @@ main:   // main()
         mov     x19,    min_row                 // int row = 5;
         mov     x20,    min_col                 // int col = 5;
 
+        // If command arguments contain row & col
         cmp     x0,     3                       // if (argc >= 3)
         b.ge    command_param                   // {read argument from command line}
         b       command_param_end               // {do nothing}
 
         command_param:
+                mov         x21, x1
 
-                // Store arguments
-                mov 	x21, x1
-                ldr 	x0, 	[x21, 8]
-                bl 	atoi
-                mov	x19, 	x0
+                // Store row
+                ldr         x0,         [x21, 8]
+                bl         atoi
+                mov        x19,         x0
 
-                ldr	x0, 	[x21, 16]
-                bl 	atoi
-                mov 	x20, 	x0
-
+                // Store column
+                ldr        x0,         [x21, 16]
+                bl         atoi
+                mov         x20,         x0
         command_param_end:
 
+        // If command arguments contain file name
+        cmp     x0,     4                       // if (argc >= 4)
+        b.ge    command_param_file              // {read argument from command line}
+        b       command_param_file_end          // {do nothing}
+
+        command_param_file:
+                // Store arguments
+                ldr x23, [x21, 24]              // char* file = argv[3]
+                xprint(output_str, x23)
+        command_param_file_end:
 
 
         // Rand seed
@@ -103,21 +122,23 @@ main:   // main()
 
         
         xprint(allstr, alloc, sp, fp)
-        
 
-        xarray(st_arr_base, st_arr_amount, int)
+        
+        /**xarray(st_arr_base, st_arr_amount, int)**/
         xwriteArray(18, st_arr_base, int, 0)
         xwriteArray(19, st_arr_base, int, 1)
-        
+
 
         // struct Table table;                  // x28
         mov     x28,    st                      // base
         add     x28,    x28,    fp              // offset = base + fp
 
 
+
         // Initialize table
         mov     x0,     x28
-        bl      initialize                      // initialize(&table)
+        mov     x1,     x23
+        bl      initialize                      // initialize(&table, file)
 
         // Display table
         mov     x0,     x28
@@ -144,18 +165,63 @@ main:   // main()
 
 
 
-initialize:     // initialize(struct Table* table)
-	xfunc()
+initialize:     // initialize(struct Table* table, char* file)
+        xfunc()
 
-        // Save pointer of table
+        // Save pointer of table & file name
         mov     x19,    x0                              // int pointer;
-        
+        mov     x22,    x1                              // char* file;
+
         // Read row and column from table struct
         xreadStruct(x20, x19, st_row, true)             // int row = table.row;
         xreadStruct(x21, x19, st_col, true)             // int column = table.column;
 
         // Save pointer of table.array
         add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
+        
+        // Open file
+        mov     w0,     -100                            // 1st arg (cwd)
+        mov     x1,     x22                             // 2nd arg (pathname)        
+        mov     w2,     0                               // 3rd arg (read-only)
+        mov     w3,     0                               // 4th arg (not used)
+        mov     x8,     56                              // openat I/O request - to open a file
+        svc     0                                       // call system function
+        mov     w18,    w0                              // int fd; Record FD
+        
+        // Check file opens
+        cmp     w18,    0                               // Check if File Descriptor = -1 (error occured)
+        b.ge    initialize_from_file                    // If no error branch over
+        b       initialize_from_random
+        
+
+        // Initialize from given file
+        initialize_from_file:
+        
+        // Read file
+        mov     w0,     w18                             // 1st arg (fd)
+        add     x1,     fp,     buffer                  // 2nd arg (buffer)
+        mov     w2,     buffer_size                     // 3rd arg (n) - how many bytes to read from buffer each time
+        mov     x8,     63                              // read I/O request
+        svc     0                                       // call system function
+        
+	mov     w17,    w0 // int actualSize; Record number of bytes actually read
+
+        test:
+	cmp w17, buffer_size // if (nread != buffersize)
+        b.ne    initialize_from_random
+
+   	
+        
+        ldr x23, [sp, buffer] // 2nd arg (load string from buffer)
+        xprint(output, x23, x23)
+
+        b       initialize_from_file
+
+        
+        
+
+        // Initialize from random numbers
+        initialize_from_random:
 
         // For loop
         mov     x23,    0                               // int t = 0; current index
@@ -182,12 +248,13 @@ initialize:     // initialize(struct Table* table)
         initialize_array_end:
 
 
+        initialize_end:
         xret()
 
 
 
 randomNum:      // randomNum(m, n)
-	xfunc()
+        xfunc()
 
         mov     x19,    x0                      // int m;
         mov     x20,    x1                      // int n;

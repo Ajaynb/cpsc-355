@@ -4,4 +4,4 @@ m4 assign5.asm > assign5.s
 
 gcc assign5.s
 
-gdb ./a.out
+gdb --args ./a.out 6 6 occurences.bin
