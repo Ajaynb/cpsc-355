@@ -61,15 +61,15 @@ output: .string "%d\n"
 main:   // main()
         xfunc()
 
-        // m and n
+        
+        // Rand seed
+        xrandSeed()
 
         mov     x0,     min_til
         mov     x1,     max_til
         bl      randomNum
 
         xprint(output, x0)
-
-        // m and n
 
 
         xret()
