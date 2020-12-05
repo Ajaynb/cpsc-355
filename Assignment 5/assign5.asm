@@ -214,9 +214,23 @@ initialize:     // initialize(struct Table* table, char* file)
                 svc     0                               // call system function
                 mov     w17,    w0                      // int actualSize; Record number of bytes actually read
 
+                // Judge if read successfully
+                cmp     w17,    buffer_size             // if (nread != buffersize)
+                b.eq    initialize_file_read_success    // {load to register}
+                b.ne    initialize_file_read_fail       // {set to 0}
+
+                // Read success, load the number to register
+                initialize_file_read_success:
                 ldr     x25,    [sp, buffer]            // 2nd arg (load string from buffer)
-                
+                b       initialize_file_write           // write to array
+
+                // Read fail, set the register to default 0
+                initialize_file_read_fail:
+                mov     x25,    0                       // set to 0
+                b       initialize_file_write           // write to array
+
                 // Write the number to array
+                initialize_file_write:
                 xwriteArray(x25, x19, int, x23, true)   // table.array[t] = random
 
                 // Increment and loop
