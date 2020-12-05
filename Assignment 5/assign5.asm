@@ -4,7 +4,7 @@
 output:         .string "%d, %d\n"
 output_float:   .string "%f, %f\n"
 allstr:         .string "alloc %d, sp %d, fp %d\n"
-test_out:       .string "frq: %f, word: %d\n"
+test_out:       .string "frq: %f, occurence: %d, word %d\n"
 
 str_table_head: .string "===== Table =====\n"
 str_occ:        .string " %d "
@@ -308,6 +308,7 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                 add     x28,    x28,    wf_arr          // offset += base
                 xwriteStruct(x25, x28, wf_document)     // array[t].document = t;
                 xwriteStruct(x20, x28, wf_word)         // array[t].word = index;
+                xprint(output, 9999, x20)
 
 
                 topdoc_wq_struct_col:
@@ -464,11 +465,9 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
                 
                 xreadStruct(x26, x24, wf_occurence)
                 xreadStruct(d27, x24, wf_freqency)
+                xreadStruct(x28, x24, wf_word)
 
-                xprint(test_out, d27, x26)
-
-                
-
+                xprint(test_out, d27, x26, x28)
 
                 
                 // Increment and loop
