@@ -203,19 +203,17 @@ initialize:     // initialize(struct Table* table, char* file)
         mov     w2,     buffer_size                     // 3rd arg (n) - how many bytes to read from buffer each time
         mov     x8,     63                              // read I/O request
         svc     0                                       // call system function
-        
-	mov     w17,    w0 // int actualSize; Record number of bytes actually read
+	mov     w17,    w0                              // int actualSize; Record number of bytes actually read
 
-        test:
-	cmp w17, buffer_size // if (nread != buffersize)
-        b.ne    initialize_from_random
+	cmp     w17,    buffer_size                     // if (nread != buffersize)
+        b.ne    initialize_from_random                  // {finish reading}
 
    	
         
-        ldr x23, [sp, buffer] // 2nd arg (load string from buffer)
+        ldr     x23,    [sp, buffer] // 2nd arg (load string from buffer)
         xprint(output, x23, x23)
 
-        b       initialize_from_file
+        b       initialize_from_file                    // go back to loop
 
         
         
