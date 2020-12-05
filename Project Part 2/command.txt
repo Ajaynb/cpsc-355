@@ -1,0 +1,7 @@
+cd "Desktop/cpsc-355/Project Part 2/"
+
+m4 project.asm > project.s
+
+gcc project.s
+
+gdb ./a.out
