@@ -10,6 +10,49 @@ output: .string "%d\n"
         fp      .req    x29
         lr      .req    x30
 
+        // Mins and Maxs
+        min_row = 10
+        min_col = 10
+        max_row = 160
+        max_col = 150
+        min_til = 0.01
+        max_til = 15.00
+
+        // Tile distributions
+        neg_percent = 0.4
+        spe_percent = 0.2
+
+        // Tiles
+        exit = 20
+        double_range = 21
+
+        // Game status
+        prepare = 0
+        gaming = 1
+        win = 2
+        die = 3
+        quit = 4
+
+        // Struct for Tile
+        tile = 0
+        tile_value = 0
+        tile_covered = 8
+        tile_size = (16) & 16
+        tile_size_alloc = -tile_size
+        
+        // Struct for Board
+        board = -alloc + 0
+        board_row = 0
+        board_column = 8
+        board_tiles = 16
+        board_negatives = 24
+        board_specials = 32
+        board_array = 40
+        board_size = (40 + max_row * max_col * tile_size) & 16
+        board_size_alloc = -board_size
+
+        
+
 
         // Expose main function to OS and set balign
         .global main
