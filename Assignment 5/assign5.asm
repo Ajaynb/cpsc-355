@@ -197,25 +197,36 @@ initialize:     // initialize(struct Table* table, char* file)
         // Initialize from given file
         initialize_from_file:
         
-        // Read file
-        mov     w0,     w18                             // 1st arg (fd)
-        add     x1,     fp,     buffer                  // 2nd arg (buffer)
-        mov     w2,     buffer_size                     // 3rd arg (n) - how many bytes to read from buffer each time
-        mov     x8,     63                              // read I/O request
-        svc     0                                       // call system function
-	mov     w17,    w0                              // int actualSize; Record number of bytes actually read
+        // For loop
+        mov     x23,    0                               // int t = 0; current index
+        mul     x26,    x20,    x21                     // int size = row * column;
 
-	cmp     w17,    buffer_size                     // if (nread != buffersize)
-        b.ne    initialize_from_random                  // {finish reading}
+        initialize_array_file:
 
-   	
-        
-        ldr     x23,    [sp, buffer]                    // 2nd arg (load string from buffer)
-        xprint(output, x23, x23)
+                cmp     x23,    x26                     // if (t >= size)
+                b.ge    initialize_array_file_end       // {end}
 
-        b       initialize_from_file                    // go back to loop
+                // Read number
+                mov     w0,     w18                     // 1st arg (fd)
+                add     x1,     fp,     buffer          // 2nd arg (buffer)
+                mov     w2,     buffer_size             // 3rd arg (n) - how many bytes to read from buffer each time
+                mov     x8,     63                      // read I/O request
+                svc     0                               // call system function
+                mov     w17,    w0                      // int actualSize; Record number of bytes actually read
 
-        
+                ldr     x25,    [sp, buffer]            // 2nd arg (load string from buffer)
+                
+                // Write the number to array
+                xwriteArray(x25, x19, int, x23, true)   // table.array[t] = random
+
+                // Increment and loop
+                xaddAdd(x23)                            // t ++;
+                b       initialize_array_file           // go back to loop top
+
+        initialize_array_file_end:
+
+
+        b       initialize_array_end
         
 
         // Initialize from random numbers
