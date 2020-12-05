@@ -2,6 +2,7 @@
 
 output: .string "%d\n"
 
+
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
         dealloc = -alloc
@@ -55,7 +56,7 @@ output: .string "%d\n"
         board_specials = 32
         board_array = 40
         board_size = -(40) & -16
-        board_size_alloc = -board_size_alloc
+        board_size_alloc = -board_size
 
 
         // Expose main function to OS and set balign
@@ -76,7 +77,8 @@ main:   // main()
         xalloc(board_size_alloc)
 
         xwriteStruct(5, board, board_row)
-        xwriteStruct(5, board, board_col)
+        xwriteStruct(5, board, board_column)
+
 
         // Dealloc for struct Board
         xdealloc(board_size_alloc)
