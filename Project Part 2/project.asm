@@ -84,43 +84,70 @@ randomNum:      // randomNum(m, n)
         define(upper, x27)
         define(lower, x28)
         define(range, x21)
-        define(quotient, x22)
-        define(product, x23)
-        define(remainder, x24)
+        define(modular, x22)
+        define(remainder, x23)
 
-        mov     m,      x0                              // int m;
-        mov     n,      x1                              // int n;
+        mov     m, x0                                   // int m;
+        mov     n, x1                                   // int n;
 
-        cmp     m,      n                               // if (m == n)
+        cmp     m, n                                    // if (m == n)
         b.eq    randomNum_end                           // {skip everything to the end}, to return m itself
 
         // For protection, check again the lower and upper bound
         xmax(upper, m, n)                               // int upper = max(m, n)
         xmin(lower, m, n)                               // int lower = min(m, n)
 
+        
         // Calculate range
-        sub     range,  upper,  lower                   // int range = upper - lower
-        xaddAdd(range)                                  // range += 1;
+        sub     range, upper, lower                     // int range = upper - lower
 
-        // Generate random number
-        bl      rand
+        // Get the smallest 2^x larger than range
+        mov     modular, 1
+        rand_modular_shift:
+                cmp     range, modular
+                b.lt    rand_modular_shift_end
+        
+                lsl     modular, modular, 1
 
-        // Limit range
-        udiv    quotient,       x0,     range           // int quotient = rand / range;
-        mul     product,        x22,    range           // int product = quotient * range
-        sub     remainder,      x0,     product         // int remainder = rand - product
+                xprint(output, modular)
 
-        mov     x0,     remainder                       // return the remainder as the generated random number
-       
+                b       rand_modular_shift
+        rand_modular_shift_end:
+
+
+        // Generate random number, generate until within the bounds
+        mov     remainder, -1
+        rand_generate_number:
+                // Generate random number
+                bl      rand
+
+                // Arithmetically limit the range of random number
+                mov     x18, x0
+                sub     x17, modular, 1
+                and     remainder, x18, x17
+                xaddEqual(remainder, lower)
+
+                // If smaller than lower, regenerate
+                cmp     remainder, lower
+                b.lt    rand_generate_number
+
+                // If greater than upper, regenerate
+                cmp     remainder, upper
+                b.gt    rand_generate_number
+
+        rand_generate_number_end:
+
+
+        mov     x0, remainder
+
 
         undefine(m, x19)
         undefine(n, x20)
         undefine(upper, x27)
         undefine(lower, x28)
         undefine(range, x21)
-        undefine(quotient, x22)
-        undefine(product, x23)
-        undefine(remainder, x24)
+        undefine(modular, x22)
+        undefine(remainder, x23)
 
         randomNum_end:
         xret()
