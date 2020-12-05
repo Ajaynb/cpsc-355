@@ -13,8 +13,6 @@ output: .string "%d\n"
         // Define minimum row and column, avoid magic numbers
         min_row = 10
         min_col = 10
-        max_row = 160
-        max_col = 150
         min_til = 1
         max_til = 1500
 
@@ -56,8 +54,8 @@ output: .string "%d\n"
         board_negatives = 24
         board_specials = 32
         board_array = 40
-        board_size = (40 + max_row * max_col * tile_size) & 16
-        board_size_alloc = -board_size
+        board_size = -(40) & -16
+        board_size_alloc = -board_size_alloc
 
 
         // Expose main function to OS and set balign
@@ -70,18 +68,18 @@ output: .string "%d\n"
  */
 main:   // main()
         xfunc()
-
         
         // Rand seed
         xrandSeed()
 
-        mov     x0,     min_til
-        mov     x1,     max_til
-        bl      randomNum
+        // Alloc for struct Board
+        xalloc(board_size_alloc)
 
-        xprint(output, x0)
+        xwriteStruct(5, board, board_row)
+        xwriteStruct(5, board, board_col)
 
-
+        // Dealloc for struct Board
+        xdealloc(board_size_alloc)
         xret()
 
 
@@ -126,7 +124,7 @@ randomNum:      // randomNum(m, n)
                 b.lt    rand_modular_shift_end
 
                 lsl     modular, modular, 1
-                
+
                 b       rand_modular_shift
         rand_modular_shift_end:
 
