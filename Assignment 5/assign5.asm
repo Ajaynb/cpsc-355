@@ -210,7 +210,7 @@ initialize:     // initialize(struct Table* table, char* file)
 
    	
         
-        ldr     x23,    [sp, buffer] // 2nd arg (load string from buffer)
+        ldr     x23,    [sp, buffer]                    // 2nd arg (load string from buffer)
         xprint(output, x23, x23)
 
         b       initialize_from_file                    // go back to loop
