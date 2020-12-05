@@ -7,12 +7,17 @@ output_str:     .string "%s\n"
 allstr:         .string "alloc %d, sp %d, fp %d\n"
 test_out:       .string "frq: %f, occurence: %d, word %d\n"
 
+str_integer:    .string "%d"
 str_table_head: .string "===== Table =====\n"
 str_occ:        .string " %d "
 str_linebr:     .string "\n"
 str_test:       .string "table[%d][%d](%d): %d\n"
 str_top_head:   .string "The top documents are: \n"
-str_top_doc:    .string "Document %02d: Occurence of %d, Frequency of %.4f\n"
+str_top_doc:    .string "Document %02d: Occurence of %d, Frequency of %.3f\n"
+str_top_index:  .string "What is the index of the word you are searching for? "
+str_top_amount: .string "How many top documents you want to retrieve? "
+str_scan_again: .string "Do you want to search again? (0 = no / 1 = yes) "
+str_ended:      .string "Ended.\n"
         
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
@@ -98,7 +103,6 @@ main:   // main()
         command_param_file:
                 // Store arguments
                 ldr x23, [x21, 24]              // char* file = argv[3]
-                xprint(output_str, x23)
         command_param_file_end:
 
 
@@ -121,10 +125,6 @@ main:   // main()
         xreadStruct(x22, st, st_col)
 
         
-        xprint(allstr, alloc, sp, fp)
-
-        
-        /**xarray(st_arr_base, st_arr_amount, int)**/
         xwriteArray(18, st_arr_base, int, 0)
         xwriteArray(19, st_arr_base, int, 1)
 
@@ -144,19 +144,46 @@ main:   // main()
         mov     x0,     x28
         bl      display                         // display(&table)
 
-        // Top Docs
-        mov     x0,     x28
-        mov     x1,     -2
-        mov     x2,     2
-        bl      topRelevantDocs
+        xprint(str_linebr)
+
+
+
+        main_topdoc_ask:
+
+        // Ask for index
+        xprint(str_top_index)
+        xscan(str_integer, x27)                 // int index;
+
+        // Ask for top document amount
+        xprint(str_top_amount)
+        xscan(str_integer, x26)                 // int top;
+
+        xprint(str_linebr)
+        
+        // Run top docs
+        mov     x0,     x28                     // pointer
+        mov     x1,     x27                     // index
+        mov     x2,     x26                     // top
+        bl      topRelevantDocs                 // topRelevantDocs(&table, index, top)
+
+        xprint(str_linebr)
+
+        // Ask for search again
+        xprint(str_scan_again)
+        xscan(str_integer, x25)
+        xprint(str_linebr)
+
+        cmp     x25,    1
+        b.eq    main_topdoc_ask
+
+        main_topdoc_ask_end:
+
+        xprint(str_ended)
+        xprint(str_linebr)
 
 
         // Deallocate memory
         xdealloc(st_size)                       // deallocate struct Table
-
-        xprint(allstr, alloc, sp, fp)
-
-
         xret()
 
 
@@ -588,10 +615,13 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
         topdoc_print_end:
         
 
-        xprint(allstr, alloc, sp, fp)
 
         
         // Dealloc WordFrequency array
         xdealloc(wf_arr_size)
 
         xret()
+
+
+        .data                                            // global variables
+n:      .int    0                                        // int n = 0

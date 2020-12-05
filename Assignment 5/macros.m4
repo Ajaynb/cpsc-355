@@ -148,6 +148,18 @@ define(xprint, `
         bl      printf
 ')
 
+
+// xscan(string, destination)
+define(xscan, `
+        // M4: SCAN
+        ldr     x0,     =$1                     // 1st parameter: scnocc, the formatted string
+        ldr     x1,     =n                      // 2nd parameter: &n, the data to store for user input
+        bl      scanf                           // scanf(scnocc, &n);
+        ldr     x1,     =n                      // 2nd parameter: &n
+        ldr     $2,    [x1]                     // int n = x1;
+')
+
+
 // xrandSeed()
 define(xrandSeed, `
         // M4: RAND SEED
