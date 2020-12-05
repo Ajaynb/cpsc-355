@@ -10,6 +10,8 @@ str_table_head: .string "===== Table =====\n"
 str_occ:        .string " %d "
 str_linebr:     .string "\n"
 str_test:       .string "table[%d][%d](%d): %d\n"
+str_top_head:   .string "The top documents are: \n"
+str_top_doc:    .string "Document %02d: Occurence of %d, Frequency of %.4f\n"
         
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
@@ -104,7 +106,7 @@ main:   // main()
         // Top Docs
         mov     x0,     x28
         mov     x1,     -2
-        mov     x2,     22
+        mov     x2,     2
         bl      topRelevantDocs
 
 
@@ -453,21 +455,23 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
         // Print result
         mov     x25,    0                               // int t = 0;
         mov     x24,    0                               // int offset = 0;
+        xprint(str_top_head)                            // print header
+
         topdoc_print:
 
                 // Check for t - current index of row
-                cmp     x25,    x22                     // if (t >= table.row)
+                cmp     x25,    x21                     // if (t >= top)
                 b.ge    topdoc_print_end                // {end}
 
                 
                 xmul(x24, x25, -wf_size)                // int offset = r * sizeof(struct WordFrequency)
                 add     x24,    x24,    wf_arr          // offset += base
                 
-                xreadStruct(x26, x24, wf_occurence)
-                xreadStruct(d27, x24, wf_freqency)
-                xreadStruct(x28, x24, wf_word)
+                xreadStruct(x26, x24, wf_document)
+                xreadStruct(x27, x24, wf_occurence)
+                xreadStruct(d28, x24, wf_freqency)
 
-                xprint(test_out, d27, x26, x28)
+                xprint(str_top_doc, x26, x27, d28)
 
                 
                 // Increment and loop
