@@ -10,7 +10,7 @@ output: .string "%d\n"
         fp      .req    x29
         lr      .req    x30
 
-        // Mins and Maxs
+        // Define minimum row and column, avoid magic numbers
         min_row = 10
         min_col = 10
         max_row = 160
@@ -18,29 +18,37 @@ output: .string "%d\n"
         min_til = 1
         max_til = 1500
 
-        // Tile distributions
+        // Define negatives and specials percentage, avoid magic numbers
         neg_percent = 40
         spe_percent = 20
 
-        // Tiles
+        // Define special tile types
         exit = 20
         double_range = 21
 
-        // Game status
+        // Define gaming status
         prepare = 0
         gaming = 1
         win = 2
         die = 3
         quit = 4
 
-        // Struct for Tile
+        /**
+        * Define gaming tile
+        *
+        * The gaming tile contains the tile value and its covered status.
+        */
         tile = 0
         tile_value = 0
         tile_covered = 8
         tile_size = (16) & 16
         tile_size_alloc = -tile_size
         
-        // Struct for Board
+        /**
+        * Define gaming board
+        *
+        * The game board contains all the tiles and relative informations.
+        */
         board = -alloc + 0
         board_row = 0
         board_column = 8
@@ -52,12 +60,14 @@ output: .string "%d\n"
         board_size_alloc = -board_size
 
 
-
-
         // Expose main function to OS and set balign
         .global main
         .balign 4
 
+        
+/**
+ * Main function
+ */
 main:   // main()
         xfunc()
 
@@ -75,6 +85,14 @@ main:   // main()
         xret()
 
 
+/**
+* Generate random number between the given range, inclusive.
+*
+* Firstly, get the smallest 2^x number that is larger than the upper bound,
+* and then use this number by and operation and get the remainder.
+* The remainder is the temporary number, then check if the remainder falls within the bounds.
+* If falls winthin, then return. Otherwise, generate another one, until satisfied.
+*/
 randomNum:      // randomNum(m, n)
         xfunc()
 
@@ -106,11 +124,9 @@ randomNum:      // randomNum(m, n)
         rand_modular_shift:
                 cmp     range, modular
                 b.lt    rand_modular_shift_end
-        
+
                 lsl     modular, modular, 1
-
-                xprint(output, modular)
-
+                
                 b       rand_modular_shift
         rand_modular_shift_end:
 
@@ -151,4 +167,6 @@ randomNum:      // randomNum(m, n)
 
         randomNum_end:
         xret()
+
+
 
