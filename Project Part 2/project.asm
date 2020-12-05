@@ -15,12 +15,12 @@ output: .string "%d\n"
         min_col = 10
         max_row = 160
         max_col = 150
-        min_til = 0.01
-        max_til = 15.00
+        min_til = 1
+        max_til = 1500
 
         // Tile distributions
-        neg_percent = 0.4
-        spe_percent = 0.2
+        neg_percent = 40
+        spe_percent = 20
 
         // Tiles
         exit = 20
@@ -51,7 +51,7 @@ output: .string "%d\n"
         board_size = (40 + max_row * max_col * tile_size) & 16
         board_size_alloc = -board_size
 
-        
+
 
 
         // Expose main function to OS and set balign
@@ -61,8 +61,8 @@ output: .string "%d\n"
 main:   // main()
         xfunc()
 
-        mov     x0,     0
-        mov     x1,     9
+        mov     x0,     min_til
+        mov     x1,     max_til
         bl      randomNum
 
         xprint(output, x0)
