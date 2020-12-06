@@ -7,6 +7,7 @@ allstr:         .string "sp %d, fp %d\n"
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
         dealloc = -alloc
+        save_base = -alloc
 
         // Define register aliases
         fp      .req    x29
@@ -45,13 +46,37 @@ allstr:         .string "sp %d, fp %d\n"
         tile_covered = 8
         tile_size_alloc = -16 & -16
         tile_size = -tile_size_alloc
+
+        /**
+        * Define gaming play
+        *
+        * The gaming play contains the playing status of the current player.
+        * This is different from gaming board.
+        * It is also used to sort top scores, as the read data would all put into
+        * this Play objects.
+        */
+        play = save_base
+        play_player = 0
+        play_lives = 8
+        play_score = 16
+        play_total_score = 24
+        play_bombs = 32
+        play_range = 40
+        play_status = 48
+        play_start_timestamp = 56
+        play_end_timestamp = 64
+        play_duration = 72
+        play_uncovered_tiles = 80
+        play_final_score = 88
+        play_size_alloc = -(play_final_score + 8) & -16
+        play_size = -play_size_alloc
         
         /**
         * Define GAMING board
         *
         * The game board contains all the tiles and relative informations.
         */
-        board = -alloc + 0
+        board = play + play_size
         board_row = 0
         board_column = 8
         board_tiles = 16
@@ -80,11 +105,11 @@ main:   // main()
 
         xprint(allstr, sp, fp)
 
-        // Alloc for struct Board
+        // Alloc for struct Play & struct Board
+        xalloc(play_size_alloc)
         xalloc(board_size_alloc)
 
         xprint(allstr, sp, fp)
-
 
         xwriteStruct(5, board, board_row)
         xwriteStruct(5, board, board_column)
@@ -94,16 +119,21 @@ main:   // main()
         and     board_array_size_alloc, board_array_size_alloc, -16
         xalloc(board_array_size_alloc)
 
+        xprint(allstr, sp, fp)
+
+
         xprint(output, board_array_size_alloc)
 
 
         add     x0, fp, board
+        add     x1, fp, play
         bl      initializeGame
 
 
-        // Dealloc for struct Board and its array
-        xdealloc(board_array_size_alloc)
+        // Dealloc for struct Play & struct Board and its array
+        xdealloc(play_size_alloc)
         xdealloc(board_size_alloc)
+        xdealloc(board_array_size_alloc)
 
         undefine(board_array_size_alloc, x19)
 
@@ -211,13 +241,15 @@ randomNum:      // randomNum(m, n)
         xfunc()
 
         define(_board, x19)
-        define(row, x20)
-        define(column, x21)
-        define(tiles, x22)
+        define(_play, x20)
+        define(row, x21)
+        define(column, x22)
+        define(tiles, x23)
 
         
-        // Store pointer of struct Table
+        // Store pointer of struct Table & struct Play
         mov     _board, x0
+        mov     _play, x1
 
         // Read row and column
         xreadStruct(row, _board, board_row, true)
@@ -232,15 +264,22 @@ randomNum:      // randomNum(m, n)
         // Initialize statistics, giving default values
         xwriteStruct(0, _board, board_negatives, true)
         xwriteStruct(0, _board, board_specials, true)
-
+        xwriteStruct(3, _play, play_lives, true)
+        xwriteStruct(0, _play, play_score, true)
+        xwriteStruct(0, _play, play_total_score, true)
+        xwriteStruct(5, _play, play_bombs, true)
+        xwriteStruct(1, _play, play_range, true)
+        xwriteStruct(0, _play, play_uncovered_tiles, true)
+        xwriteStruct(PREPARE, _play, play_status, true)
         
 
         
 
         undefine(_board, x19)
-        undefine(row, x20)
-        undefine(column, x21)
-        undefine(tiles, x22)
+        undefine(_play, x20)
+        undefine(row, x21)
+        undefine(column, x22)
+        undefine(tiles, x23)
 
 
         xret()
