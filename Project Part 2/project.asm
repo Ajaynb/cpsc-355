@@ -1,6 +1,7 @@
         include(`macros.m4')
 
 output: .string "%d\n"
+allstr:         .string "sp %d, fp %d\n"
 
 
         // Equates for alloc & dealloc
@@ -40,8 +41,8 @@ output: .string "%d\n"
         tile = 0
         tile_value = 0
         tile_covered = 8
-        tile_size = (16) & 16
-        tile_size_alloc = -tile_size
+        tile_size_alloc = -16 & -16
+        tile_size = -tile_size_alloc
         
         /**
         * Define gaming board
@@ -55,8 +56,8 @@ output: .string "%d\n"
         board_negatives = 24
         board_specials = 32
         board_array = 40
-        board_size = -(40) & -16
-        board_size_alloc = -board_size
+        board_size_alloc = -(40) & -16
+        board_size = -board_size_alloc
 
 
         // Expose main function to OS and set balign
@@ -73,11 +74,19 @@ main:   // main()
         // Rand seed
         xrandSeed()
 
+        xprint(allstr, sp, fp)
+
         // Alloc for struct Board
         xalloc(board_size_alloc)
 
+        xprint(allstr, sp, fp)
+
+
         xwriteStruct(5, board, board_row)
         xwriteStruct(5, board, board_column)
+
+        add     x0, fp, board
+        bl      initializeGame
 
 
         // Dealloc for struct Board
@@ -170,3 +179,51 @@ randomNum:      // randomNum(m, n)
 
 
 
+/**
+ * Initialize the game board and play
+ *
+ * Firstly, populate all the tiles with positive random numbers.
+ * Then, calculate how many negative tiles are needed and
+ * flip that number of tiles. By fliping, simply multiply -1.
+ * Thirdly, flip tiles to special tiles. Simply assign new value.
+ *
+ * The board->array, the tile array, is a 1-d array, but used as a 2-d.
+ * Simply convert between 1-d array index to x and y by math.
+ */
+
+ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
+        xfunc()
+
+        define(pointer, x19)
+        define(row, x20)
+        define(column, x21)
+        define(tiles, x22)
+
+        
+        // Store pointer of struct Table
+        mov     pointer, x0
+
+        // Read row and column
+        xreadStruct(row, pointer, board_row, true)
+        xreadStruct(column, pointer, board_row, true)
+
+        // Ensure the board is at least the minimum size
+        xmax(row, row, min_row)
+        xmax(column, column, min_col)
+
+        // Intialize array by allocating memory
+        mul     tiles, row, column
+        xmul(x18, tiles, tile_size_alloc)
+        and     x18, x18, -16
+
+        xprint(output, x18)
+
+        
+
+        undefine(pointer, x19)
+        undefine(row, x20)
+        undefine(column, x21)
+        undefine(tiles, x22)
+
+
+        xret()
