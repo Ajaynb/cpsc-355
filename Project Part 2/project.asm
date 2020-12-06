@@ -147,6 +147,7 @@ main:   // main()
         bl      initializeGame
 
 
+
         // Dealloc for struct Play & struct Board and its array
         xdealloc(play_size_alloc)
         xdealloc(board_size_alloc)

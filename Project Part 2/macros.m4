@@ -186,26 +186,26 @@ define(xrand, `
 // xarray(base, element_amount, element_size)
 define(xarray, `
         // M4: ARRAY
-    format(`
-        mov     x9,     0                           // loop Counter
-        loop_%s:
-                cmp     x9,     $2                          // if reach amount
-                b.eq    loop_end_%s
+        format(`
+            mov     x9,     0                           // loop Counter
+            loop_%s:
+                    cmp     x9,     $2                          // if reach amount
+                    b.eq    loop_end_%s
 
-                mov     x10,    $3                          // get element size
-                mul     x10,    x10,    x9                  // calculate element offset by index
-                
-                mov     x11,    $1                          // get base
-                add     x10,    x10,    x11                 // calculate total offset, offset in array + base
+                    mov     x10,    $3                          // get element size
+                    mul     x10,    x10,    x9                  // calculate element offset by index
+                    
+                    mov     x11,    $1                          // get base
+                    add     x10,    x10,    x11                 // calculate total offset, offset in array + base
 
-                str 	xzr,    [fp,    x10]                // initialize with 0
+                    str 	xzr,    [fp,    x10]                // initialize with 0
 
-                add     x9,     x9,     1                   // increment
-                b       loop_%s
-        loop_end_%s:
+                    add     x9,     x9,     1                   // increment
+                    b       loop_%s
+            loop_end_%s:
 
-    ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
-    xcount()
+        ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+        xcount()
 ')
 // xreadArray(destination, base, size, index, ignore_fp = false)
 define(xreadArray, `
@@ -377,15 +377,37 @@ define(xret, `
 // xpointer(destination, param1, param2, ..., ignore_fp = false)
 define(xpointer, `
         // M4: POINTER
-    define(`index', eval(`1'))
-    foreach(`t', `$@', `
-        ifelse(
-            index, `1', `',
-            index, `$#', `',
-            `t'
-        )
-        define(`index', incr(index))
-    ')
+        mov     x9,     0               // base value (negative)
+
+        define(`index', eval(`1'))
+        foreach(`t', `$@', `
+            ifelse(
+                index, `1', `',
+                t, `true', `
+                    add     x9,     x9,     fp      // x9 += fp
+                ',
+                `
+                    format(`
+                        mov     x10,    t   // param value (unknown)
+                        
+                        cmp     x10,      xzr // if (x10 > 0)
+                        b.gt    if_%s
+                        b       if_%s_end
+
+                        if_%s:  
+                                sub     x10,    xzr,    x10     // x10 = -x10 (negative)
+                        if_%s_end:
+
+                        add     x9,     x9,     x10             // base += attribute (negative)
+
+                    ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+                    xcount()
+                '
+            )
+            define(`index', incr(index))
+        ')
+
+        mov     $1,     x9
 
 ')
 
