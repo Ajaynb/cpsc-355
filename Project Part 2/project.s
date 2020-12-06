@@ -448,10 +448,6 @@ main:   // main()
 
 
 
-        sub     x0, fp, board
-        sub     x1, fp, play
-        bl      initializeGame
-
         
         // M4: POINTER
         mov     x9,     0               // base value (negative)
@@ -463,9 +459,9 @@ main:   // main()
         
             
                     
-                        mov     x10,    b   // param value (unknown)
+                        mov     x10,    board   // param value (unknown)
                         
-                        cmp     0,      x10 // if (x10 > 0)
+                        cmp     x10,      xzr // if (x10 > 0)
                         b.gt    if_0
                         b       if_0_end
 
@@ -482,10 +478,28 @@ main:   // main()
             
         
             
+                    add     x9,     x9,     fp      // x9 += fp
+                
+            
+        
+
+        mov     x0,     x9
+
+
+        
+        // M4: POINTER
+        mov     x9,     0               // base value (negative)
+
+        
+        
+            
+            
+        
+            
                     
-                        mov     x10,    c   // param value (unknown)
+                        mov     x10,    play   // param value (unknown)
                         
-                        cmp     0,      x10 // if (x10 > 0)
+                        cmp     x10,      xzr // if (x10 > 0)
                         b.gt    if_1
                         b       if_1_end
 
@@ -502,28 +516,15 @@ main:   // main()
             
         
             
-                    
-                        mov     x10,    d   // param value (unknown)
-                        
-                        cmp     0,      x10 // if (x10 > 0)
-                        b.gt    if_2
-                        b       if_2_end
-
-                        if_2:  
-                                sub     x10,    xzr,    x10     // x10 = -x10 (negative)
-                        if_2_end:
-
-                        add     x9,     x9,     x10             // base += attribute (negative)
-
-                    
-                    
+                    add     x9,     x9,     fp      // x9 += fp
                 
-            
             
         
 
-        mov     a,     x9
+        mov     x1,     x9
 
+
+        bl      initializeGame
 
 
 
@@ -635,14 +636,14 @@ randomNum:      // randomNum(m, n)
         
 
         cmp     x9,     x10
-        b.gt    if_3
-        b       else_3
+        b.gt    if_2
+        b       else_2
 
-        if_3:  mov     x27,     x9
-                b       end_3
-        else_3:mov     x27,     x10
-                b       end_3
-        end_3:
+        if_2:  mov     x27,     x9
+                b       end_2
+        else_2:mov     x27,     x10
+                b       end_2
+        end_2:
 
         
         
@@ -657,14 +658,14 @@ randomNum:      // randomNum(m, n)
         
 
         cmp     x9,     x10
-        b.lt    if_4
-        b       else_4
+        b.lt    if_3
+        b       else_3
 
-        if_4:  mov     x28,     x9
-                b       end_4
-        else_4:mov     x28,     x10
-                b       end_4
-        end_4:
+        if_3:  mov     x28,     x9
+                b       end_3
+        else_3:mov     x28,     x10
+                b       end_3
+        end_3:
 
         
         
@@ -757,7 +758,7 @@ randomNum:      // randomNum(m, n)
  * Thirdly, flip tiles to special tiles. Simply assign new value.
  *
  * The board->array, the tile array, is a 1-d array, but used as a 2-d.
- * Simply convert between 1-d array 5 to x and y by math.
+ * Simply convert between 1-d array 4 to x and y by math.
  */
 
  initializeGame:        // initializeGame(struct Board* board, struct Play* play)
@@ -839,14 +840,14 @@ randomNum:      // randomNum(m, n)
         
 
         cmp     x9,     x10
-        b.gt    if_5
-        b       else_5
+        b.gt    if_4
+        b       else_4
 
-        if_5:  mov     x21,     x9
-                b       end_5
-        else_5:mov     x21,     x10
-                b       end_5
-        end_5:
+        if_4:  mov     x21,     x9
+                b       end_4
+        else_4:mov     x21,     x10
+                b       end_4
+        end_4:
 
         
         
@@ -861,14 +862,14 @@ randomNum:      // randomNum(m, n)
         
 
         cmp     x9,     x10
-        b.gt    if_6
-        b       else_6
+        b.gt    if_5
+        b       else_5
 
-        if_6:  mov     x22,     x9
-                b       end_6
-        else_6:mov     x22,     x10
-                b       end_6
-        end_6:
+        if_5:  mov     x22,     x9
+                b       end_5
+        else_5:mov     x22,     x10
+                b       end_5
+        end_5:
 
         
         
@@ -883,14 +884,14 @@ randomNum:      // randomNum(m, n)
         
 
         cmp     x9,     x10
-        b.lt    if_7
-        b       else_7
+        b.lt    if_6
+        b       else_6
 
-        if_7:  mov     x21,     x9
-                b       end_7
-        else_7:mov     x21,     x10
-                b       end_7
-        end_7:
+        if_6:  mov     x21,     x9
+                b       end_6
+        else_6:mov     x21,     x10
+                b       end_6
+        end_6:
 
         
         
@@ -905,14 +906,14 @@ randomNum:      // randomNum(m, n)
         
 
         cmp     x9,     x10
-        b.lt    if_8
-        b       else_8
+        b.lt    if_7
+        b       else_7
 
-        if_8:  mov     x22,     x9
-                b       end_8
-        else_8:mov     x22,     x10
-                b       end_8
-        end_8:
+        if_7:  mov     x22,     x9
+                b       end_7
+        else_7:mov     x22,     x10
+                b       end_7
+        end_7:
 
         
         

@@ -115,21 +115,6 @@ main:   // main()
         xwriteStruct(5, board, board_row)
         xwriteStruct(5, board, board_column)
 
-        
-        mov     x11,    play                    // int base
-        mov     x12,    play_player             // int attribute offset
-        add     x9,     x11,    x12             // int offset = base + attribute
-        sub     x9,     xzr,    x9              // offset = -offset
-        add     x9,     fp,     x9
-        xprint(output, x9)
-
-        mov     x11,    play                    // int base (positive)
-        mov     x12,    play_lives              // int attribute offset (positive)
-        add     x9,     x11,    x12             // int offset = base + attribute (positive)
-        sub     x9,     xzr,    x9              // offset = -offset (negative)
-        add     x9,     fp,     x9              // offset += fp (negative + negative)
-        xprint(output, x9)
-
 
         // Alloc for array in struct Board
         xmul(board_array_size_alloc, MAX_ROW, MAX_COL, tile_size_alloc)
@@ -142,8 +127,8 @@ main:   // main()
         xprint(output, board_array_size_alloc)
 
 
-        sub     x0, fp, board
-        sub     x1, fp, play
+        xpointer(x0, board, true)
+        xpointer(x1, play, true)
         bl      initializeGame
 
 
