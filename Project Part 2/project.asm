@@ -83,9 +83,9 @@ allstr:         .string "sp %d, fp %d\n"
         board_tiles = 16
         board_negatives = 24
         board_specials = 32
-        board_array = 40
         board_size_alloc = -(40) & -16
         board_size = -board_size_alloc
+        board_array = board_size
 
 
         // Expose main function to OS and set balign
@@ -115,6 +115,22 @@ main:   // main()
         xwriteStruct(5, board, board_row)
         xwriteStruct(5, board, board_column)
 
+        
+        mov     x11,    play                    // int base
+        mov     x12,    play_player             // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        sub     x9,     xzr,    x9              // offset = -offset
+        add     x9,     fp,     x9
+        xprint(output, x9)
+
+        mov     x11,    play                    // int base (positive)
+        mov     x12,    play_lives              // int attribute offset (positive)
+        add     x9,     x11,    x12             // int offset = base + attribute (positive)
+        sub     x9,     xzr,    x9              // offset = -offset (negative)
+        add     x9,     fp,     x9              // offset += fp (negative + negative)
+        xprint(output, x9)
+
+
         // Alloc for array in struct Board
         xmul(board_array_size_alloc, MAX_ROW, MAX_COL, tile_size_alloc)
         and     board_array_size_alloc, board_array_size_alloc, -16
@@ -126,8 +142,8 @@ main:   // main()
         xprint(output, board_array_size_alloc)
 
 
-        add     x0, fp, board
-        add     x1, fp, play
+        sub     x0, fp, board
+        sub     x1, fp, play
         bl      initializeGame
 
 
@@ -280,6 +296,7 @@ randomNum:      // randomNum(m, n)
 
         // Populate board with random positive values
         define(random_number, d18)
+        define(array_offset, x25)
         mov     t, 0
         initialize_populate_row:
                 cmp     t, tiles
@@ -296,12 +313,19 @@ randomNum:      // randomNum(m, n)
                 scvtf   d1, x1
                 fdiv    random_number, d0, d1
 
-                xprint(output_f, random_number)
+                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
+                xmul(array_offset, t, tile_size)
+                xaddEqual(array_offset, board_array)
+                xmul(array_offset, array_offset, -1)
+                xaddEqual(array_offset, _board)
+
+                xprint(output, array_offset)
         
                 xaddAdd(t)
                 b       initialize_populate_row
         initialize_populate_row_end:
         undefine(random_number, d18)
+        undefine(array_offset, x25)
         
 
         

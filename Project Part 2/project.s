@@ -1,6 +1,7 @@
         
 
-output: .string "%d\n"
+output:         .string "%d\n"
+output_f:       .string "%f\n"
 allstr:         .string "sp %d, fp %d\n"
 
 
@@ -82,9 +83,9 @@ allstr:         .string "sp %d, fp %d\n"
         board_tiles = 16
         board_negatives = 24
         board_specials = 32
-        board_array = 40
         board_size_alloc = -(40) & -16
         board_size = -board_size_alloc
+        board_array = board_size
 
 
         // Expose main function to OS and set balign
@@ -230,7 +231,8 @@ main:   // main()
         mov     x11,    board                      // int base
         mov     x12,    board_row                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    5              // int value
                 
@@ -248,7 +250,8 @@ main:   // main()
         mov     x11,    board                      // int base
         mov     x12,    board_column                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    5              // int value
                 
@@ -257,6 +260,76 @@ main:   // main()
         
         str	x10,    [fp,   x9]              // store the value
         
+
+
+        
+        mov     x11,    play                    // int base
+        mov     x12,    play_player             // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        sub     x9,     xzr,    x9              // offset = -offset
+        add     x9,     fp,     x9
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    x9
+                
+        
+
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+        mov     x11,    play                    // int base
+        mov     x12,    play_lives              // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        sub     x9,     xzr,    x9              // offset = -offset
+        add     x9,     fp,     x9
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    x9
+                
+        
+
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
 
 
         // Alloc for array in struct Board
@@ -363,9 +436,10 @@ main:   // main()
 
 
 
-        add     x0, fp, board
-        add     x1, fp, play
-        bl      initializeGame
+        sub     x0, fp, board
+        sub     x1, fp, play
+
+        // bl      initializeGame
 
 
         // Dealloc for struct Play & struct Board and its array
@@ -635,6 +709,7 @@ end_1:
         
         
         
+        
 
         
         // Store pointer of struct Table & struct Play
@@ -647,6 +722,7 @@ end_1:
         mov     x11,    x19                      // int base
         mov     x12,    board_row                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
+        sub     x9,     xzr,    x9              // offset = -offset
 
         
         ldr	x21,     [x9]                    // load the value
@@ -657,6 +733,7 @@ end_1:
         mov     x11,    x19                      // int base
         mov     x12,    board_row                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
+        sub     x9,     xzr,    x9              // offset = -offset
 
         
         ldr	x22,     [x9]                    // load the value
@@ -749,7 +826,29 @@ end_5:
         
 
 
+        // Calculate x23
+        mul     x23, x21, x22
+
         // Initialize statistics, giving default values
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    x19                      // int base
+        mov     x12,    board_tiles                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        sub     x9,     xzr,    x9              // offset = -offset
+
+        
+                mov     x10,    x23              // int value
+                
+        
+        
+        
+        str	x10,    [x9]                    // store the value
+        
+
         
         
         
@@ -758,7 +857,8 @@ end_5:
         mov     x11,    x19                      // int base
         mov     x12,    board_negatives                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    0              // int value
                 
@@ -776,7 +876,8 @@ end_5:
         mov     x11,    x19                      // int base
         mov     x12,    board_specials                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    0              // int value
                 
@@ -794,7 +895,8 @@ end_5:
         mov     x11,    x20                      // int base
         mov     x12,    play_lives                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    3              // int value
                 
@@ -812,7 +914,8 @@ end_5:
         mov     x11,    x20                      // int base
         mov     x12,    play_score                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    0              // int value
                 
@@ -830,7 +933,8 @@ end_5:
         mov     x11,    x20                      // int base
         mov     x12,    play_total_score                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    0              // int value
                 
@@ -848,7 +952,8 @@ end_5:
         mov     x11,    x20                      // int base
         mov     x12,    play_bombs                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    5              // int value
                 
@@ -866,7 +971,8 @@ end_5:
         mov     x11,    x20                      // int base
         mov     x12,    play_range                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    1              // int value
                 
@@ -884,7 +990,8 @@ end_5:
         mov     x11,    x20                      // int base
         mov     x12,    play_uncovered_tiles                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    0              // int value
                 
@@ -902,7 +1009,8 @@ end_5:
         mov     x11,    x20                      // int base
         mov     x12,    play_status                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
-        
+        sub     x9,     xzr,    x9              // offset = -offset
+
         
                 mov     x10,    PREPARE              // int value
                 
@@ -912,10 +1020,122 @@ end_5:
         str	x10,    [x9]                    // store the value
         
 
+
+        // Populate board with random positive values
+        
+        
+        mov     x24, 0
+        initialize_populate_row:
+                cmp     x24, x23
+                b.ge    initialize_populate_row_end
+                
+                // Generate random number
+                mov     x0, MIN_TIL
+                mov     x1, MAX_TIL
+                bl      randomNum
+
+                // Convert random number and divide by 100
+                mov     x1, 100
+                scvtf   d0, x0
+                scvtf   d1, x1
+                fdiv    d18, d0, d1
+
+                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
+                
+        // M4: MUL
+    
+        mov     x9,     1                       // initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x24                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    tile_size                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        mov     x25,     x9                      // result
+
+                
+        // M4: ADD EQUAL
+        add     x25, x25, board_array
+
+                
+        // M4: MUL
+    
+        mov     x9,     1                       // initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    x25                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    -1                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        mov     x25,     x9                      // result
+
+                
+        // M4: ADD EQUAL
+        add     x25, x25, x19
+
+
+                /*
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    x25
+                
+        
+
+        
+    
+        ldr     x0,     =output
+        bl      printf
+*/
+        
+                
+        // M4: ADD ADD
+        add     x24, x24, 1
+
+                b       initialize_populate_row
+        initialize_populate_row_end:
+        
+        
         
 
         
 
+        
         
         
         

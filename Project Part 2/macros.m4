@@ -248,14 +248,21 @@ define(xstruct, `
 // xreadStruct(destination, base, attribute, ignore_fp = false)
 define(xreadStruct, `
         // M4: READ STRUCT
-        mov     x11,    $2                      // int base
-        mov     x12,    $3                      // int attribute offset
-        add     x9,     x11,    x12             // int offset = base + attribute
 
         ifelse(`$#', `4', `
-        ldr	$1,     [x9]                    // load the value
+                mov     x11,    $2                      // int base (negative)
+                mov     x12,    $3                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+
+                ldr	$1,     [x9]                    // load the value
         ', `
-        ldr	$1,     [fp,   x9]              // load the value
+                mov     x11,    $2                      // int base (positive)
+                mov     x12,    $3                      // int attribute offset (positive)
+                add     x9,     x11,    x12             // int offset = base + attribute (positive)
+                sub     x9,     xzr,    x9              // offset = -offset (negative)
+                
+                ldr	$1,     [fp,   x9]              // load the value
         ')
 ')
 
@@ -263,24 +270,33 @@ define(xreadStruct, `
 define(xwriteStruct, `
         define(`register_type', substr($1, 0, 1))
         define(`register_store', `x10')
+        define(`register_store_method', `mov')
 
         // M4: WRITE STRUCT
-        mov     x11,    $2                      // int base
-        mov     x12,    $3                      // int attribute offset
-        add     x9,     x11,    x12             // int offset = base + attribute
-        
         ifelse(register_type, `d', `
-                fmov    d10,    $1              // float value
                 define(`register_store', `d10')
+                define(`register_store_method', `fmov')
         ', `
-                mov     x10,    $1              // int value
                 define(`register_store', `x10')
+                define(`register_store_method', `mov')
         ')
         
         ifelse(`$#', `4', `
-        str	register_store,    [x9]                    // store the value
+                mov     x11,    $2                      // int base (negative)
+                mov     x12,    $3                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                register_store_method    register_store,    $1           // float value
+
+                str	register_store,    [x9]         // store the value
         ', `
-        str	register_store,    [fp,   x9]              // store the value
+                mov     x11,    $2                      // int base (positive)
+                mov     x12,    $3                      // int attribute offset (positive)
+                add     x9,     x11,    x12             // int offset = base + attribute (positive)
+                sub     x9,     xzr,    x9              // offset = -offset (negative)
+                register_store_method    register_store,    $1           // float value
+
+                str	register_store,    [fp,   x9]   // offset += fp (negative + negative)
         ')
 ')
 
