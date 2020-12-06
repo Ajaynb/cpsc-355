@@ -661,7 +661,6 @@ logToFile:      // logToFile(string, param1, param2, ...)
 
 
 
-
         .data                                            // global variables
 n:      .int    0                                        // int n = 0
 
