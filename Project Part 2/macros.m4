@@ -33,15 +33,17 @@ define(`_forloop',
 // xadd(destination, param2, param3, ...) -> destination = param2 + param3 + ...
 define(xadd, `
         // M4: ADD
-    define(`index', eval(`1'))
+        define(`index', eval(`1'))
         mov     x9,     0                       // initialize x9 to 0
-    foreach(`t', `$@', `
-        ifelse(index, `1', `', `format(`
-        mov     x10,    t                       // move next number to x10
-        add     x9,     x9,     x10             // and Adds x10 to x9
-        ')')
-        define(`index', incr(index))
-    ')
+        
+        foreach(`t', `$@', `
+            ifelse(index, `1', `', `format(`
+                mov     x10,    t                       // move next number to x10
+                add     x9,     x9,     x10             // and Adds x10 to x9
+            ')')
+            define(`index', incr(index))
+        ')
+        
         mov     $1,     x9                      // result
 ')
 
@@ -75,11 +77,12 @@ define(xmin, `
         cmp     x9,     x10
         b.lt    if_%s
         b       else_%s
-if_%s:  mov     $1,     x9
-        b       end_%s
-else_%s:mov     $1,     x10
-        b       end_%s
-end_%s:
+
+        if_%s:  mov     $1,     x9
+                b       end_%s
+        else_%s:mov     $1,     x10
+                b       end_%s
+        end_%s:
 
         ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
         
@@ -98,11 +101,12 @@ define(xmax, `
         cmp     x9,     x10
         b.gt    if_%s
         b       else_%s
-if_%s:  mov     $1,     x9
-        b       end_%s
-else_%s:mov     $1,     x10
-        b       end_%s
-end_%s:
+
+        if_%s:  mov     $1,     x9
+                b       end_%s
+        else_%s:mov     $1,     x10
+                b       end_%s
+        end_%s:
 
         ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
         
@@ -112,38 +116,41 @@ end_%s:
 // xmul(destination, param2, param3, ...)
 define(xmul, `
         // M4: MUL
-    define(`index', eval(`1'))
+        define(`index', eval(`1'))
         mov     x9,     1                       // initialize x9 to 1
-    foreach(`t', `$@', `
-        ifelse(index, `1', `', `format(`
-        mov     x10,    t                       // move next multiplier to x10
-        mul     x9,     x9,     x10             // and multiplies x10 to x9
-        ')')
-        define(`index', incr(index))
-    ')
+        
+        foreach(`t', `$@', `
+            ifelse(index, `1', `', `format(`
+                mov     x10,    t                       // move next multiplier to x10
+                mul     x9,     x9,     x10             // and multiplies x10 to x9
+            ')')
+            define(`index', incr(index))
+        ')
+        
         mov     $1,     x9                      // result
 ')
 
 // xprint(string, param1, param2, ...) -> Just like how to use printf :)
 define(xprint, `
         // M4: PRINT
-    define(`index', eval(`0'))
-    define(`register_x_index', eval(`0'))
-    define(`register_d_index', eval(`0'))
+        define(`index', eval(`0'))
+        define(`register_x_index', eval(`0'))
+        define(`register_d_index', eval(`0'))
 
-    foreach(`t', `$@', `
-        define(`register_type', substr(t, 0, 1))
-        
-        ifelse(register_type, `d', `
+        foreach(`t', `$@', `
+            define(`register_type', substr(t, 0, 1))
+            
+            ifelse(register_type, `d', `
                 ifelse(index, `0', `', `format(`fmov     d%s,    %s', eval(register_d_index), `t')')
                 define(`register_d_index', incr(register_d_index))
-        ', `
+            ', `
                 ifelse(index, `0', `', `format(`mov     x%s,    %s', eval(register_x_index), `t')')
                 define(`register_x_index', incr(register_x_index))
+            ')
+
+            define(`index', incr(index))
         ')
 
-        define(`index', incr(index))
-    ')
         ldr     x0,     =$1
         bl      printf
 ')
@@ -181,22 +188,21 @@ define(xarray, `
         // M4: ARRAY
     format(`
         mov     x9,     0                           // loop Counter
-loop_%s:
-        cmp     x9,     $2                          // if reach amount
-        b.eq    loop_end_%s
+        loop_%s:
+                cmp     x9,     $2                          // if reach amount
+                b.eq    loop_end_%s
 
-        mov     x10,    $3                          // get element size
-        mul     x10,    x10,    x9                  // calculate element offset by index
-        
-        mov     x11,    $1                          // get base
-        add     x10,    x10,    x11                 // calculate total offset, offset in array + base
+                mov     x10,    $3                          // get element size
+                mul     x10,    x10,    x9                  // calculate element offset by index
+                
+                mov     x11,    $1                          // get base
+                add     x10,    x10,    x11                 // calculate total offset, offset in array + base
 
-        str 	xzr,    [fp,    x10]                // initialize with 0
+                str 	xzr,    [fp,    x10]                // initialize with 0
 
-        add     x9,     x9,     1                   // increment
-        b       loop_%s
-
-loop_end_%s:
+                add     x9,     x9,     1                   // increment
+                b       loop_%s
+        loop_end_%s:
 
     ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
     xcount()
@@ -210,9 +216,9 @@ define(xreadArray, `
         add     x9,     x9,     $2                  // calculate Offset += Base
 
         ifelse(`$#', `5', `
-        ldr     $1,     [x9]
+            ldr     $1,     [x9]
         ', `
-        ldr     $1,     [fp,   x9]
+            ldr     $1,     [fp,   x9]
         ')     
 ')
 
@@ -227,22 +233,22 @@ define(xwriteArray, `
         mov     x10,    $1
 
         ifelse(`$#', `5', `
-        str     x10,    [x9]
+            str     x10,    [x9]
         ', `
-        str     x10,    [fp,   x9]
+            str     x10,    [fp,   x9]
         ')
 ')
 
 // xstruct(base, attribute1, attribute2, ...)
 define(xstruct, `
         // M4: STRUCT
-    define(`index', eval(`1'))
-    foreach(`t', `$@', `
-        ifelse(index, `1', `', `format(`
-            xwriteStruct(xzr, $1, t)
-        ')')
-        define(`index', incr(index))
-    ')
+        define(`index', eval(`1'))
+        foreach(`t', `$@', `
+            ifelse(index, `1', `', `format(`
+                xwriteStruct(xzr, $1, t)
+            ')')
+            define(`index', incr(index))
+        ')
 ')
 
 // xreadStruct(destination, base, attribute, ignore_fp = false)
@@ -368,6 +374,19 @@ define(xret, `
 
 ')
 
-// 
+// xpointer(destination, param1, param2, ..., ignore_fp = false)
+define(xpointer, `
+        // M4: POINTER
+    define(`index', eval(`1'))
+    foreach(`t', `$@', `
+        ifelse(
+            index, `1', `',
+            index, `$#', `',
+            `t'
+        )
+        define(`index', incr(index))
+    ')
+
+')
 
 divert
