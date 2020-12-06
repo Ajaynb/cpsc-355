@@ -115,6 +115,8 @@ main:   // main()
         xwriteStruct(5, board, board_row)
         xwriteStruct(5, board, board_column)
 
+        xprint(output, x9)
+
 
         // Alloc for array in struct Board
         xmul(board_array_size_alloc, MAX_ROW, MAX_COL, tile_size_alloc)
@@ -127,8 +129,8 @@ main:   // main()
         xprint(output, board_array_size_alloc)
 
 
-        xpointer(x0, board, true)
-        xpointer(x1, play, true)
+        sub     x0,     fp,     board
+        sub     x1,     fp,     play
         bl      initializeGame
 
 
@@ -255,6 +257,9 @@ randomNum:      // randomNum(m, n)
         mov     _board, x0
         mov     _play, x1
 
+        xprint(output, _board)
+        xprint(output, _play)
+
         // Read row and column
         xreadStruct(row, _board, board_row, true)
         xreadStruct(column, _board, board_row, true)
@@ -305,7 +310,7 @@ randomNum:      // randomNum(m, n)
                 xmul(array_offset, array_offset, -1)
                 xaddEqual(array_offset, _board)
 
-                xprint(output, array_offset)
+                /*xprint(output, array_offset)*/
         
                 xaddAdd(t)
                 b       initialize_populate_row

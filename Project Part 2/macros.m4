@@ -30,6 +30,7 @@ define(`_forloop',
   `$3`$1'$4`'ifelse(`$1', `$2', `',
     `$0(incr(`$1'), `$2', `$3', `$4')')')
 
+
 // xadd(destination, param2, param3, ...) -> destination = param2 + param3 + ...
 define(xadd, `
         // M4: ADD
@@ -374,41 +375,5 @@ define(xret, `
 
 ')
 
-// xpointer(destination, param1, param2, ..., ignore_fp = false)
-define(xpointer, `
-        // M4: POINTER
-        mov     x9,     0               // base value (negative)
-
-        define(`index', eval(`1'))
-        foreach(`t', `$@', `
-            ifelse(
-                index, `1', `',
-                t, `true', `
-                    add     x9,     x9,     fp      // x9 += fp
-                ',
-                `
-                    format(`
-                        mov     x10,    t   // param value (unknown)
-                        
-                        cmp     x10,      xzr // if (x10 > 0)
-                        b.gt    if_%s
-                        b       if_%s_end
-
-                        if_%s:  
-                                sub     x10,    xzr,    x10     // x10 = -x10 (negative)
-                        if_%s_end:
-
-                        add     x9,     x9,     x10             // base += attribute (negative)
-
-                    ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
-                    xcount()
-                '
-            )
-            define(`index', incr(index))
-        ')
-
-        mov     $1,     x9
-
-')
 
 divert
