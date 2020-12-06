@@ -627,9 +627,10 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
 
 
 
-logToFile:
+logToFile:      // logToFile(string, param1, param2, ...)
         xfunc()
 
+        // Store x0 and x1 temporarily
         str     x0,     [fp, 96]
         str     x1,     [fp, 104]
 
@@ -639,7 +640,8 @@ logToFile:
         bl      fopen
         mov     x19, x0
 
-        
+        // Move arguments 1 position forward & restore original x0 and x1
+        // And use fprintf to write to file formatted
         mov     x0,     x19
         mov     x2,     x1
         mov     x3,     x2
@@ -651,7 +653,7 @@ logToFile:
         ldr     x2,     [fp, 104]
         bl      fprintf
 
-
+        // Close file
         mov     x0, x19
         bl      fclose
 
