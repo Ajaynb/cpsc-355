@@ -115,11 +115,10 @@ main:   // main()
         xwriteStruct(5, board, board_row)
         xwriteStruct(5, board, board_column)
 
-        xprint(output, x9)
-
 
         // Alloc for array in struct Board
         xmul(board_array_size_alloc, MAX_ROW, MAX_COL, tile_size_alloc)
+        xaddEqual(board_array_size_alloc, alloc)
         and     board_array_size_alloc, board_array_size_alloc, -16
         xalloc(board_array_size_alloc)
 
@@ -289,6 +288,7 @@ randomNum:      // randomNum(m, n)
         define(random_number, d18)
         define(array_offset, x25)
         mov     t, 0
+        mov     array_offset, 0
         initialize_populate_row:
                 cmp     t, tiles
                 b.ge    initialize_populate_row_end
@@ -310,11 +310,17 @@ randomNum:      // randomNum(m, n)
                 xmul(array_offset, array_offset, -1)
                 xaddEqual(array_offset, _board)
 
-                /*xprint(output, array_offset)*/
+                // Write to struct Tile
+                xwriteStruct(random_number, array_offset, tile_value, true)
+                xwriteStruct(1, array_offset, tile_covered, true)
+
         
                 xaddAdd(t)
                 b       initialize_populate_row
         initialize_populate_row_end:
+
+        xprint(output, array_offset)
+
         undefine(random_number, d18)
         undefine(array_offset, x25)
         
