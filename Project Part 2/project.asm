@@ -1,6 +1,7 @@
         include(`macros.m4')
 
-output: .string "%d\n"
+output:         .string "%d\n"
+output_f:       .string "%f\n"
 allstr:         .string "sp %d, fp %d\n"
 
 
@@ -245,6 +246,7 @@ randomNum:      // randomNum(m, n)
         define(row, x21)
         define(column, x22)
         define(tiles, x23)
+        define(t, x24)
 
         
         // Store pointer of struct Table & struct Play
@@ -261,7 +263,11 @@ randomNum:      // randomNum(m, n)
         xmin(row, row, MAX_ROW)
         xmin(column, column, MAX_COL)
 
+        // Calculate tiles
+        mul     tiles, row, column
+
         // Initialize statistics, giving default values
+        xwriteStruct(tiles, _board, board_tiles, true)
         xwriteStruct(0, _board, board_negatives, true)
         xwriteStruct(0, _board, board_specials, true)
         xwriteStruct(3, _play, play_lives, true)
@@ -271,6 +277,31 @@ randomNum:      // randomNum(m, n)
         xwriteStruct(1, _play, play_range, true)
         xwriteStruct(0, _play, play_uncovered_tiles, true)
         xwriteStruct(PREPARE, _play, play_status, true)
+
+        // Populate board with random positive values
+        define(random_number, d18)
+        mov     t, 0
+        initialize_populate_row:
+                cmp     t, tiles
+                b.ge    initialize_populate_row_end
+                
+                // Generate random number
+                mov     x0, MIN_TIL
+                mov     x1, MAX_TIL
+                bl      randomNum
+
+                // Convert random number and divide by 100
+                mov     x1, 100
+                scvtf   d0, x0
+                scvtf   d1, x1
+                fdiv    random_number, d0, d1
+
+                xprint(output_f, random_number)
+        
+                xaddAdd(t)
+                b       initialize_populate_row
+        initialize_populate_row_end:
+        undefine(random_number, d18)
         
 
         
@@ -280,6 +311,7 @@ randomNum:      // randomNum(m, n)
         undefine(row, x21)
         undefine(column, x22)
         undefine(tiles, x23)
+        undefine(t, x24)
 
 
         xret()
