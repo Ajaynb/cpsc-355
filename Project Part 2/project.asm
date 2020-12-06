@@ -2,12 +2,17 @@
 
 output:         .string "%d\n"
 output_f:       .string "%f\n"
+output_s:       .string "%c\n"
 allstr:         .string "sp %d, fp %d\n"
 output_init:    .string "tile index %d, tile value %f\n"
 
-linebr:                 .string "\n"
-
-peek_table_head:        .string "Board: \n\n"
+str_linebr:                 .string "\n"
+str_table_header:           .string "Board: \n\n"
+str_tile_covered:           .string "·  "
+str_tile_peek_special:      .string "   %c    "
+str_tile_special:           .string "%c  "
+str_tile_peek_number:       .string "%+6.2f  "
+str_tile_number:            .string "%c  "
 
 
         // Equates for alloc & dealloc
@@ -31,9 +36,13 @@ peek_table_head:        .string "Board: \n\n"
         NEG_PERCENT = 40
         SPE_PERCENT = 20
 
+        // Define number tiles type
+        POSITIVE = '+'
+        NEGATIVE = '-'
+
         // Define special tile types
-        EXIT = 20
-        DOUBLE_RANGE = 21
+        EXIT = '*'
+        DOUBLE_RANGE = '$'
 
         // Define GAMING status
         PREPARE = 0
@@ -149,6 +158,12 @@ main:   // main()
         sub     x0,     fp,     board
         sub     x1,     fp,     play
         bl      initializeGame
+
+        
+        sub     x0,     fp,     board
+        sub     x1,     fp,     play
+        mov     x2,     TRUE
+        bl      displayGame
 
 
 
@@ -287,6 +302,10 @@ randomNum:      // randomNum(m, n)
         xmin(row, row, MAX_ROW)
         xmin(column, column, MAX_COL)
 
+        // Write new row & column back to struct Board* board
+        xwriteStruct(row, _board, board_row, true)
+        xwriteStruct(column, _board, board_row, true)
+
         // Calculate tiles
         mul     tiles, row, column
 
@@ -322,7 +341,7 @@ randomNum:      // randomNum(m, n)
                 scvtf   d1, x1
                 fdiv    random_number, d0, d1
 
-                xprint(output_f, random_number)
+                /*xprint(output_f, random_number)*/
 
                 // Calculate and store the pointer of current struct Tile
                 xtilePointer(_tile, _board, t)
@@ -383,7 +402,7 @@ randomNum:      // randomNum(m, n)
                 fmul    t_value, t_value, d17
                 xwriteStruct(t_value, _tile, tile_value, true)
 
-                xprint(output_init, t_index, t_value)
+                /*xprint(output_init, t_index, t_value)*/
 
 
                 // Increase negatives amount in struct Board
@@ -452,14 +471,14 @@ randomNum:      // randomNum(m, n)
                 // Flip the tile into special
                 xwriteStruct(t_value, _tile, tile_value, true)
                 
-                xprint(output_init, t_index, t_value)
+                /*xprint(output_init, t_index, t_value)*/
 
 
                 // Increase negatives amount in struct Board
                 xaddAdd(specials)
                 xwriteStruct(specials, _board, board_specials, true)
 
-                xprint(output, specials)
+                /*xprint(output, specials)*/
 
                 // Loop again
                 b       initialize_flip_spe
@@ -493,7 +512,7 @@ randomNum:      // randomNum(m, n)
                 scvtf   t_value, x18
                 xwriteStruct(t_value, _tile, tile_value, true)
 
-                xprint(output_init, t_index, t_value)
+                /*xprint(output_init, t_index, t_value)*/
 
                 initialize_flip_exit_end:
         undefine(`_tile')
@@ -527,25 +546,33 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         define(_board, x19)
         define(_play, x20)
         define(peek, x21)
+        define(row, x22)
+        define(column, x23)
 
         // Store pointer of struct Table & struct Play & peek
         mov     _board, x0
         mov     _play, x1
         mov     peek, x2
+        
+        // Read row and column
+        xreadStruct(row, _board, board_row, true)
+        xreadStruct(column, _board, board_row, true)
+
+        xprint(output, peek)
+
 
         cmp     peek, TRUE
         b.eq    display_show_peek
         b       display_show_peek_end
         display_show_peek:
-                xprint(peek_table_head)
+                xprint(str_table_header)
         display_show_peek_end:
 
         // Loop for displaying
-        define(row, x22)
-        define(column, x23)
         define(t, x24)
         define(r, x25)
         define(_tile, x26)
+        define(t_value, d27)
         mov     t, 0
         mov     r, 0
         display_row:
@@ -565,6 +592,45 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                         xaddEqual(x18, r)
                         xtilePointer(_tile, _board, x18)
 
+                        xreadStruct(x18, _tile, tile_covered, true)
+
+                        cmp     x18, TRUE
+                        b.eq    display_uncovered
+
+                        cmp     peek, TRUE
+                        b.eq    display_uncovered
+                        
+                        // Uncovered tile
+                        display_uncovered:
+
+                                xreadStruct(t_value, _tile, tile_value, true)
+
+                                mov     x17, 20
+                                scvtf   d17, x17
+                                fcmp    t_value, d17
+                                b.gt    display_uncovered_specials
+                                b       display_uncovered_number
+
+                                // Special tiles
+                                display_uncovered_specials:
+                                        fcvtns  x27, d27
+                                        xprint(str_tile_peek_special, x27)
+                                display_uncovered_specials_end:
+                                b       display_uncovered_number_end
+
+                                // Number tile
+                                display_uncovered_number:
+                                        xprint(str_tile_peek_number, d27)
+                                display_uncovered_number_end:
+
+
+                        display_uncovered_end:
+                        b       display_covered_end
+
+                        // Covered tile
+                        display_covered:
+
+                        display_covered_end:
 
                         
                         // Increment and loop again
@@ -573,7 +639,7 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                 display_col_end:
 
                 // Print line break
-                xprint(linebr)
+                xprint(str_linebr)
 
                 // Increment and loop again
                 xaddAdd(t)
@@ -585,6 +651,7 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         undefine(`t')
         undefine(`r')
         undefine(`_tile')
+        undefine(`t_value')
 
         
         undefine(`_board')
