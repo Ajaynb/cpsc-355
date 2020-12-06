@@ -3,6 +3,7 @@
 output:         .string "%d\n"
 output_f:       .string "%f\n"
 allstr:         .string "sp %d, fp %d\n"
+output_init:    .string "tile index %d, tile value %f\n"
 
 
         // Equates for alloc & dealloc
@@ -139,7 +140,7 @@ main:   // main()
         xdealloc(board_size_alloc)
         xdealloc(board_array_size_alloc)
 
-        undefine(board_array_size_alloc, x19)
+        undefine(`board_array_size_alloc')
 
         xret()
 
@@ -216,13 +217,13 @@ randomNum:      // randomNum(m, n)
         mov     x0, remainder
 
 
-        undefine(m, x19)
-        undefine(n, x20)
-        undefine(upper, x27)
-        undefine(lower, x28)
-        undefine(range, x21)
-        undefine(modular, x22)
-        undefine(remainder, x23)
+        undefine(`m')
+        undefine(`n')
+        undefine(`upper')
+        undefine(`lower')
+        undefine(`range')
+        undefine(`modular')
+        undefine(`remainder')
 
         randomNum_end:
         xret()
@@ -289,6 +290,7 @@ randomNum:      // randomNum(m, n)
         define(array_offset, x25)
         mov     t, 0
         initialize_populate_row:
+                // Loop condition
                 cmp     t, tiles
                 b.ge    initialize_populate_row_end
                 
@@ -303,6 +305,8 @@ randomNum:      // randomNum(m, n)
                 scvtf   d1, x1
                 fdiv    random_number, d0, d1
 
+                xprint(output_f, random_number)
+
                 // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
                 xmul(array_offset, t, tile_size)
                 xaddEqual(array_offset, board_array)
@@ -312,23 +316,88 @@ randomNum:      // randomNum(m, n)
                 // Write to struct Tile
                 xwriteStruct(random_number, array_offset, tile_value, true)
                 xwriteStruct(1, array_offset, tile_covered, true)
+                
+                xreadStruct(random_number, array_offset, tile_value, true)
 
                 // Increment and loop again
                 xaddAdd(t)
                 b       initialize_populate_row
         initialize_populate_row_end:
-        undefine(random_number, d18)
-        undefine(array_offset, x25)
+        undefine(`random_number')
+        undefine(`array_offset')
         
+
+
+        // Flip to negative numbers
+        define(array_offset, x24)
+        define(negatives, x25)
+        define(max_negatives, x26)
+        define(t_index, x27)
+        define(t_value, d18)
+        
+        // Calculate max amount of negatives
+        xmul(max_negatives, tiles, NEG_PERCENT)
+        mov     x18, 100
+        udiv    max_negatives, max_negatives, x18
+
+        initialize_flip_neg:
+                // Loop condition
+                xreadStruct(negatives, _board, board_negatives, true)
+                cmp     negatives, max_negatives
+                b.ge    initialize_flip_neg_end
+
+                mov     x0, 0
+                sub     x1, tiles, 1
+                bl      randomNum
+                mov     t_index, x0
+
+                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
+                xmul(array_offset, t_index, tile_size)
+                xaddEqual(array_offset, board_array)
+                xmul(array_offset, array_offset, -1)
+                xaddEqual(array_offset, _board)
+
+                // Flip number to negative
+                xreadStruct(t_value, array_offset, tile_value, true)
+
+                mov     x17, 0
+                scvtf   d17, x17
+
+                fcmp    t_value, d17
+                b.lt    initialize_flip_neg
+
+                mov     x17, -1
+                scvtf   d17, x17
+                fmul    t_value, t_value, d17
+                xwriteStruct(t_value, array_offset, tile_value, true)
+
+                xprint(output_init, t_index, t_value)
+
+
+                // Increase negatives amount in struct Board
+                xaddAdd(negatives)
+                xwriteStruct(negatives, _board, board_negatives, true)
+                
+                xprint(output, negatives)
+
+
+                // Loop again
+                b       initialize_flip_neg
+        initialize_flip_neg_end:
+        undefine(`array_offset')
+        undefine(`negatives')
+        undefine(`max_negatives')
+        undefine(`t_index')
+        undefine(`t_value')
 
         
 
-        undefine(_board, x19)
-        undefine(_play, x20)
-        undefine(row, x21)
-        undefine(column, x22)
-        undefine(tiles, x23)
-        undefine(t, x24)
+        undefine(`_board')
+        undefine(`_play')
+        undefine(`row')
+        undefine(`column')
+        undefine(`tiles')
+        undefine(`t')
 
 
         xret()

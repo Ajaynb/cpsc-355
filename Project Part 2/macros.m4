@@ -131,6 +131,13 @@ define(xmul, `
         mov     $1,     x9                      // result
 ')
 
+// xmulEqual(destination, param2)
+define(xmulEqual, `
+        // M4: MUL EQUAL
+        mov     x10,    $2
+        mul     $1,     $1,     x10
+')
+
 // xprint(string, param1, param2, ...) -> Just like how to use printf :)
 define(xprint, `
         // M4: PRINT
@@ -261,7 +268,7 @@ define(xreadStruct, `
                 mov     x12,    $3                      // int attribute offset (positive)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
-
+                
                 ldr	$1,     [x9]                    // load the value
         ', `
                 mov     x11,    $2                      // int base (positive)
@@ -269,7 +276,7 @@ define(xreadStruct, `
                 add     x9,     x11,    x12             // int offset = base + attribute (positive)
                 sub     x9,     xzr,    x9              // offset = -offset (negative)
                 
-                ldr	$1,     [fp,   x9]              // load the value
+                ldr	$1,     [fp, x9]                // load the value
         ')
 ')
 
