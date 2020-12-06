@@ -558,13 +558,12 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         xreadStruct(row, _board, board_row, true)
         xreadStruct(column, _board, board_row, true)
 
-        xprint(output, peek)
-
-
+        // Print a table header under peek mode
         cmp     peek, TRUE
         b.eq    display_show_peek
         b       display_show_peek_end
         display_show_peek:
+                // Print table header
                 xprint(str_table_header)
         display_show_peek_end:
 
@@ -585,7 +584,6 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                         // Loop condition
                         cmp     r, column
                         b.ge    display_col_end
-
                         
                         // Calculate and store the pointer of current struct Tile
                         xmul(x18, t, row)
@@ -598,7 +596,7 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                         xreadStruct(t_value, _tile, tile_value, true)
 
                         // If tile is uncovered
-                        cmp     x18, TRUE
+                        cmp     x18, FALSE
                         b.eq    display_uncovered
 
                         // Else If is in peek mode
