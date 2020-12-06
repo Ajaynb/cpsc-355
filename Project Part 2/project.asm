@@ -462,6 +462,36 @@ randomNum:      // randomNum(m, n)
         undefine(`t_index')
         undefine(`t_value')
 
+
+
+        // Generate Exit
+        define(array_offset, x24)
+        define(t_index, x27)
+        define(t_value, d18)
+
+                // Pick a tile
+                mov     x0, 0
+                sub     x1, tiles, 1
+                bl      randomNum
+                mov     t_index, x0
+
+                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
+                xmul(array_offset, t_index, tile_size)
+                xaddEqual(array_offset, board_array)
+                xmul(array_offset, array_offset, -1)
+                xaddEqual(array_offset, _board)
+
+                // Write value
+                mov     x18, EXIT
+                scvtf   t_value, x18
+                xwriteStruct(t_value, array_offset, tile_value, true)
+
+                xprint(output_init, t_index, t_value)
+
+
+        undefine(`array_offset')
+        undefine(`t_index')
+        undefine(`t_value')
         
 
         undefine(`_board')
