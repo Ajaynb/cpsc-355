@@ -18,6 +18,10 @@ str_top_index:  .string "What is the index of the word you are searching for? "
 str_top_amount: .string "How many top documents you want to retrieve? "
 str_scan_again: .string "Do you want to search again? (0 = no / 1 = yes) "
 str_ended:      .string "Ended.\n"
+
+filename:       .string "test.txt"
+filemode:       .string "a+"
+
         
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
@@ -105,6 +109,16 @@ main:   // main()
                 ldr x23, [x21, 24]                      // char* file = argv[3]
         command_param_file_end:
 
+
+        ldr     x0, =output
+        mov     x1,     1
+        mov     x2,     2
+        mov     x3,     0
+        mov     x4,     0
+        mov     x5,     0
+        mov     x6,     0
+        mov     x7,     0
+        bl      logToFile
 
         // Rand seed
         xrandSeed()
@@ -623,5 +637,42 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
         xret()
 
 
+
+logToFile:
+        xfunc()
+
+        str     x0,     [fp, 96]
+        str     x1,     [fp, 104]
+        str     x2,     [fp, 112]
+
+        // Open log file
+        ldr     x0, =filename
+        ldr     x1, =filemode
+        bl      fopen
+        mov     x19, x0
+
+        
+        mov     x0,     x19
+        mov     x2,     x1
+        mov     x3,     x2
+        mov     x4,     x3
+        mov     x5,     x4
+        mov     x6,     x5
+        mov     x7,     x6
+        ldr     x1,     [fp, 96]
+        ldr     x2,     [fp, 104]
+        ldr     x3,     [fp, 112]
+        bl      fprintf
+
+
+        mov     x0, x19
+        bl      fclose
+
+        xret()
+
+
+
+
         .data                                            // global variables
 n:      .int    0                                        // int n = 0
+

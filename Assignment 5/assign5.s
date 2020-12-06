@@ -7,12 +7,21 @@ output_str:     .string "%s\n"
 allstr:         .string "alloc %d, sp %d, fp %d\n"
 test_out:       .string "frq: %f, occurence: %d, word %d\n"
 
+str_integer:    .string "%d"
 str_table_head: .string "===== Table =====\n"
 str_occ:        .string " %d "
 str_linebr:     .string "\n"
 str_test:       .string "table[%d][%d](%d): %d\n"
 str_top_head:   .string "The top documents are: \n"
-str_top_doc:    .string "Document %02d: Occurence of %d, Frequency of %.4f\n"
+str_top_doc:    .string "Document %02d: Occurence of %d, Frequency of %.3f\n"
+str_top_index:  .string "What is the index of the word you are searching for? "
+str_top_amount: .string "How many top documents you want to retrieve? "
+str_scan_again: .string "Do you want to search again? (0 = no / 1 = yes) "
+str_ended:      .string "Ended.\n"
+
+filename:       .string "test.txt"
+filemode:       .string "a+"
+
         
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
@@ -96,13 +105,13 @@ main:   // main()
 
 
         // Initialize values
-        mov     x19,    min_row                 // int row = 5;
-        mov     x20,    min_col                 // int col = 5;
+        mov     x19,    min_row                         // int row = 5;
+        mov     x20,    min_col                         // int col = 5;
 
         // If command arguments contain row & col
-        cmp     x0,     3                       // if (argc >= 3)
-        b.ge    command_param                   // {read argument from command line}
-        b       command_param_end               // {do nothing}
+        cmp     x0,     3                               // if (argc >= 3)
+        b.ge    command_param                           // {read argument from command line}
+        b       command_param_end                       // {do nothing}
 
         command_param:
                 mov         x21, x1
@@ -119,43 +128,17 @@ main:   // main()
         command_param_end:
 
         // If command arguments contain file name
-        cmp     x0,     4                       // if (argc >= 4)
-        b.ge    command_param_file              // {read argument from command line}
-        b       command_param_file_end          // {do nothing}
+        cmp     x0,     4                               // if (argc >= 4)
+        b.ge    command_param_file                      // {read argument from command line}
+        b       command_param_file_end                  // {do nothing}
 
         command_param_file:
                 // Store arguments
-                ldr x23, [x21, 24]              // char* file = argv[3]
-                
-        // M4: PRINT
-    
-    
-    
-
-    
-        
-        
-        
-                
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x1,    x23
-                
-        
-
-        
-    
-        ldr     x0,     =output_str
-        bl      printf
-
+                ldr x23, [x21, 24]                      // char* file = argv[3]
         command_param_file_end:
 
+
+        bl      logToFile
 
         // Rand seed
         
@@ -186,7 +169,7 @@ end_0:
         
         
         
-                 // row = min(row, max_row);
+                         // row = min(row, max_row);
         
         // M4: MAX
         mov     x9,     x19
@@ -207,7 +190,7 @@ end_1:
         
         
         
-                 // row = max(row, min_row);
+                         // row = max(row, min_row);
         
         // M4: MIN
         mov     x9,     x20
@@ -228,7 +211,7 @@ end_2:
         
         
         
-                 // col = min(col, max_col);
+                         // col = min(col, max_col);
         
         // M4: MAX
         mov     x9,     x20
@@ -249,13 +232,13 @@ end_3:
         
         
         
-                 // col = max(col, min_col);
+                         // col = max(col, min_col);
 
         // Construct struct Table
         
         // M4: ALLOC
         add     sp,     sp,     st_size              // allocate on SP
-                         // allocate for struct Table
+                                 // allocate for struct Table
         
         // M4: STRUCT
     
@@ -307,7 +290,7 @@ end_3:
         
         
     
-             // init struct Table attributes with 0
+                     // init struct Table attributes with 0
         
         
         
@@ -325,7 +308,7 @@ end_3:
         
         str	x10,    [fp,   x9]              // store the value
         
-           // write the reset row to struct
+                   // write the reset row to struct
         
         
         
@@ -343,7 +326,7 @@ end_3:
         
         str	x10,    [fp,   x9]              // store the value
         
-           // write the reset col to struct
+                   // write the reset col to struct
 
         
         // M4: READ STRUCT
@@ -367,78 +350,6 @@ end_3:
 
 
         
-        
-        // M4: PRINT
-    
-    
-    
-
-    
-        
-        
-        
-                
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x1,    alloc
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x2,    sp
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x3,    fp
-                
-        
-
-        
-    
-        ldr     x0,     =allstr
-        bl      printf
-
-        
-
-        
-        // M4: ARRAY
-    
-        mov     x9,     0                           // loop Counter
-loop_4:
-        cmp     x9,     st_arr_amount                          // if reach amount
-        b.eq    loop_end_4
-
-        mov     x10,    int                          // get element size
-        mul     x10,    x10,    x9                  // calculate element offset by 4
-        
-        mov     x11,    st_arr_base                          // get base
-        add     x10,    x10,    x11                 // calculate total offset, offset in array + base
-
-        str 	xzr,    [fp,    x10]                // initialize with 0
-
-        add     x9,     x9,     1                   // increment
-        b       loop_4
-
-loop_end_4:
-
-    
-    
-
         
         // M4: WRITE ARRAY
         mov     x9,     int                          // x9 - size
@@ -466,6 +377,22 @@ loop_end_4:
         
 
 
+
+        // struct Table table;                          // x28
+        mov     x28,    st                              // base
+        add     x28,    x28,    fp                      // offset = base + fp
+
+
+
+        // Initialize table
+        mov     x0,     x28
+        mov     x1,     x23
+        bl      initialize                              // initialize(&table, file)
+
+        // Display table
+        mov     x0,     x28
+        bl      display                                 // display(&table)
+
         
         // M4: PRINT
     
@@ -482,41 +409,209 @@ loop_end_4:
 
         
     
+        ldr     x0,     =str_linebr
+        bl      printf
+
+
+
+
+        main_topdoc_ask:
+
+        // Ask for 1
+        
+        // M4: PRINT
+    
+    
+    
+
+    
         
         
         
-                mov     x1,    x23
+                
                 
         
 
         
     
-        ldr     x0,     =output_str
+        ldr     x0,     =str_top_index
+        bl      printf
+
+        
+        // M4: SCAN
+        ldr     x0,     =str_integer                     // 1st parameter: scnocc, the formatted string
+        ldr     x1,     =n                      // 2nd parameter: &n, the data to store for user input
+        bl      scanf                           // scanf(scnocc, &n);
+        ldr     x1,     =n                      // 2nd parameter: &n
+        ldr     x27,    [x1]                     // int n = x1;
+                         // int 1;
+
+        // Ask for top document amount
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        ldr     x0,     =str_top_amount
+        bl      printf
+
+        
+        // M4: SCAN
+        ldr     x0,     =str_integer                     // 1st parameter: scnocc, the formatted string
+        ldr     x1,     =n                      // 2nd parameter: &n, the data to store for user input
+        bl      scanf                           // scanf(scnocc, &n);
+        ldr     x1,     =n                      // 2nd parameter: &n
+        ldr     x26,    [x1]                     // int n = x1;
+                         // int top;
+
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        ldr     x0,     =str_linebr
+        bl      printf
+
+        
+        // Run top docs
+        mov     x0,     x28                             // pointer
+        mov     x1,     x27                             // 1
+        mov     x2,     x26                             // top
+        bl      topRelevantDocs                         // topRelevantDocs(&table, 1, top)
+
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        ldr     x0,     =str_linebr
         bl      printf
 
 
+        // Ask for search again
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
         
 
-        // struct Table table;                  // x28
-        mov     x28,    st                      // base
-        add     x28,    x28,    fp              // offset = base + fp
+        
+    
+        ldr     x0,     =str_scan_again
+        bl      printf
+
+        
+        // M4: SCAN
+        ldr     x0,     =str_integer                     // 1st parameter: scnocc, the formatted string
+        ldr     x1,     =n                      // 2nd parameter: &n, the data to store for user input
+        bl      scanf                           // scanf(scnocc, &n);
+        ldr     x1,     =n                      // 2nd parameter: &n
+        ldr     x25,    [x1]                     // int n = x1;
+
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        ldr     x0,     =str_linebr
+        bl      printf
 
 
+        cmp     x25,    1
+        b.eq    main_topdoc_ask
 
-        // Initialize table
-        mov     x0,     x28
-        mov     x1,     x23
-        bl      initialize                      // initialize(&table, file)
+        main_topdoc_ask_end:
 
-        // Display table
-        mov     x0,     x28
-        bl      display                         // display(&table)
+        
+        // M4: PRINT
+    
+    
+    
 
-        // Top Docs
-        mov     x0,     x28
-        mov     x1,     -2
-        mov     x2,     2
-        bl      topRelevantDocs
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        ldr     x0,     =str_ended
+        bl      printf
+
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        ldr     x0,     =str_linebr
+        bl      printf
+
 
 
         // Deallocate memory
@@ -525,56 +620,7 @@ loop_end_4:
         mov     x9,     st_size                      // move to x9
         sub     x9,     xzr,    x9              // negate the size again to positive
         add     sp,     sp,     x9              // dealloc on SP
-                       // deallocate struct Table
-
-        
-        // M4: PRINT
-    
-    
-    
-
-    
-        
-        
-        
-                
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x1,    alloc
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x2,    sp
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x3,    fp
-                
-        
-
-        
-    
-        ldr     x0,     =allstr
-        bl      printf
-
-
-
+                               // deallocate struct Table
         
         // M4: RET
 
@@ -636,8 +682,6 @@ initialize:     // initialize(struct Table* table, char* file)
         // Save pointer of table & file name
         mov     x19,    x0                              // int pointer;
         mov     x22,    x1                              // char* file;
-        
-        test2:
 
         // Read row and column from table struct
         
@@ -663,126 +707,91 @@ initialize:     // initialize(struct Table* table, char* file)
 
         // Save pointer of table.array
         add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
-
         
-        // Try open file
+        // Open file
         mov     w0,     -100                            // 1st arg (cwd)
         mov     x1,     x22                             // 2nd arg (pathname)        
         mov     w2,     0                               // 3rd arg (read-only)
         mov     w3,     0                               // 4th arg (not used)
         mov     x8,     56                              // openat I/O request - to open a file
         svc     0                                       // call system function
-        //mov     w18,    w0                              // int fd; Record FD
+        mov     w18,    w0                              // int fd; Record FD
         
-        
-        test:
         // Check file opens
-        cmp     w0,    0                               // Check if File Descriptor = -1 (error occured)
+        cmp     w18,    0                               // Check if File Descriptor = -1 (error occured)
         b.ge    initialize_from_file                    // If no error branch over
         b       initialize_from_random
-
-        
         
 
         // Initialize from given file
         initialize_from_file:
         
-        // M4: PRINT
-    
-    
-    
+        // For loop
+        mov     x23,    0                               // int t = 0; current 1
+        mul     x26,    x20,    x21                     // int size = row * column;
 
-    
-        
-        
-        
+        initialize_array_file:
+
+                cmp     x23,    x26                     // if (t >= size)
+                b.ge    initialize_array_file_end       // {end}
+
+                // Read number
+                mov     w0,     w18                     // 1st arg (fd)
+                add     x1,     fp,     buffer          // 2nd arg (buffer)
+                mov     w2,     buffer_size             // 3rd arg (n) - how many bytes to read from buffer each time
+                mov     x8,     63                      // read I/O request
+                svc     0                               // call system function
+                mov     w17,    w0                      // int actualSize; Record number of bytes actually read
+
+                // Judge if read successfully
+                cmp     w17,    buffer_size             // if (nread != buffersize)
+                b.eq    initialize_file_read_success    // {load to register}
+                b.ne    initialize_file_read_fail       // {set to 0}
+
+                // Read success, load the number to register
+                initialize_file_read_success:
+                ldr     x25,    [sp, buffer]            // 2nd arg (load string from buffer)
+                b       initialize_file_write           // write to array
+
+                // Read fail, set the register to default 0
+                initialize_file_read_fail:
+                mov     x25,    0                       // set to 0
+                b       initialize_file_write           // write to array
+
+                // Write the number to array
+                initialize_file_write:
                 
+        // M4: WRITE ARRAY
+        mov     x9,     int                          // x9 - size
+        mov     x10,    x23                          // x10 - 1
+        mul     x9,     x9,     x10                 // calculate Offset = Size * Index
+        add     x9,     x9,     x19                  // calculate Offset += Base
+
+        mov     x10,    x25
+
+        
+        str     x10,    [x9]
+        
+   // table.array[t] = random
+
+                // Increment and loop
                 
-        
+        // M4: ADD ADD
+        add     x23, x23, 1
+                            // t ++;
+                b       initialize_array_file           // go back to loop top
 
-        
-    
-        
-        
-        
-                mov     x1,    2333
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x2,    2333
-                
-        
-
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
-        // add     x23,    fp,     16                      // int bufferBase = fp + 16; Calculate base address
-        /*mov     w0,     w19                             // 1st arg (fd)
-        mov     x1,     buffer                          // 2nd arg (buffer)
-        mov     w2,     buffer_size                     // 3rd arg (n) - how many bytes to read from buffer each time
-        mov     x8,     63                              // read I/O request
-        svc     0                                       // call system function
-        
-	mov w20, w0 // int actualSize; Record number of bytes actually read
-
-	cmp w20, buffer_size // if (nread != buffersize)
-        b.ne    initialize_end
-
-   	ldr x23, [sp, buffer] // 2nd arg (load string from buffer)
-        
-        // M4: PRINT
-    
-    
-    
-
-    
-        
-        
-        
-                
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x1,    x23
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x2,    x23
-                
-        
-
-        
-    
-        ldr     x0,     =output
-        bl      printf
+        initialize_array_file_end:
 
 
-        b       initialize_from_file
-
-        */
+        b       initialize_array_end
+        
 
         // Initialize from random numbers
         initialize_from_random:
 
         // For loop
-        mov     x23,    0                               // int t = 0; current 3
+        mov     x23,    0                               // int t = 0; current 1
         mul     x26,    x20,    x21                     // int size = row * column;
 
         initialize_array:
@@ -800,7 +809,7 @@ initialize:     // initialize(struct Table* table, char* file)
                 
         // M4: WRITE ARRAY
         mov     x9,     int                          // x9 - size
-        mov     x10,    x23                          // x10 - 3
+        mov     x10,    x23                          // x10 - 1
         mul     x9,     x9,     x10                 // calculate Offset = Size * Index
         add     x9,     x9,     x19                  // calculate Offset += Base
 
@@ -876,11 +885,11 @@ randomNum:      // randomNum(m, n)
         mov     x28,    0
 
 
-        mov     x19,    x0                      // int m;
-        mov     x20,    x1                      // int n;
+        mov     x19,    x0                              // int m;
+        mov     x20,    x1                              // int n;
 
-        cmp     x19,    x20                     // if (m == n)
-        b.eq    randomNum_end                   // {skip everything to the end}, to return m itself
+        cmp     x19,    x20                             // if (m == n)
+        b.eq    randomNum_end                           // {skip everything to the end}, to return m itself
 
         // For protection, check again the lower and upper bound
         
@@ -892,18 +901,18 @@ randomNum:      // randomNum(m, n)
         
 
         cmp     x9,     x10
-        b.gt    if_5
-        b       else_5
-if_5:  mov     x27,     x9
-        b       end_5
-else_5:mov     x27,     x10
-        b       end_5
-end_5:
+        b.gt    if_4
+        b       else_4
+if_4:  mov     x27,     x9
+        b       end_4
+else_4:mov     x27,     x10
+        b       end_4
+end_4:
 
         
         
         
-                     // int upper = max(m, n)
+                             // int upper = max(m, n)
         
         // M4: MIN
         mov     x9,     x19
@@ -913,35 +922,35 @@ end_5:
         
 
         cmp     x9,     x10
-        b.lt    if_6
-        b       else_6
-if_6:  mov     x28,     x9
-        b       end_6
-else_6:mov     x28,     x10
-        b       end_6
-end_6:
+        b.lt    if_5
+        b       else_5
+if_5:  mov     x28,     x9
+        b       end_5
+else_5:mov     x28,     x10
+        b       end_5
+end_5:
 
         
         
         
-                     // int lower = min(m, n)
+                             // int lower = min(m, n)
 
         // Calculate range
-        sub     x21,    x27,    x28             // int range = upper - lower
+        sub     x21,    x27,    x28                     // int range = upper - lower
         
         // M4: ADD ADD
         add     x21, x21, 1
-                            // range += 1;
+                                    // range += 1;
 
         // Generate random number
         bl      rand
 
         // Limit range
-        udiv    x22,    x0,     x21             // int quotient = rand / range;
-        mul     x23,    x22,    x21             // int product = quotient * range
-        sub     x24,    x0,     x23             // int remainder = rand - product
+        udiv    x22,    x0,     x21                     // int quotient = rand / range;
+        mul     x23,    x22,    x21                     // int product = quotient * range
+        sub     x24,    x0,     x23                     // int remainder = rand - product
 
-        mov     x0,     x24                     // return the remainder as the generated random number
+        mov     x0,     x24                             // return the remainder as the generated random number
        
         randomNum_end:
         
@@ -1028,8 +1037,8 @@ display:        // display(struct Table* table)
         add     x19,    x19,    st_arr                  // int array_base = *table.array; get array base offset
 
         // Counters
-        mov     x23,    0                               // int t = 0; current row 3
-        mov     x24,    0                               // int r = 0; current col 3
+        mov     x23,    0                               // int t = 0; current row 1
+        mov     x24,    0                               // int r = 0; current col 1
 
         // Print table head
         
@@ -1273,13 +1282,13 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int 1, int top)
         
 
         cmp     x9,     x10
-        b.lt    if_7
-        b       else_7
-if_7:  mov     x20,     x9
-        b       end_7
-else_7:mov     x20,     x10
-        b       end_7
-end_7:
+        b.lt    if_6
+        b       else_6
+if_6:  mov     x20,     x9
+        b       end_6
+else_6:mov     x20,     x10
+        b       end_6
+end_6:
 
         
         
@@ -1294,13 +1303,13 @@ end_7:
         
 
         cmp     x9,     x10
-        b.gt    if_8
-        b       else_8
-if_8:  mov     x20,     x9
-        b       end_8
-else_8:mov     x20,     x10
-        b       end_8
-end_8:
+        b.gt    if_7
+        b       else_7
+if_7:  mov     x20,     x9
+        b       end_7
+else_7:mov     x20,     x10
+        b       end_7
+end_7:
 
         
         
@@ -1315,13 +1324,13 @@ end_8:
         
 
         cmp     x9,     x10
-        b.lt    if_9
-        b       else_9
-if_9:  mov     x21,     x9
-        b       end_9
-else_9:mov     x21,     x10
-        b       end_9
-end_9:
+        b.lt    if_8
+        b       else_8
+if_8:  mov     x21,     x9
+        b       end_8
+else_8:mov     x21,     x10
+        b       end_8
+end_8:
 
         
         
@@ -1336,13 +1345,13 @@ end_9:
         
 
         cmp     x9,     x10
-        b.gt    if_10
-        b       else_10
-if_10:  mov     x21,     x9
-        b       end_10
-else_10:mov     x21,     x10
-        b       end_10
-end_10:
+        b.gt    if_9
+        b       else_9
+if_9:  mov     x21,     x9
+        b       end_9
+else_9:mov     x21,     x10
+        b       end_9
+end_9:
 
         
         
@@ -2055,52 +2064,6 @@ end_10:
         topdoc_print_end:
         
 
-        
-        // M4: PRINT
-    
-    
-    
-
-    
-        
-        
-        
-                
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x1,    alloc
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x2,    sp
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x3,    fp
-                
-        
-
-        
-    
-        ldr     x0,     =allstr
-        bl      printf
-
 
         
         // Dealloc WordFrequency array
@@ -2129,4 +2092,170 @@ end_10:
         ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
         ret
 
+
+
+
+
+
+logToFile:
+        
+        // M4: FUNC
+        stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
+        mov     fp,     sp                              // update FP to current SP
+        
+        // Save registers
+        str 	x19,    [fp, 16]
+        str 	x20,    [fp, 24]
+        str 	x21,    [fp, 32]
+        str 	x22,    [fp, 40]
+        str 	x23,    [fp, 48]
+        str 	x24,    [fp, 56]
+        str 	x25,    [fp, 64]
+        str 	x26,    [fp, 72]
+        str 	x27,    [fp, 80]
+        str 	x28,    [fp, 88]
+
+        // Reset registers to 0
+        mov     x19,    0
+        mov     x20,    0
+        mov     x21,    0
+        mov     x22,    0
+        mov     x23,    0
+        mov     x24,    0
+        mov     x25,    0
+        mov     x26,    0
+        mov     x27,    0
+        mov     x28,    0
+
+
+        ldr     x1, =str_table_head
+        
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    x0
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    x0
+                
+        
+
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+        // Record all paramaters
+        mov     w20, [x1]
+        mov     x21, x1
+        mov     x22, x2
+        mov     x23, x3
+        mov     x24, x4
+        mov     x25, x5
+        mov     x26, x6
+        mov     x27, x7
+        mov     x28, x8
+
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    x20
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    x20
+                
+        
+
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+        // Open log file
+        ldr     x0, =filename
+        ldr     x1, =filemode
+        bl      fopen
+        mov     x19, x0
+
+        
+        mov     x0, x19
+        mov     w1, [x20]
+        bl      fprintf
+
+
+        mov     x0, x19
+        bl      fclose
+
+        
+        // M4: RET
+
+        // Restore registers
+        ldr 	x19,    [fp, 16]
+        ldr 	x20,    [fp, 24]
+        ldr 	x21,    [fp, 32]
+        ldr 	x22,    [fp, 30]
+        ldr 	x23,    [fp, 48]
+        ldr 	x24,    [fp, 56]
+        ldr 	x25,    [fp, 64]
+        ldr 	x26,    [fp, 72]
+        ldr 	x27,    [fp, 80]
+        ldr 	x28,    [fp, 88]
+
+        ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
+        ret
+
+
+
+
+
+
+
+        .data                                            // global variables
+n:      .int    0                                        // int n = 0
 
