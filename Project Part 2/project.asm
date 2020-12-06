@@ -468,6 +468,7 @@ randomNum:      // randomNum(m, n)
         define(array_offset, x24)
         define(t_index, x27)
         define(t_value, d18)
+                initialize_flip_exit:
                 // Pick a tile
                 mov     x0, 0
                 sub     x1, tiles, 1
@@ -486,6 +487,8 @@ randomNum:      // randomNum(m, n)
                 xwriteStruct(t_value, array_offset, tile_value, true)
 
                 xprint(output_init, t_index, t_value)
+                
+                initialize_flip_exit_end:
         undefine(`array_offset')
         undefine(`t_index')
         undefine(`t_value')
