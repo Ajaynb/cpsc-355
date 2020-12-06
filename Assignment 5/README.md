@@ -22,3 +22,8 @@ For searching top documents:
 For input file from command line argument:
 - If does exist, then read from the file to populate the table array
 - If not exist, it will ignore the file and populate the table array with random numbers, just like how it runs without providing a file.
+
+## File logging
+
+If you see nowhere the function `logToFile` is invoked, it is from macro.
+In macro `xprint` and `xscan` invoke this function. So, whenever there is a print or scan, it logges to the file.
