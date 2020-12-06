@@ -288,7 +288,6 @@ randomNum:      // randomNum(m, n)
         define(random_number, d18)
         define(array_offset, x25)
         mov     t, 0
-        mov     array_offset, 0
         initialize_populate_row:
                 cmp     t, tiles
                 b.ge    initialize_populate_row_end
@@ -314,13 +313,10 @@ randomNum:      // randomNum(m, n)
                 xwriteStruct(random_number, array_offset, tile_value, true)
                 xwriteStruct(1, array_offset, tile_covered, true)
 
-        
+                // Increment and loop again
                 xaddAdd(t)
                 b       initialize_populate_row
         initialize_populate_row_end:
-
-        xprint(output, array_offset)
-
         undefine(random_number, d18)
         undefine(array_offset, x25)
         
