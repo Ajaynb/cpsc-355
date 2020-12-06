@@ -13,30 +13,32 @@ allstr:         .string "sp %d, fp %d\n"
         lr      .req    x30
 
         // Define minimum row and column, avoid magic numbers
-        min_row = 10
-        min_col = 10
-        min_til = 1
-        max_til = 1500
+        MIN_ROW = 10
+        MIN_COL = 10
+        MAX_ROW = 200
+        MAX_COL = 200
+        MIN_TIL = 1
+        MAX_TIL = 1500
 
         // Define negatives and specials percentage, avoid magic numbers
-        neg_percent = 40
-        spe_percent = 20
+        NEG_PERCENT = 40
+        SPE_PERCENT = 20
 
         // Define special tile types
-        exit = 20
-        double_range = 21
+        EXIT = 20
+        DOUBLE_RANGE = 21
 
-        // Define gaming status
-        prepare = 0
-        gaming = 1
-        win = 2
-        die = 3
-        quit = 4
+        // Define GAMING status
+        PREPARE = 0
+        GAMING = 1
+        WIN = 2
+        DIE = 3
+        QUIT = 4
 
         /**
-        * Define gaming tile
+        * Define GAMING tile
         *
-        * The gaming tile contains the tile value and its covered status.
+        * The GAMING tile contains the tile value and its covered status.
         */
         tile = 0
         tile_value = 0
@@ -45,7 +47,7 @@ allstr:         .string "sp %d, fp %d\n"
         tile_size = -tile_size_alloc
         
         /**
-        * Define gaming board
+        * Define GAMING board
         *
         * The game board contains all the tiles and relative informations.
         */
@@ -70,6 +72,8 @@ allstr:         .string "sp %d, fp %d\n"
  */
 main:   // main()
         xfunc()
+
+        define(board_array_size_alloc, x19)
         
         // Rand seed
         xrandSeed()
@@ -85,12 +89,24 @@ main:   // main()
         xwriteStruct(5, board, board_row)
         xwriteStruct(5, board, board_column)
 
+        // Alloc for array in struct Board
+        xmul(board_array_size_alloc, MAX_ROW, MAX_COL, tile_size_alloc)
+        and     board_array_size_alloc, board_array_size_alloc, -16
+        xalloc(board_array_size_alloc)
+
+        xprint(output, board_array_size_alloc)
+
+
         add     x0, fp, board
         bl      initializeGame
 
 
-        // Dealloc for struct Board
+        // Dealloc for struct Board and its array
+        xdealloc(board_array_size_alloc)
         xdealloc(board_size_alloc)
+
+        undefine(board_array_size_alloc, x19)
+
         xret()
 
 
@@ -100,7 +116,7 @@ main:   // main()
 * Firstly, get the smallest 2^x number that is larger than the upper bound,
 * and then use this number by and operation and get the remainder.
 * The remainder is the temporary number, then check if the remainder falls within the bounds.
-* If falls winthin, then return. Otherwise, generate another one, until satisfied.
+* If falls WINthin, then return. Otherwise, generate another one, until satisfied.
 */
 randomNum:      // randomNum(m, n)
         xfunc()
@@ -194,33 +210,34 @@ randomNum:      // randomNum(m, n)
  initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         xfunc()
 
-        define(pointer, x19)
+        define(_board, x19)
         define(row, x20)
         define(column, x21)
         define(tiles, x22)
 
         
         // Store pointer of struct Table
-        mov     pointer, x0
+        mov     _board, x0
 
         // Read row and column
-        xreadStruct(row, pointer, board_row, true)
-        xreadStruct(column, pointer, board_row, true)
+        xreadStruct(row, _board, board_row, true)
+        xreadStruct(column, _board, board_row, true)
 
-        // Ensure the board is at least the minimum size
-        xmax(row, row, min_row)
-        xmax(column, column, min_col)
+        // Ensure the board is within the acceptable size
+        xmax(row, row, MIN_ROW)
+        xmax(column, column, MIN_COL)
+        xmin(row, row, MAX_ROW)
+        xmin(column, column, MAX_COL)
 
-        // Intialize array by allocating memory
-        mul     tiles, row, column
-        xmul(x18, tiles, tile_size_alloc)
-        and     x18, x18, -16
-
-        xprint(output, x18)
+        // Initialize statistics, giving default values
+        xwriteStruct(0, _board, board_negatives, true)
+        xwriteStruct(0, _board, board_specials, true)
 
         
 
-        undefine(pointer, x19)
+        
+
+        undefine(_board, x19)
         undefine(row, x20)
         undefine(column, x21)
         undefine(tiles, x22)

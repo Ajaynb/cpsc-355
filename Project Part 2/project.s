@@ -1,6 +1,7 @@
         
 
 output: .string "%d\n"
+allstr:         .string "sp %d, fp %d\n"
 
 
         // Equates for alloc & dealloc
@@ -14,6 +15,8 @@ output: .string "%d\n"
         // Define minimum row and column, avoid magic numbers
         min_row = 10
         min_col = 10
+        max_row = 200
+        max_col = 200
         min_til = 1
         max_til = 1500
 
@@ -40,8 +43,8 @@ output: .string "%d\n"
         tile = 0
         tile_value = 0
         tile_covered = 8
-        tile_size = (16) & 16
-        tile_size_alloc = -tile_size
+        tile_size_alloc = -16 & -16
+        tile_size = -tile_size_alloc
         
         /**
         * Define gaming board
@@ -55,8 +58,8 @@ output: .string "%d\n"
         board_negatives = 24
         board_specials = 32
         board_array = 40
-        board_size = -(40) & -16
-        board_size_alloc = -board_size
+        board_size_alloc = -(40) & -16
+        board_size = -board_size_alloc
 
 
         // Expose main function to OS and set balign
@@ -97,6 +100,8 @@ main:   // main()
         mov     x27,    0
         mov     x28,    0
 
+
+        
         
         // Rand seed
         
@@ -106,10 +111,87 @@ main:   // main()
         bl      srand                           // srand(time(0));
 
 
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    sp
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    fp
+                
+        
+
+        
+    
+        ldr     x0,     =allstr
+        bl      printf
+
+
         // Alloc for struct Board
         
         // M4: ALLOC
         add     sp,     sp,     board_size_alloc              // allocate on SP
+
+
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    sp
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x2,    fp
+                
+        
+
+        
+    
+        ldr     x0,     =allstr
+        bl      printf
+
 
 
         
@@ -149,16 +231,90 @@ main:   // main()
         
 
 
-        //add     x0, fp, board
+        // Alloc for array in struct Board
+        
+        // M4: MUL
+    
+        mov     x9,     1                       // initialize x9 to 1
+    
+        
+        
+    
+        
+        mov     x10,    max_row                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    max_col                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        
+        mov     x10,    tile_size_alloc                       // move next multiplier to x10
+        mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+        
+    
+        mov     x19,     x9                      // result
+
+        and     x19, x19, -16
+        
+        // M4: ALLOC
+        add     sp,     sp,     x19              // allocate on SP
+
+
+        
+        // M4: PRINT
+    
+    
+    
+
+    
+        
+        
+        
+                
+                
+        
+
+        
+    
+        
+        
+        
+                mov     x1,    x19
+                
+        
+
+        
+    
+        ldr     x0,     =output
+        bl      printf
+
+
+
+        add     x0, fp, board
         bl      initializeGame
 
 
-        // Dealloc for struct Board
+        // Dealloc for struct Board and its array
+        
+        // M4: DEALLOC
+        mov     x9,     x19                      // move to x9
+        sub     x9,     xzr,    x9              // negate the size again to positive
+        add     sp,     sp,     x9              // dealloc on SP
+
         
         // M4: DEALLOC
         mov     x9,     board_size_alloc                      // move to x9
         sub     x9,     xzr,    x9              // negate the size again to positive
         add     sp,     sp,     x9              // dealloc on SP
+
+
+        
 
         
         // M4: RET
@@ -366,7 +522,7 @@ end_1:
  * Thirdly, flip tiles to special tiles. Simply assign new value.
  *
  * The board->array, the tile array, is a 1-d array, but used as a 2-d.
- * Simply convert between 1-d array index to x and y by math.
+ * Simply convert between 1-d array 2 to x and y by math.
  */
 
  initializeGame:        // initializeGame(struct Board* board, struct Play* play)
@@ -399,20 +555,20 @@ end_1:
         mov     x27,    0
         mov     x28,    0
 
-/*
+
         
         
         
         
 
         
-        // Store x19 of struct Table
-        mov     x19, x0
+        // Store pointer of struct Table
+        mov     board*, x0
 
         // Read x20 and x21
         
         // M4: READ STRUCT
-        mov     x11,    x19                      // int base
+        mov     x11,    board*                      // int base
         mov     x12,    board_row                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
 
@@ -422,7 +578,7 @@ end_1:
 
         
         // M4: READ STRUCT
-        mov     x11,    x19                      // int base
+        mov     x11,    board*                      // int base
         mov     x12,    board_row                      // int attribute offset
         add     x9,     x11,    x12             // int offset = base + attribute
 
@@ -431,7 +587,7 @@ end_1:
         
 
 
-        // Ensure the board is at least the minimum size
+        // Ensure the board is within the acceptable size
         
         // M4: MAX
         mov     x9,     x20
@@ -474,60 +630,88 @@ end_3:
         
         
 
-
-        // Intialize array by allocating memory
-        mul     x22, x20, x21
         
-        // M4: MUL
-    
-        mov     x9,     1                       // initialize x9 to 1
-    
-        
-        
-    
-        
-        mov     x10,    x22                       // move next multiplier to x10
-        mul     x9,     x9,     x10             // and multiplies x10 to x9
-        
-        
-    
-        
-        mov     x10,    tile_size_alloc                       // move next multiplier to x10
-        mul     x9,     x9,     x10             // and multiplies x10 to x9
-        
-        
-    
-        mov     x18,     x9                      // result
-
+        // M4: MIN
+        mov     x9,     x20
+        mov     x10,    max_row
+        // csel    x20,     x9,     x10,    le
 
         
-        // M4: PRINT
-    
-    
-    
 
-    
+        cmp     x9,     x10
+        b.lt    if_4
+        b       else_4
+if_4:  mov     x20,     x9
+        b       end_4
+else_4:mov     x20,     x10
+        b       end_4
+end_4:
+
         
         
         
+
+        
+        // M4: MIN
+        mov     x9,     col
+        mov     x10,    max_col
+        // csel    col,     x9,     x10,    le
+
+        
+
+        cmp     x9,     x10
+        b.lt    if_5
+        b       else_5
+if_5:  mov     col,     x9
+        b       end_5
+else_5:mov     col,     x10
+        b       end_5
+end_5:
+
+        
+        
+        
+
+
+        // Initialize statistics, giving default values
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    board*                      // int base
+        mov     x12,    board_negatives                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                mov     x10,    0              // int value
                 
+        
+        
+        
+        str	x10,    [x9]                    // store the value
+        
+
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        mov     x11,    board*                      // int base
+        mov     x12,    board_specials                      // int attribute offset
+        add     x9,     x11,    x12             // int offset = base + attribute
+        
+        
+                mov     x10,    0              // int value
                 
         
-
-        
-    
         
         
-        
-                mov     x1,    x18
-                
+        str	x10,    [x9]                    // store the value
         
 
-        
-    
-        ldr     x0,     =output
-        bl      printf
 
+        
 
         
 
@@ -535,7 +719,7 @@ end_3:
         
         
         
-*/
+
 
         
         // M4: RET
