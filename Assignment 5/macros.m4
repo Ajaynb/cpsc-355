@@ -146,6 +146,26 @@ define(xprint, `
     ')
         ldr     x0,     =$1
         bl      printf
+
+    define(`index', eval(`0'))
+    define(`register_x_index', eval(`0'))
+    define(`register_d_index', eval(`0'))
+
+    foreach(`t', `$@', `
+        define(`register_type', substr(t, 0, 1))
+        
+        ifelse(register_type, `d', `
+                ifelse(index, `0', `', `format(`fmov     d%s,    %s', eval(register_d_index), `t')')
+                define(`register_d_index', incr(register_d_index))
+        ', `
+                ifelse(index, `0', `', `format(`mov     x%s,    %s', eval(register_x_index), `t')')
+                define(`register_x_index', incr(register_x_index))
+        ')
+
+        define(`index', incr(index))
+    ')
+        ldr     x0,     =$1
+        bl      logToFile
 ')
 
 
@@ -157,6 +177,13 @@ define(xscan, `
         bl      scanf                           // scanf(scnocc, &n);
         ldr     x1,     =n                      // 2nd parameter: &n
         ldr     $2,    [x1]                     // int n = x1;
+
+        ldr     x0,     =$1
+        ldr     x1,     [x1]
+        bl      logToFile
+
+        ldr     x0,     =str_linebr
+        bl      logToFile
 ')
 
 

@@ -109,17 +109,6 @@ main:   // main()
                 ldr x23, [x21, 24]                      // char* file = argv[3]
         command_param_file_end:
 
-
-        ldr     x0, =output
-        mov     x1,     1
-        mov     x2,     2
-        mov     x3,     0
-        mov     x4,     0
-        mov     x5,     0
-        mov     x6,     0
-        mov     x7,     0
-        bl      logToFile
-
         // Rand seed
         xrandSeed()
 
@@ -643,7 +632,6 @@ logToFile:
 
         str     x0,     [fp, 96]
         str     x1,     [fp, 104]
-        str     x2,     [fp, 112]
 
         // Open log file
         ldr     x0, =filename
@@ -661,7 +649,6 @@ logToFile:
         mov     x7,     x6
         ldr     x1,     [fp, 96]
         ldr     x2,     [fp, 104]
-        ldr     x3,     [fp, 112]
         bl      fprintf
 
 

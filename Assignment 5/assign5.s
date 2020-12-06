@@ -137,9 +137,6 @@ main:   // main()
                 ldr x23, [x21, 24]                      // char* file = argv[3]
         command_param_file_end:
 
-
-        bl      logToFile
-
         // Rand seed
         
         // M4: RAND SEED
@@ -412,6 +409,8 @@ end_3:
         ldr     x0,     =str_linebr
         bl      printf
 
+        bl      logToFile
+
 
 
 
@@ -436,6 +435,8 @@ end_3:
     
         ldr     x0,     =str_top_index
         bl      printf
+
+        bl      logToFile
 
         
         // M4: SCAN
@@ -466,6 +467,8 @@ end_3:
         ldr     x0,     =str_top_amount
         bl      printf
 
+        bl      logToFile
+
         
         // M4: SCAN
         ldr     x0,     =str_integer                     // 1st parameter: scnocc, the formatted string
@@ -494,6 +497,8 @@ end_3:
         ldr     x0,     =str_linebr
         bl      printf
 
+        bl      logToFile
+
         
         // Run top docs
         mov     x0,     x28                             // pointer
@@ -520,6 +525,8 @@ end_3:
         ldr     x0,     =str_linebr
         bl      printf
 
+        bl      logToFile
+
 
         // Ask for search again
         
@@ -540,6 +547,8 @@ end_3:
     
         ldr     x0,     =str_scan_again
         bl      printf
+
+        bl      logToFile
 
         
         // M4: SCAN
@@ -568,6 +577,8 @@ end_3:
         ldr     x0,     =str_linebr
         bl      printf
 
+        bl      logToFile
+
 
         cmp     x25,    1
         b.eq    main_topdoc_ask
@@ -593,6 +604,8 @@ end_3:
         ldr     x0,     =str_ended
         bl      printf
 
+        bl      logToFile
+
         
         // M4: PRINT
     
@@ -611,6 +624,8 @@ end_3:
     
         ldr     x0,     =str_linebr
         bl      printf
+
+        bl      logToFile
 
 
 
@@ -1060,6 +1075,8 @@ display:        // display(struct Table* table)
         ldr     x0,     =str_table_head
         bl      printf
 
+        bl      logToFile
+
 
         // For loop of row
         display_array_row:
@@ -1146,6 +1163,8 @@ display:        // display(struct Table* table)
         ldr     x0,     =str_occ
         bl      printf
 
+        bl      logToFile
+
 
                         // Increment and loop
                         
@@ -1176,6 +1195,8 @@ display:        // display(struct Table* table)
     
         ldr     x0,     =str_linebr
         bl      printf
+
+        bl      logToFile
 
 
                 // Increment and loop
@@ -1941,6 +1962,8 @@ end_9:
     
         ldr     x0,     =str_top_head
         bl      printf
+
+        bl      logToFile
                             // print header
 
         topdoc_print:
@@ -2051,6 +2074,8 @@ end_9:
         ldr     x0,     =str_top_doc
         bl      printf
 
+        bl      logToFile
+
 
                 
                 // Increment and loop
@@ -2128,94 +2153,9 @@ logToFile:
         mov     x28,    0
 
 
-        ldr     x1, =str_table_head
-        
-        
-        // M4: PRINT
-    
-    
-    
-
-    
-        
-        
-        
-                
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x1,    x0
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x2,    x0
-                
-        
-
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
-
-        // Record all paramaters
-        mov     w20, [x1]
-        mov     x21, x1
-        mov     x22, x2
-        mov     x23, x3
-        mov     x24, x4
-        mov     x25, x5
-        mov     x26, x6
-        mov     x27, x7
-        mov     x28, x8
-
-        
-        // M4: PRINT
-    
-    
-    
-
-    
-        
-        
-        
-                
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x1,    x20
-                
-        
-
-        
-    
-        
-        
-        
-                mov     x2,    x20
-                
-        
-
-        
-    
-        ldr     x0,     =output
-        bl      printf
-
+        str     x0,     [fp, 96]
+        str     x1,     [fp, 104]
+        str     x2,     [fp, 112]
 
         // Open log file
         ldr     x0, =filename
@@ -2224,8 +2164,16 @@ logToFile:
         mov     x19, x0
 
         
-        mov     x0, x19
-        mov     w1, [x20]
+        mov     x0,     x19
+        mov     x2,     x1
+        mov     x3,     x2
+        mov     x4,     x3
+        mov     x5,     x4
+        mov     x6,     x5
+        mov     x7,     x6
+        ldr     x1,     [fp, 96]
+        ldr     x2,     [fp, 104]
+        ldr     x3,     [fp, 112]
         bl      fprintf
 
 
