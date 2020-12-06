@@ -5,6 +5,8 @@ output_f:       .string "%f\n"
 allstr:         .string "sp %d, fp %d\n"
 output_init:    .string "tile index %d, tile value %f\n"
 
+peek_table_head:        .string "Board: \n\n"
+
 
         // Equates for alloc & dealloc
         alloc =  -(16 + 96) & -16
@@ -87,6 +89,15 @@ output_init:    .string "tile index %d, tile value %f\n"
         board_size_alloc = -(40) & -16
         board_size = -board_size_alloc
         board_array = board_size
+
+        // Customized macro function to calculate array offset of struct Tile in struct Board
+        // xtilePointer(destination, struct Board* board, index)
+        define(xtilePointer, `
+                xmul($1, $3, tile_size)
+                xaddEqual($1, board_array)
+                xmulEqual($1, -1)
+                xaddEqual($1, $2)
+        ')
 
 
         // Expose main function to OS and set balign
@@ -308,10 +319,8 @@ randomNum:      // randomNum(m, n)
                 xprint(output_f, random_number)
 
                 // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
-                xmul(array_offset, t, tile_size)
-                xaddEqual(array_offset, board_array)
-                xmul(array_offset, array_offset, -1)
-                xaddEqual(array_offset, _board)
+                xtilePointer(array_offset, _board, t_index)
+
 
                 // Write to struct Tile
                 xwriteStruct(random_number, array_offset, tile_value, true)
@@ -352,10 +361,7 @@ randomNum:      // randomNum(m, n)
                 mov     t_index, x0
 
                 // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
-                xmul(array_offset, t_index, tile_size)
-                xaddEqual(array_offset, board_array)
-                xmul(array_offset, array_offset, -1)
-                xaddEqual(array_offset, _board)
+                xtilePointer(array_offset, _board, t_index)
 
                 // Flip number to negative
                 xreadStruct(t_value, array_offset, tile_value, true)
@@ -413,10 +419,7 @@ randomNum:      // randomNum(m, n)
                 mov     t_index, x0
                 
                 // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
-                xmul(array_offset, t_index, tile_size)
-                xaddEqual(array_offset, board_array)
-                xmul(array_offset, array_offset, -1)
-                xaddEqual(array_offset, _board)
+                xtilePointer(array_offset, _board, t_index)
 
                 // Read tile value
                 xreadStruct(t_value, array_offset, tile_value, true)
@@ -476,10 +479,8 @@ randomNum:      // randomNum(m, n)
                 mov     t_index, x0
 
                 // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
-                xmul(array_offset, t_index, tile_size)
-                xaddEqual(array_offset, board_array)
-                xmul(array_offset, array_offset, -1)
-                xaddEqual(array_offset, _board)
+                xtilePointer(array_offset, _board, t_index)
+
 
                 // Write value
                 mov     x18, EXIT
@@ -487,7 +488,7 @@ randomNum:      // randomNum(m, n)
                 xwriteStruct(t_value, array_offset, tile_value, true)
 
                 xprint(output_init, t_index, t_value)
-                
+
                 initialize_flip_exit_end:
         undefine(`array_offset')
         undefine(`t_index')
@@ -501,5 +502,45 @@ randomNum:      // randomNum(m, n)
         undefine(`tiles')
         undefine(`t')
 
+        xret()
+
+
+/**
+ * Display game
+ *
+ * Diaplay the board to the user.
+ *
+ * If the parameter peek is true, then show real tile values.
+ * Otherwise, show tiles accordingly.
+ *
+ * Show relative statistics as well.
+ */
+displayGame:            // displayGame(struct Board* board, struct Play* play, bool peek)
+        xfunc()
+
+        define(_board, x19)
+        define(_play, x20)
+        define(peek, x21)
+
+        // Store pointer of struct Table & struct Play & peek
+        mov     _board, x0
+        mov     _play, x1
+        mov     peek, x2
+
+        cmp     peek, 1
+        b.eq    display_show_peek
+        b       display_show_peek_end
+        display_show_peek:
+                xprint(peek_table_head)
+        display_show_peek_end:
+
+
+
+        
+        undefine(`_board')
+        undefine(`_play')
+        undefine(`peek')
 
         xret()
+
+
