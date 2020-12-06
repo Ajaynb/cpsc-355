@@ -3,7 +3,11 @@
 output:         .string "%d\n"
 output_f:       .string "%f\n"
 allstr:         .string "sp %d, fp %d\n"
-output_init:    .string "tile index %d, tile value %d\n"
+output_init:    .string "tile index %d, tile value %f\n"
+
+linebr:                 .string "\n"
+
+peek_table_head:        .string "Board: \n\n"
 
 
         // Equates for alloc & dealloc
@@ -37,6 +41,10 @@ output_init:    .string "tile index %d, tile value %d\n"
         WIN = 2
         DIE = 3
         QUIT = 4
+
+        // Boolean
+        TRUE = 1
+        FALSE = 0
 
         /**
         * Define GAMING tile
@@ -87,6 +95,10 @@ output_init:    .string "tile index %d, tile value %d\n"
         board_size_alloc = -(40) & -16
         board_size = -board_size_alloc
         board_array = board_size
+
+        // Customized macro function to calculate array offset of struct Tile in struct Board
+        // xtilePointer(destination, struct Board* board, index)
+        
 
 
         // Expose main function to OS and set balign
@@ -732,7 +744,7 @@ randomNum:      // randomNum(m, n)
                 mov     x12,    board_row                      // int attribute offset (positive)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
-
+                
                 ldr	x21,     [x9]                    // load the value
         
 
@@ -744,7 +756,7 @@ randomNum:      // randomNum(m, n)
                 mov     x12,    board_row                      // int attribute offset (positive)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
-
+                
                 ldr	x22,     [x9]                    // load the value
         
 
@@ -1074,7 +1086,38 @@ randomNum:      // randomNum(m, n)
                 scvtf   d1, x1
                 fdiv    d18, d0, d1
 
-                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+                
+                
+            
+
+            
+        
+            
+            
+            
+                fmov     d0,    d18
+                
+            
+
+            
+        
+
+        ldr     x0,     =output_f
+        bl      printf
+
+
+                // Calculate and store the pointer of current struct Tile
+                
                 
         // M4: MUL
         
@@ -1085,7 +1128,7 @@ randomNum:      // randomNum(m, n)
             
         
             
-                mov     x10,    x24                       // move next multiplier to x10
+                mov     x10,    t_index                       // move next multiplier to x10
                 mul     x9,     x9,     x10             // and multiplies x10 to x9
             
             
@@ -1104,32 +1147,15 @@ randomNum:      // randomNum(m, n)
         add     x25, x25, board_array
 
                 
-        // M4: MUL
-        
-        mov     x9,     1                       // initialize x9 to 1
-        
-        
-            
-            
-        
-            
-                mov     x10,    x25                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
-        
-            
-                mov     x10,    -1                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
-        
-        
-        mov     x25,     x9                      // result
+        // M4: MUL EQUAL
+        mov     x10,    -1
+        mul     x25,     x25,     x10
 
                 
         // M4: ADD EQUAL
         add     x25, x25, x19
+
+        
 
 
                 // Write to struct Tile
@@ -1170,9 +1196,22 @@ randomNum:      // randomNum(m, n)
                 mov     x12,    tile_covered                      // int attribute offset (positive)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                mov    x10,    1           // float value
+                mov    x10,    TRUE           // float value
 
                 str	x10,    [x9]         // store the value
+        
+
+                
+                
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x25                      // int base (negative)
+                mov     x12,    tile_value                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	d18,     [x9]                    // load the value
         
 
 
@@ -1233,7 +1272,7 @@ randomNum:      // randomNum(m, n)
                 mov     x12,    board_negatives                      // int attribute offset (positive)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
-
+                
                 ldr	x25,     [x9]                    // load the value
         
 
@@ -1245,7 +1284,8 @@ randomNum:      // randomNum(m, n)
                 bl      randomNum
                 mov     x27, x0
 
-                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
+                // Calculate and store the pointer of current struct Tile
+                
                 
         // M4: MUL
         
@@ -1275,33 +1315,15 @@ randomNum:      // randomNum(m, n)
         add     x24, x24, board_array
 
                 
-        // M4: MUL
-        
-        mov     x9,     1                       // initialize x9 to 1
-        
-        
-            
-            
-        
-            
-                mov     x10,    x24                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
-        
-            
-                mov     x10,    -1                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
-        
-        
-        mov     x24,     x9                      // result
+        // M4: MUL EQUAL
+        mov     x10,    -1
+        mul     x24,     x24,     x10
 
                 
         // M4: ADD EQUAL
         add     x24, x24, x19
 
+        
 
                 // Flip number to negative
                 
@@ -1309,18 +1331,23 @@ randomNum:      // randomNum(m, n)
 
         
                 mov     x11,    x24                      // int base (negative)
-                mov     x12,    x28                      // int attribute offset (positive)
+                mov     x12,    tile_value                      // int attribute offset (positive)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
-
-                ldr	x28,     [x9]                    // load the value
+                
+                ldr	d18,     [x9]                    // load the value
         
 
-                /*
-        // M4: MUL EQUAL
-        mov     x10,    -1
-        mul     x28,     x28,     x10
 
+                mov     x17, 0
+                scvtf   d17, x17
+
+                fcmp    d18, d17
+                b.lt    initialize_flip_neg
+
+                mov     x17, -1
+                scvtf   d17, x17
+                fmul    d18, d18, d17
                 
         
         
@@ -1334,14 +1361,14 @@ randomNum:      // randomNum(m, n)
         
         
                 mov     x11,    x24                      // int base (negative)
-                mov     x12,    x28                      // int attribute offset (positive)
+                mov     x12,    tile_value                      // int attribute offset (positive)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                mov    x10,    x28           // float value
+                fmov    d10,    d18           // float value
 
-                str	x10,    [x9]         // store the value
+                str	d10,    [x9]         // store the value
         
-*/
+
 
                 
         // M4: PRINT
@@ -1371,7 +1398,7 @@ randomNum:      // randomNum(m, n)
             
             
             
-                mov     x2,    x28
+                fmov     d0,    d18
                 
             
 
@@ -1379,35 +1406,6 @@ randomNum:      // randomNum(m, n)
         
 
         ldr     x0,     =output_init
-        bl      printf
-
-                
-        // M4: PRINT
-        
-        
-        
-
-        
-            
-            
-            
-                
-                
-            
-
-            
-        
-            
-            
-            
-                mov     x1,    x24
-                
-            
-
-            
-        
-
-        ldr     x0,     =output
         bl      printf
 
 
@@ -1438,7 +1436,239 @@ randomNum:      // randomNum(m, n)
                 str	x10,    [x9]         // store the value
         
 
+
+                // Loop again
+                b       initialize_flip_neg
+        initialize_flip_neg_end:
+        
+        
+        
+        
+        
+
+
+
+        // Flip to specials
+        
+        
+        
+        
+        
+
+        // Calculate max amount of x25
+        
+        // M4: MUL
+        
+        mov     x9,     1                       // initialize x9 to 1
+        
+        
+            
+            
+        
+            
+                mov     x10,    x23                       // move next multiplier to x10
+                mul     x9,     x9,     x10             // and multiplies x10 to x9
+            
+            
+        
+            
+                mov     x10,    SPE_PERCENT                       // move next multiplier to x10
+                mul     x9,     x9,     x10             // and multiplies x10 to x9
+            
+            
+        
+        
+        mov     x26,     x9                      // result
+
+        mov     x18, 100
+        udiv    x26, x26, x18
+
+        initialize_flip_spe:
+                // Loop condition
                 
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x19                      // int base (negative)
+                mov     x12,    board_specials                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x25,     [x9]                    // load the value
+        
+
+                cmp     x25, x26
+                b.ge    initialize_flip_spe_end
+
+                mov     x0, 0
+                sub     x1, x23, 1
+                bl      randomNum
+                mov     x27, x0
+                
+                // Calculate and store the pointer of current struct Tile
+                
+                
+        // M4: MUL
+        
+        mov     x9,     1                       // initialize x9 to 1
+        
+        
+            
+            
+        
+            
+                mov     x10,    x27                       // move next multiplier to x10
+                mul     x9,     x9,     x10             // and multiplies x10 to x9
+            
+            
+        
+            
+                mov     x10,    tile_size                       // move next multiplier to x10
+                mul     x9,     x9,     x10             // and multiplies x10 to x9
+            
+            
+        
+        
+        mov     x24,     x9                      // result
+
+                
+        // M4: ADD EQUAL
+        add     x24, x24, board_array
+
+                
+        // M4: MUL EQUAL
+        mov     x10,    -1
+        mul     x24,     x24,     x10
+
+                
+        // M4: ADD EQUAL
+        add     x24, x24, x19
+
+        
+
+                // Read tile value
+                
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x24                      // int base (negative)
+                mov     x12,    tile_value                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	d18,     [x9]                    // load the value
+        
+
+
+                // Check if tile is already negative
+                mov     x17, 0
+                scvtf   d17, x17
+                fcmp    d18, d17
+                b.lt    initialize_flip_spe
+
+                // Check if tile is already special
+                mov     x17, 20
+                scvtf   d17, x17
+                fcmp    d18, d17
+                b.ge    initialize_flip_spe
+
+                // Pick a special
+                mov     x0, DOUBLE_RANGE
+                mov     x1, DOUBLE_RANGE
+                bl      randomNum
+                mov     x18, x0
+                scvtf   d18, x18
+
+                // Flip the tile into special
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    x24                      // int base (negative)
+                mov     x12,    tile_value                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                fmov    d10,    d18           // float value
+
+                str	d10,    [x9]         // store the value
+        
+
+                
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+                
+                
+            
+
+            
+        
+            
+            
+            
+                mov     x1,    x27
+                
+            
+
+            
+        
+            
+            
+            
+                fmov     d0,    d18
+                
+            
+
+            
+        
+
+        ldr     x0,     =output_init
+        bl      printf
+
+
+
+                // Increase negatives amount in struct Board
+                
+        // M4: ADD ADD
+        add     x25, x25, 1
+
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    x19                      // int base (negative)
+                mov     x12,    board_specials                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x25           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+
                 
         // M4: PRINT
         
@@ -1469,16 +1699,139 @@ randomNum:      // randomNum(m, n)
         bl      printf
 
 
-
                 // Loop again
-                b       initialize_flip_neg
-        initialize_flip_neg_end:
+                b       initialize_flip_spe
+
+        initialize_flip_spe_end:
         
         
         
         
         
 
+
+
+        // Generate Exit
+        
+        
+        
+                initialize_flip_exit:
+                // Pick a tile
+                mov     x0, 0
+                sub     x1, x23, 1
+                bl      randomNum
+                mov     x27, x0
+
+                // Calculate and store the pointer of current struct Tile
+                
+                
+        // M4: MUL
+        
+        mov     x9,     1                       // initialize x9 to 1
+        
+        
+            
+            
+        
+            
+                mov     x10,    x27                       // move next multiplier to x10
+                mul     x9,     x9,     x10             // and multiplies x10 to x9
+            
+            
+        
+            
+                mov     x10,    tile_size                       // move next multiplier to x10
+                mul     x9,     x9,     x10             // and multiplies x10 to x9
+            
+            
+        
+        
+        mov     x24,     x9                      // result
+
+                
+        // M4: ADD EQUAL
+        add     x24, x24, board_array
+
+                
+        // M4: MUL EQUAL
+        mov     x10,    -1
+        mul     x24,     x24,     x10
+
+                
+        // M4: ADD EQUAL
+        add     x24, x24, x19
+
+        
+
+
+                // Write value
+                mov     x18, EXIT
+                scvtf   d18, x18
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    x24                      // int base (negative)
+                mov     x12,    tile_value                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                fmov    d10,    d18           // float value
+
+                str	d10,    [x9]         // store the value
+        
+
+
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+                
+                
+            
+
+            
+        
+            
+            
+            
+                mov     x1,    x27
+                
+            
+
+            
+        
+            
+            
+            
+                fmov     d0,    d18
+                
+            
+
+            
+        
+
+        ldr     x0,     =output_init
+        bl      printf
+
+
+                initialize_flip_exit_end:
+        
+        
+        
         
 
         
@@ -1487,7 +1840,6 @@ randomNum:      // randomNum(m, n)
         
         
         
-
 
         
         // M4: RET
@@ -1506,6 +1858,218 @@ randomNum:      // randomNum(m, n)
 
         ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
         ret
+
+
+
+
+
+/**
+ * Display game
+ *
+ * Diaplay the board to the user.
+ *
+ * If the parameter peek is true, then show real tile values.
+ * Otherwise, show tiles accordingly.
+ *
+ * Show relative statistics as well.
+ */
+displayGame:            // displayGame(struct Board* board, struct Play* play, bool peek)
+        
+        // M4: FUNC
+        stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
+        mov     fp,     sp                              // update FP to current SP
+        
+        // Save registers
+        str 	x19,    [fp, 16]
+        str 	x20,    [fp, 24]
+        str 	x21,    [fp, 32]
+        str 	x22,    [fp, 40]
+        str 	x23,    [fp, 48]
+        str 	x24,    [fp, 56]
+        str 	x25,    [fp, 64]
+        str 	x26,    [fp, 72]
+        str 	x27,    [fp, 80]
+        str 	x28,    [fp, 88]
+
+        // Reset registers to 0
+        mov     x19,    0
+        mov     x20,    0
+        mov     x21,    0
+        mov     x22,    0
+        mov     x23,    0
+        mov     x24,    0
+        mov     x25,    0
+        mov     x26,    0
+        mov     x27,    0
+        mov     x28,    0
+
+
+        
+        
+        
+
+        // Store pointer of struct Table & struct Play & x21
+        mov     x19, x0
+        mov     x20, x1
+        mov     x21, x2
+
+        cmp     x21, TRUE
+        b.eq    display_show_peek
+        b       display_show_peek_end
+        display_show_peek:
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+                
+                
+            
+
+            
+        
+
+        ldr     x0,     =peek_table_head
+        bl      printf
+
+        display_show_peek_end:
+
+        // Loop for displaying
+        
+        
+        
+        
+        
+        mov     x24, 0
+        mov     x25, 0
+        display_row:
+                // Loop condition
+                cmp     x24, x22
+                b.ge    display_row_end
+                
+                mov     x25, 0
+                display_col:
+                        // Loop condition
+                        cmp     x25, x23
+                        b.ge    display_col_end
+
+                        
+                        // Calculate and store the pointer of current struct Tile
+                        
+                
+        // M4: MUL
+        
+        mov     x9,     1                       // initialize x9 to 1
+        
+        
+            
+            
+        
+            
+                mov     x10,    t_index                       // move next multiplier to x10
+                mul     x9,     x9,     x10             // and multiplies x10 to x9
+            
+            
+        
+            
+                mov     x10,    tile_size                       // move next multiplier to x10
+                mul     x9,     x9,     x10             // and multiplies x10 to x9
+            
+            
+        
+        
+        mov     x26,     x9                      // result
+
+                
+        // M4: ADD EQUAL
+        add     x26, x26, board_array
+
+                
+        // M4: MUL EQUAL
+        mov     x10,    -1
+        mul     x26,     x26,     x10
+
+                
+        // M4: ADD EQUAL
+        add     x26, x26, x19
+
+        
+
+
+                        
+                        // Increment and loop again
+                        
+        // M4: ADD ADD
+        add     x25, x25, 1
+
+                        b       display_col
+                display_col_end:
+
+                // Print line break
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+                
+                
+            
+
+            
+        
+
+        ldr     x0,     =linebr
+        bl      printf
+
+
+                // Increment and loop again
+                
+        // M4: ADD ADD
+        add     x24, x24, 1
+
+                b       display_row
+        display_row_end:
+        
+        
+        
+        
+        
+        
+
+        
+        
+        
+        
+
+        
+        // M4: RET
+
+        // Restore registers
+        ldr 	x19,    [fp, 16]
+        ldr 	x20,    [fp, 24]
+        ldr 	x21,    [fp, 32]
+        ldr 	x22,    [fp, 30]
+        ldr 	x23,    [fp, 48]
+        ldr 	x24,    [fp, 56]
+        ldr 	x25,    [fp, 64]
+        ldr 	x26,    [fp, 72]
+        ldr 	x27,    [fp, 80]
+        ldr 	x28,    [fp, 88]
+
+        ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
+        ret
+
+
 
 
 

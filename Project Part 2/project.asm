@@ -5,6 +5,8 @@ output_f:       .string "%f\n"
 allstr:         .string "sp %d, fp %d\n"
 output_init:    .string "tile index %d, tile value %f\n"
 
+linebr:                 .string "\n"
+
 peek_table_head:        .string "Board: \n\n"
 
 
@@ -39,6 +41,10 @@ peek_table_head:        .string "Board: \n\n"
         WIN = 2
         DIE = 3
         QUIT = 4
+
+        // Boolean
+        TRUE = 1
+        FALSE = 0
 
         /**
         * Define GAMING tile
@@ -298,7 +304,7 @@ randomNum:      // randomNum(m, n)
 
         // Populate board with random positive values
         define(random_number, d18)
-        define(array_offset, x25)
+        define(_tile, x25)
         mov     t, 0
         initialize_populate_row:
                 // Loop condition
@@ -318,27 +324,27 @@ randomNum:      // randomNum(m, n)
 
                 xprint(output_f, random_number)
 
-                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
-                xtilePointer(array_offset, _board, t_index)
+                // Calculate and store the pointer of current struct Tile
+                xtilePointer(_tile, _board, t)
 
 
                 // Write to struct Tile
-                xwriteStruct(random_number, array_offset, tile_value, true)
-                xwriteStruct(1, array_offset, tile_covered, true)
+                xwriteStruct(random_number, _tile, tile_value, true)
+                xwriteStruct(TRUE, _tile, tile_covered, true)
                 
-                xreadStruct(random_number, array_offset, tile_value, true)
+                xreadStruct(random_number, _tile, tile_value, true)
 
                 // Increment and loop again
                 xaddAdd(t)
                 b       initialize_populate_row
         initialize_populate_row_end:
         undefine(`random_number')
-        undefine(`array_offset')
+        undefine(`_tile')
         
 
 
         // Flip to negative numbers
-        define(array_offset, x24)
+        define(_tile, x24)
         define(negatives, x25)
         define(max_negatives, x26)
         define(t_index, x27)
@@ -360,11 +366,11 @@ randomNum:      // randomNum(m, n)
                 bl      randomNum
                 mov     t_index, x0
 
-                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
-                xtilePointer(array_offset, _board, t_index)
+                // Calculate and store the pointer of current struct Tile
+                xtilePointer(_tile, _board, t_index)
 
                 // Flip number to negative
-                xreadStruct(t_value, array_offset, tile_value, true)
+                xreadStruct(t_value, _tile, tile_value, true)
 
                 mov     x17, 0
                 scvtf   d17, x17
@@ -375,7 +381,7 @@ randomNum:      // randomNum(m, n)
                 mov     x17, -1
                 scvtf   d17, x17
                 fmul    t_value, t_value, d17
-                xwriteStruct(t_value, array_offset, tile_value, true)
+                xwriteStruct(t_value, _tile, tile_value, true)
 
                 xprint(output_init, t_index, t_value)
 
@@ -387,7 +393,7 @@ randomNum:      // randomNum(m, n)
                 // Loop again
                 b       initialize_flip_neg
         initialize_flip_neg_end:
-        undefine(`array_offset')
+        undefine(`_tile')
         undefine(`negatives')
         undefine(`max_negatives')
         undefine(`t_index')
@@ -396,7 +402,7 @@ randomNum:      // randomNum(m, n)
 
 
         // Flip to specials
-        define(array_offset, x24)
+        define(_tile, x24)
         define(specials, x25)
         define(max_specials, x26)
         define(t_index, x27)
@@ -418,11 +424,11 @@ randomNum:      // randomNum(m, n)
                 bl      randomNum
                 mov     t_index, x0
                 
-                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
-                xtilePointer(array_offset, _board, t_index)
+                // Calculate and store the pointer of current struct Tile
+                xtilePointer(_tile, _board, t_index)
 
                 // Read tile value
-                xreadStruct(t_value, array_offset, tile_value, true)
+                xreadStruct(t_value, _tile, tile_value, true)
 
                 // Check if tile is already negative
                 mov     x17, 0
@@ -444,7 +450,7 @@ randomNum:      // randomNum(m, n)
                 scvtf   t_value, x18
 
                 // Flip the tile into special
-                xwriteStruct(t_value, array_offset, tile_value, true)
+                xwriteStruct(t_value, _tile, tile_value, true)
                 
                 xprint(output_init, t_index, t_value)
 
@@ -459,7 +465,7 @@ randomNum:      // randomNum(m, n)
                 b       initialize_flip_spe
 
         initialize_flip_spe_end:
-        undefine(`array_offset')
+        undefine(`_tile')
         undefine(`specials')
         undefine(`max_specials')
         undefine(`t_index')
@@ -468,7 +474,7 @@ randomNum:      // randomNum(m, n)
 
 
         // Generate Exit
-        define(array_offset, x24)
+        define(_tile, x24)
         define(t_index, x27)
         define(t_value, d18)
                 initialize_flip_exit:
@@ -478,19 +484,19 @@ randomNum:      // randomNum(m, n)
                 bl      randomNum
                 mov     t_index, x0
 
-                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
-                xtilePointer(array_offset, _board, t_index)
+                // Calculate and store the pointer of current struct Tile
+                xtilePointer(_tile, _board, t_index)
 
 
                 // Write value
                 mov     x18, EXIT
                 scvtf   t_value, x18
-                xwriteStruct(t_value, array_offset, tile_value, true)
+                xwriteStruct(t_value, _tile, tile_value, true)
 
                 xprint(output_init, t_index, t_value)
 
                 initialize_flip_exit_end:
-        undefine(`array_offset')
+        undefine(`_tile')
         undefine(`t_index')
         undefine(`t_value')
         
@@ -527,14 +533,58 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         mov     _play, x1
         mov     peek, x2
 
-        cmp     peek, 1
+        cmp     peek, TRUE
         b.eq    display_show_peek
         b       display_show_peek_end
         display_show_peek:
                 xprint(peek_table_head)
         display_show_peek_end:
 
+        // Loop for displaying
+        define(row, x22)
+        define(column, x23)
+        define(t, x24)
+        define(r, x25)
+        define(_tile, x26)
+        mov     t, 0
+        mov     r, 0
+        display_row:
+                // Loop condition
+                cmp     t, row
+                b.ge    display_row_end
+                
+                mov     r, 0
+                display_col:
+                        // Loop condition
+                        cmp     r, column
+                        b.ge    display_col_end
 
+                        
+                        // Calculate and store the pointer of current struct Tile
+                        xmul(x18, t, row)
+                        xaddEqual(x18, r)
+                        xtilePointer(_tile, _board, x18)
+
+
+                        
+                        // Increment and loop again
+                        xaddAdd(r)
+                        b       display_col
+                display_col_end:
+
+                // Print line break
+                xprint(linebr)
+
+                // Increment and loop again
+                xaddAdd(t)
+                b       display_row
+        display_row_end:
+        
+        undefine(`row')
+        undefine(`column')
+        undefine(`t')
+        undefine(`r')
+        undefine(`_tile')
 
         
         undefine(`_board')
