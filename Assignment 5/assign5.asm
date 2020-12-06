@@ -616,8 +616,6 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
 
 
         topdoc_print_end:
-        
-
 
         
         // Dealloc WordFrequency array
@@ -630,9 +628,14 @@ topRelevantDocs:        // topRelevantDocs(struct Table* table, int index, int t
 logToFile:      // logToFile(string, param1, param2, ...)
         xfunc()
 
-        // Store x0 and x1 temporarily
+        // Store arguments into registers and stack temporarily
         str     x0,     [fp, 96]
-        str     x1,     [fp, 104]
+        mov     x21,    x1
+        mov     x22,    x2
+        mov     x23,    x3
+        mov     x24,    x4
+        mov     x25,    x5
+        mov     x26,    x6
 
         // Open log file
         ldr     x0, =filename
@@ -640,17 +643,17 @@ logToFile:      // logToFile(string, param1, param2, ...)
         bl      fopen
         mov     x19, x0
 
-        // Move arguments 1 position forward & restore original x0 and x1
+        // Move arguments 1 position forward & restore original parameters
         // And use fprintf to write to file formatted
         mov     x0,     x19
-        mov     x2,     x1
-        mov     x3,     x2
-        mov     x4,     x3
-        mov     x5,     x4
-        mov     x6,     x5
-        mov     x7,     x6
+        
         ldr     x1,     [fp, 96]
-        ldr     x2,     [fp, 104]
+        mov     x2,     x21
+        mov     x3,     x22
+        mov     x4,     x23
+        mov     x5,     x24
+        mov     x6,     x25
+        mov     x7,     x26
         bl      fprintf
 
         // Close file
