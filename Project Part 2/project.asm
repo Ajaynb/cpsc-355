@@ -377,9 +377,6 @@ randomNum:      // randomNum(m, n)
                 // Increase negatives amount in struct Board
                 xaddAdd(negatives)
                 xwriteStruct(negatives, _board, board_negatives, true)
-                
-                xprint(output, negatives)
-
 
                 // Loop again
                 b       initialize_flip_neg
@@ -387,6 +384,81 @@ randomNum:      // randomNum(m, n)
         undefine(`array_offset')
         undefine(`negatives')
         undefine(`max_negatives')
+        undefine(`t_index')
+        undefine(`t_value')
+
+
+
+        // Flip to specials
+        define(array_offset, x24)
+        define(specials, x25)
+        define(max_specials, x26)
+        define(t_index, x27)
+        define(t_value, d18)
+
+        // Calculate max amount of specials
+        xmul(max_specials, tiles, SPE_PERCENT)
+        mov     x18, 100
+        udiv    max_specials, max_specials, x18
+
+        initialize_flip_spe:
+                // Loop condition
+                xreadStruct(specials, _board, board_specials, true)
+                cmp     specials, max_specials
+                b.ge    initialize_flip_spe_end
+
+                mov     x0, 0
+                sub     x1, tiles, 1
+                bl      randomNum
+                mov     t_index, x0
+                
+                // Calculate array offset for current struct Tile (This calculation is an exception, it runs backwards)
+                xmul(array_offset, t_index, tile_size)
+                xaddEqual(array_offset, board_array)
+                xmul(array_offset, array_offset, -1)
+                xaddEqual(array_offset, _board)
+
+                // Read tile value
+                xreadStruct(t_value, array_offset, tile_value, true)
+
+                // Check if tile is already negative
+                mov     x17, 0
+                scvtf   d17, x17
+                fcmp    t_value, d17
+                b.lt    initialize_flip_spe
+
+                // Check if tile is already special
+                mov     x17, 20
+                scvtf   d17, x17
+                fcmp    t_value, d17
+                b.ge    initialize_flip_spe
+
+                // Pick a special
+                mov     x0, DOUBLE_RANGE
+                mov     x1, DOUBLE_RANGE
+                bl      randomNum
+                mov     x18, x0
+                scvtf   t_value, x18
+
+                // Flip the tile into special
+                xwriteStruct(t_value, array_offset, tile_value, true)
+                
+                xprint(output_init, t_index, t_value)
+
+
+                // Increase negatives amount in struct Board
+                xaddAdd(specials)
+                xwriteStruct(specials, _board, board_specials, true)
+
+                xprint(output, specials)
+
+                // Loop again
+                b       initialize_flip_spe
+
+        initialize_flip_spe_end:
+        undefine(`array_offset')
+        undefine(`specials')
+        undefine(`max_specials')
         undefine(`t_index')
         undefine(`t_value')
 
