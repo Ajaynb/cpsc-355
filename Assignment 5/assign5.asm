@@ -19,7 +19,7 @@ str_top_amount: .string "How many top documents you want to retrieve? "
 str_scan_again: .string "Do you want to search again? (0 = no / 1 = yes) "
 str_ended:      .string "Ended.\n"
 
-filename:       .string "test.txt"
+filename:       .string "assign5.log"
 filemode:       .string "a+"
 
         
