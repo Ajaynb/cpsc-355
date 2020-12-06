@@ -9,9 +9,9 @@ output_init:    .string "tile index %d, tile value %f\n"
 str_linebr:                 .string "\n"
 str_table_header:           .string "Board: \n\n"
 str_tile_covered:           .string "·  "
-str_tile_peek_special:      .string "   %c    "
+str_tile_special_peek:      .string "   %c    "
 str_tile_special:           .string "%c  "
-str_tile_peek_number:       .string "%+6.2f  "
+str_tile_number_peek:       .string "%+6.2f  "
 str_tile_number:            .string "%c  "
 
 
@@ -162,7 +162,7 @@ main:   // main()
         
         sub     x0,     fp,     board
         sub     x1,     fp,     play
-        mov     x2,     TRUE
+        mov     x2,     FALSE
         bl      displayGame
 
 
@@ -594,16 +594,23 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
 
                         xreadStruct(x18, _tile, tile_covered, true)
 
+                        // Read tile value
+                        xreadStruct(t_value, _tile, tile_value, true)
+
+                        // If tile is uncovered
                         cmp     x18, TRUE
                         b.eq    display_uncovered
 
+                        // Else If is in peek mode
                         cmp     peek, TRUE
                         b.eq    display_uncovered
+
+                        // Else
+                        b       display_covered
+                        
                         
                         // Uncovered tile
                         display_uncovered:
-
-                                xreadStruct(t_value, _tile, tile_value, true)
 
                                 mov     x17, 20
                                 scvtf   d17, x17
@@ -613,14 +620,68 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
 
                                 // Special tiles
                                 display_uncovered_specials:
-                                        fcvtns  x27, d27
-                                        xprint(str_tile_peek_special, x27)
+                                        // If is in peek mode
+                                        cmp     peek, TRUE
+                                        b.eq    display_uncovered_specials_peek
+                                        b       display_uncovered_specials_normal
+
+                                        // Peek mode display
+                                        display_uncovered_specials_peek:
+                                                // Print tile
+                                                fcvtns  x27, d27
+                                                xprint(str_tile_special_peek, x27)
+                                        display_uncovered_specials_peek_end:
+                                        b       display_uncovered_specials_normal_end
+                                        
+                                        // Normal mode display
+                                        display_uncovered_specials_normal:
+                                                // Print tile
+                                                fcvtns  x27, d27
+                                                xprint(str_tile_special, x27)
+                                        display_uncovered_specials_normal_end:
+                                        
                                 display_uncovered_specials_end:
                                 b       display_uncovered_number_end
 
                                 // Number tile
                                 display_uncovered_number:
-                                        xprint(str_tile_peek_number, d27)
+                                        // If is in peek mode
+                                        cmp     peek, TRUE
+                                        b.eq    display_uncovered_number_peek
+                                        b       display_uncovered_number_normal
+                                        
+                                        // Peek mode display
+                                        display_uncovered_number_peek:
+                                                // Print tile
+                                                xprint(str_tile_number_peek, d27)
+                                        display_uncovered_number_peek_end:
+                                        b       display_uncovered_number_normal_end
+
+                                        // Normal mode display
+                                        display_uncovered_number_normal:
+                                                // Print tile
+                                                mov     x17, 0
+                                                scvtf   d17, x17
+
+                                                fcmp    t_value, d17
+                                                b.gt    display_uncovered_number_normal_pos
+                                                b       display_uncovered_number_normal_neg
+                                                
+                                                // Positive value
+                                                display_uncovered_number_normal_pos:
+                                                        // Print positive sign
+                                                        xprint(str_tile_number, POSITIVE)
+                                                display_uncovered_number_normal_pos_end:
+                                                b       display_uncovered_number_normal_neg_end
+                                                
+                                                // Negative value
+                                                display_uncovered_number_normal_neg:
+                                                        // Print negative sign
+                                                        xprint(str_tile_number, NEGATIVE)
+                                                display_uncovered_number_normal_neg_end:
+
+                                        display_uncovered_number_normal_end:
+
                                 display_uncovered_number_end:
 
 
@@ -629,7 +690,8 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
 
                         // Covered tile
                         display_covered:
-
+                                // Print tile covered
+                                xprint(str_tile_covered)
                         display_covered_end:
 
                         
