@@ -18,6 +18,7 @@ str_stats_peek_specials:        .string "Total specials:  %d/%d (%d%%)\n"
 str_play_lives:                 .string "Lives: %d	\n"
 str_play_bombs:                 .string "Bombs: %d	\n"
 str_play_score:                 .string "Score: %.2f	\n"
+str_play_total_score:           .string "Total: %.2f	\n"
 
 
 
@@ -764,21 +765,25 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         display_stats_normal:
                 define(lives, x24)
                 define(bombs, x25)
-                define(score, x26)
+                define(score, d26)
+                define(total_score, d27)
                 
                 // Read from struct Play* play
                 xreadStruct(lives, _play, play_lives, true)
                 xreadStruct(bombs, _play, play_bombs, true)
                 xreadStruct(score, _play, play_score, true)
+                xreadStruct(total_score, _play, play_total_score, true)
 
                 // Print stats
                 xprint(str_play_lives, lives)
                 xprint(str_play_bombs, bombs)
                 xprint(str_play_score, score)
+                xprint(str_play_total_score, total_score)
         
                 undefine(`lives')
                 undefine(`bombs')
                 undefine(`score')
+                undefine(`total_score')
         display_stats_normal_end:
 
         
@@ -789,5 +794,3 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         undefine(`peek')
 
         xret()
-
-
