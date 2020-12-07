@@ -1011,8 +1011,8 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
                 undefine(`duration')
         
         // Calculate final score
+        // int final_score = rate * score - time_deduct;
         calculate_score_final_score:
-                // int final_score = rate * score - time_deduct;
                 fmul    d18, rate, score
                 fsub    d18, d18, time_deduct
 
