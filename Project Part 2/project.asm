@@ -6,13 +6,15 @@ output_s:       .string "%c\n"
 allstr:         .string "sp %d, fp %d\n"
 output_init:    .string "tile index %d, tile value %f\n"
 
-str_linebr:                 .string "\n"
-str_table_header:           .string "Board: \n\n"
-str_tile_covered:           .string "·  "
-str_tile_special_peek:      .string "   %c    "
-str_tile_special:           .string "%c  "
-str_tile_number_peek:       .string "%+6.2f  "
-str_tile_number:            .string "%c  "
+str_linebr:                     .string "\n"
+str_table_header:               .string "Board: \n\n"
+str_tile_covered:               .string "·  "
+str_tile_special_peek:          .string "   %c    "
+str_tile_special:               .string "%c  "
+str_tile_number_peek:           .string "%+6.2f  "
+str_tile_number:                .string "%c  "
+str_stats_peek_negatives:       .string "Total negatives: %d/%d (%d%%)\n"
+str_stats_peek_specials:        .string "Total specials:  %d/%d (%d%%)\n"
 
 
         // Equates for alloc & dealloc
@@ -162,7 +164,7 @@ main:   // main()
         
         sub     x0,     fp,     board
         sub     x1,     fp,     play
-        mov     x2,     FALSE
+        mov     x2,     TRUE
         bl      displayGame
 
 
@@ -560,12 +562,12 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
 
         // Print a table header under peek mode
         cmp     peek, TRUE
-        b.eq    display_show_peek
-        b       display_show_peek_end
-        display_show_peek:
+        b.eq    display_header_peek
+        b       display_header_peek_end
+        display_header_peek:
                 // Print table header
                 xprint(str_table_header)
-        display_show_peek_end:
+        display_header_peek_end:
 
         // Loop for displaying
         define(t, x24)
@@ -712,6 +714,50 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         undefine(`r')
         undefine(`_tile')
         undefine(`t_value')
+
+
+        // Print stats, accordingly
+        cmp     peek, TRUE
+        b.eq    display_stats_peek
+        b       display_stats_normal
+
+        // If peek, then print statistic of the board.
+        display_stats_peek:
+                define(negatives, x24)
+                define(specials, x25)
+                define(tiles, x26)
+                define(percent, x27)
+
+                // Read values
+                xreadStruct(tiles, _board, board_tiles, true)
+                xreadStruct(negatives, _board, board_negatives, true)
+                xreadStruct(specials, _board, board_specials, true)
+
+                // Calculate negatives percent
+                xmul(x18, negatives, 100)
+                udiv    percent, x18, tiles
+                xprint(str_stats_peek_negatives, negatives, tiles, percent)
+
+                // Calculate specials percent
+                xmul(x18, specials, 100)
+                udiv    percent, x18, tiles
+                xprint(str_stats_peek_specials, specials, tiles, percent)
+
+                undefine(`negatives')
+                undefine(`specials')
+                undefine(`tiles')
+                undefine(`tiles_float')
+                undefine(`percent')
+        display_stats_peek_end:
+        b       display_stats_normal_end
+
+        // Otherwise, print the current play statistics.
+        display_stats_normal:
+
+
+        display_stats_normal_end:
+
+        
 
         
         undefine(`_board')
