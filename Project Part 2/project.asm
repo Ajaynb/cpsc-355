@@ -746,7 +746,6 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                 undefine(`negatives')
                 undefine(`specials')
                 undefine(`tiles')
-                undefine(`tiles_float')
                 undefine(`percent')
         display_stats_peek_end:
         b       display_stats_normal_end
