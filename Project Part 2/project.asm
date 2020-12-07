@@ -794,3 +794,62 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         undefine(`peek')
 
         xret()
+
+
+/**
+ * Start game
+ *
+ * Record the start timestamp and set the status to gaming.
+ */
+startGame:
+        xfunc()
+        define(_play, x19)
+        mov     _play, x0
+
+        // Change play status to GAMING
+        xwriteStruct(GAMING, _play, play_status, true)
+
+        // Record start time
+        mov     x0, 0
+        bl      time
+        xwriteStruct(x0, _play, play_start_timestamp, true)
+        
+        undefine(`_play')
+        xret()
+
+
+/**
+ * Exit game
+ *
+ * Record end timestamp and calculate gaming duration.
+ * Print user message.
+ */
+startGame:
+        xfunc()
+        define(_play, x19)
+        define(start_timestamp, x20)
+        define(end_timestamp, x21)
+        define(duration, x22)
+        mov     _play, x0
+
+        // Change play status to EXIT
+        xwriteStruct(EXIT, _play, play_status, true)
+
+        // Record end time
+        mov     x0, 0
+        bl      time
+        xwriteStruct(x0, _play, play_end_timestamp, true)
+
+        // Calculate duration
+        xreadStruct(start_timestamp, _play, play_start_timestamp, true)
+        xreadStruct(end_timestamp, _play, play_end_timestamp, true)
+        sub     duration, end_timestamp, start_timestamp
+        xwriteStruct(duration, _play, play_duration, true)
+        
+        undefine(`_play')
+        undefine(`start_timestamp')
+        undefine(`end_timestamp')
+        undefine(`duration')
+        xret()
+
+
