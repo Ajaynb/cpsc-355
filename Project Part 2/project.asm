@@ -801,7 +801,7 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
  *
  * Record the start timestamp and set the status to gaming.
  */
-startGame:
+startGame:      // startGame(struct Play* play)
         xfunc()
         define(_play, x19)
         mov     _play, x0
@@ -824,7 +824,7 @@ startGame:
  * Record end timestamp and calculate gaming duration.
  * Print user message.
  */
-exitGame:
+exitGame:       // exitGame(struct Play* play)
         xfunc()
         define(_play, x19)
         define(start_timestamp, x20)
@@ -851,4 +851,5 @@ exitGame:
         undefine(`end_timestamp')
         undefine(`duration')
         xret()
+
 
