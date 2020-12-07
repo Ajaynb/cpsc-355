@@ -766,14 +766,15 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                 define(bombs, x25)
                 define(score, x26)
                 
+                // Read from struct Play* play
                 xreadStruct(lives, _play, play_lives, true)
                 xreadStruct(bombs, _play, play_bombs, true)
                 xreadStruct(score, _play, play_score, true)
 
+                // Print stats
                 xprint(str_play_lives, lives)
                 xprint(str_play_bombs, bombs)
                 xprint(str_play_score, score)
-
         
                 undefine(`lives')
                 undefine(`bombs')
