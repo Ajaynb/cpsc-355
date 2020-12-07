@@ -8,7 +8,6 @@ output_init:    .string "tile index %d, tile value %f\n"
 
 str_linebr:                     .string "\n"
 str_enter_continue:             .string "press ENTER to continue..."
-str_clear:                      .string "cls"
 str_table_header:               .string "Board: \n\n"
 str_tile_covered:               .string "·  "
 str_tile_special_peek:          .string "   %c    "
