@@ -60,7 +60,14 @@ define(xaddEqual, `
         add     $1, $1, $2
 ')
 
-// xminusEqual(variable, param2) -> variable += param2;
+
+// xminusMinus(variable) -> variable ++;
+define(xminusMinus, `
+        // M4: MINUS MINUS
+        sub     $1, $1, 1
+')
+
+// xminusEqual(variable) -> variable ++;
 define(xminusEqual, `
         // M4: MINUS EQUAL
         sub     $1, $1, $2
