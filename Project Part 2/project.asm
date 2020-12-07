@@ -146,13 +146,13 @@ main:   // main()
         // Rand seed
         xrandSeed()
 
-        xprint(allstr, sp, fp)
+        /*xprint(allstr, sp, fp)*/
 
         // Alloc for struct Play & struct Board
         xalloc(play_size_alloc)
         xalloc(board_size_alloc)
 
-        xprint(allstr, sp, fp)
+        /*xprint(allstr, sp, fp)*/
 
         xwriteStruct(5, board, board_row)
         xwriteStruct(5, board, board_column)
@@ -164,11 +164,8 @@ main:   // main()
         and     board_array_size_alloc, board_array_size_alloc, -16
         xalloc(board_array_size_alloc)
 
-        xprint(allstr, sp, fp)
-
-
-        xprint(output, board_array_size_alloc)
-
+        /*xprint(allstr, sp, fp)*/
+        /*xprint(output, board_array_size_alloc)*/
 
         sub     x0,     fp,     board
         sub     x1,     fp,     play
