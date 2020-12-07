@@ -7,6 +7,7 @@ allstr:         .string "sp %d, fp %d\n"
 output_init:    .string "tile index %d, tile value %f\n"
 
 str_linebr:                     .string "\n"
+str_enter_continue:             .string "press ENTER to continue..."
 str_table_header:               .string "Board: \n\n"
 str_tile_covered:               .string "·  "
 str_tile_special_peek:          .string "   %c    "
@@ -19,6 +20,13 @@ str_play_lives:                 .string "Lives: %d	\n"
 str_play_bombs:                 .string "Bombs: %d	\n"
 str_play_score:                 .string "Score: %.2f	\n"
 str_play_total_score:           .string "Total: %.2f	\n"
+str_result_header:              .string "Result: \n\n"
+str_result_player:              .string "Player        %s\n"
+str_result_total_score:          .string "Tiles score   %.2f pts\n"
+str_result_left_bombs:          .string "Left bombs    %d\n"
+str_result_left_lives:          .string "Left lives    %d\n"
+str_result_duration:            .string "Duration      %lu s\n"
+str_result_final_score:         .string "Final score   %d pts\n"
 
 
 
@@ -851,5 +859,58 @@ exitGame:       // exitGame(struct Play* play)
         undefine(`end_timestamp')
         undefine(`duration')
         xret()
+
+
+
+/**
+ * Display play result
+ *
+ * Just printing values. Nicely with text colors and formats.
+ */
+displayResult:  // displayResult(struct Play* play)
+        xfunc()
+
+        define(_play, x19)
+        define(value, x20)
+        define(value_float, d20)
+        mov     _play, x0
+
+        // Print header
+        xprint(str_result_header)
+
+        // Print player name
+        xreadStruct(value, _play, play_player, true)
+        xprint(str_result_player, value)
+
+        // Print total tile score
+        xreadStruct(value_float, _play, play_total_score, true)
+        xprint(str_result_total_score, value_float)
+
+        // Print left bombs
+        xreadStruct(value, _play, play_bombs, true)
+        xprint(str_result_left_bombs, value)
+        
+        // Print left lives
+        xreadStruct(value, _play, play_lives, true)
+        xprint(str_result_left_lives, value)
+        
+        // Print duration
+        xreadStruct(value, _play, play_duration, true)
+        xprint(str_result_duration, value)
+        
+        // Print final score
+        xreadStruct(value, _play, play_final_score, true)
+        xprint(str_result_final_score, value)
+
+        // Print enter continue
+        xprint(str_enter_continue)
+
+
+        undefine(`_play')
+        undefine(`value')
+        undefine(`value_float')
+
+        xret()
+
 
 
