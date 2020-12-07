@@ -824,7 +824,7 @@ startGame:
  * Record end timestamp and calculate gaming duration.
  * Print user message.
  */
-startGame:
+exitGame:
         xfunc()
         define(_play, x19)
         define(start_timestamp, x20)
@@ -851,5 +851,4 @@ startGame:
         undefine(`end_timestamp')
         undefine(`duration')
         xret()
-
 
