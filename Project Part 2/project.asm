@@ -307,8 +307,8 @@ randomNum:      // randomNum(m, n)
         mov     _board, x0
         mov     _play, x1
 
-        xprint(output, _board)
-        xprint(output, _play)
+        /*xprint(output, _board)*/
+        /*xprint(output, _play)*/
 
         // Read row and column
         xreadStruct(row, _board, board_row, true)
