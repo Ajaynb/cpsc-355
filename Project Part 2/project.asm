@@ -925,7 +925,6 @@ displayResult:  // displayResult(struct Play* play)
  * 5. Use less time to win
  *
  * The following formula gives player a relatively fair score.
- * If the score is less than 0, then just simply count as 0.
  */
 
 calculateScore:        // calculateScore(struct Board* board, struct Play* play)
@@ -1030,3 +1029,16 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
         undefine(`time_deduct')
         undefine(`final_score')
         xret()
+
+
+
+/**
+ * Select position and place bomb.
+ *
+ * Only when the x and y values are within the board and the current status is gaming,
+ * invalid x and y would be ignored and this round would be ignored. So no effect if user
+ * accidently input incorrect value, everything (eg. double ranged bomb) will be saved
+ * for the next time, always.
+ *
+ * Using for loop with range to uncover tiles.
+ */
