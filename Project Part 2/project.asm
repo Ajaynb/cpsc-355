@@ -912,4 +912,121 @@ displayResult:  // displayResult(struct Play* play)
         xret()
 
 
+/**
+ * Calculate the final score of play
+ *
+ * It calculates a comprehensive score for the game.
+ *
+ * According to the formula, by doing the following would get a higher mark:
+ * 1. Uncover more tiles
+ * 2. Get higher uncover tile score
+ * 3. Use less bombs to win
+ * 4. Keep more lives to win
+ * 5. Use less time to win
+ *
+ * The following formula gives player a relatively fair score.
+ * If the score is less than 0, then just simply count as 0.
+ */
 
+calculateScore:        // calculateScore(struct Board* board, struct Play* play)
+        xfunc()
+        define(_board, x19)
+        define(_play, x20)
+        define(rate, d21)
+        define(score, d22)
+        define(time_deduct, d23)
+        define(final_score, x24)
+
+        // Calculate rate
+        // float rate = 1.0 * play->uncovered_tiles / board->tiles;
+        calculate_score_rate:
+                define(uncovered_tiles, x25)
+                define(tiles, x26)
+
+                // Read stats from struct Play* play
+                xreadStruct(uncovered_tiles, _play, play_uncovered_tiles, true)
+                xreadStruct(tiles, _board, board_tiles, true)
+                
+                // Calculate portion of uncovered tiles
+                scvtf   d18, uncovered_tiles
+                scvtf   d17, tiles
+                fdiv    rate, d18, d17
+
+                undefine(`uncovered_tiles')
+                undefine(`tiles')
+        
+        // Calculate score
+        // float score = play->total_score * 20 + play->bombs * 33 + play->lives * 10;
+        calculate_score_score:
+                define(total_score, x25)
+                define(bombs, x26)
+                define(lives, x27)
+
+                // Read stats from struct Play* play
+                xreadStruct(total_score, _play, play_total_score, true)
+                xreadStruct(bombs, _play, play_bombs, true)
+                xreadStruct(lives, _play, play_lives, true)
+
+                // Calculate portion of total score
+                mov     x18, 20
+                scvtf   d17, total_score
+                scvtf   d18, x18
+                fmul    d16, d17, d18
+                fadd    score, score, d16
+
+                // Calculate protion of bombs left
+                mov     x18, 33
+                scvtf   d17, bombs
+                scvtf   d18, x18
+                fmul    d16, d17, d18
+                fadd    score, score, d16
+                
+                // Calculate protion of lives left
+                mov     x18, 33
+                scvtf   d17, lives
+                scvtf   d18, x18
+                fmul    d16, d17, d18
+                fadd    score, score, d16
+                
+                undefine(`total_score')
+                undefine(`bombs')
+                undefine(`lives')
+        
+
+        // Calculate time deduct
+        // float time_deduct = play->duration * 46;
+        calculate_score_time_deduct:
+                define(duration, x25)
+
+                // Read stats from struct Play* play
+                xreadStruct(duration, _play, play_duration, true)
+
+                // Calculate protion of lives left
+                mov     x18, 46
+                scvtf   d17, duration
+                scvtf   d18, x18
+                fmul    d16, d17, d18
+                fadd    time_deduct, time_deduct, d16
+
+                undefine(`duration')
+        
+        // Calculate final score
+        calculate_score_final_score:
+                // int final_score = rate * score - time_deduct;
+                fmul    d18, rate, score
+                fsub    d18, d18, time_deduct
+
+                fcvtns  final_score, d18
+
+        // Write final score to struct Play* play
+        // play->final_score = final_score
+        xreadStruct(final_score, _play, play_final_score, true)
+
+
+        undefine(`_board')
+        undefine(`_play')
+        undefine(`rate')
+        undefine(`score')
+        undefine(`time_deduct')
+        undefine(`final_score')
+        xret()
