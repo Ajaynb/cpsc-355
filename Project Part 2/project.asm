@@ -8,6 +8,7 @@ output_init:    .string "tile index %d, tile value %f\n"
 
 str_linebr:                     .string "\n"
 str_enter_continue:             .string "press ENTER to continue..."
+str_clear:                      .string "cls"
 str_table_header:               .string "Board: \n\n"
 str_tile_covered:               .string "·  "
 str_tile_special_peek:          .string "   %c    "
@@ -129,7 +130,6 @@ str_result_final_score:         .string "Final score   %d pts\n"
                 xaddEqual($1, $2)
         ')
 
-
         // Expose main function to OS and set balign
         .global main
         .balign 4
@@ -167,22 +167,25 @@ main:   // main()
         /*xprint(allstr, sp, fp)*/
         /*xprint(output, board_array_size_alloc)*/
 
+        // Initialize game
+        // initializeGame(&board, &play);
         sub     x0,     fp,     board
         sub     x1,     fp,     play
         bl      initializeGame
 
-        
+        // Peek game board before start
+        // displayGame(&board, &play, true);
         sub     x0,     fp,     board
         sub     x1,     fp,     play
         mov     x2,     TRUE
         bl      displayGame
 
-        
-        sub     x0,     fp,     board
-        sub     x1,     fp,     play
-        mov     x2,     FALSE
-        bl      displayGame
-
+        // Breaks for actual game
+        xprint(str_linebr)
+        xprint(str_enter_continue)
+        bl      getchar
+        xprint(str_linebr)
+        xprint(str_linebr)
 
 
         // Dealloc for struct Play & struct Board and its array
