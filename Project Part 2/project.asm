@@ -1127,7 +1127,7 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 undefine(`column')
 
         
-        // Control range value
+        // Range max value protection
         // If the range is extremely big, when uncover tils, inefficient
         // Set the range value to the max size of board if exceeded
         play_game_range_control:
