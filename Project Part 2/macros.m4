@@ -41,15 +41,11 @@ define(`argn', `ifelse(`$1', 1, ``$2'',
 // xadd(destination, param2, param3, ...) -> destination = param2 + param3 + ...
 define(xadd, `
         // M4: ADD
-        define(`index', eval(`1'))
         mov     x9,     0                       // initialize x9 to 0
-        
-        foreach(`t', `$@', `
-            ifelse(index, `1', `', `format(`
-                mov     x10,    t                       // move next number to x10
-                add     x9,     x9,     x10             // and Adds x10 to x9
-            ')')
-            define(`index', incr(index))
+
+        forloop(`t', `2', `$#', `
+            mov     x10,    argn(t, $@)             // move next number to x10
+            add     x9,     x9,     x10             // and Adds x10 to x9
         ')
         
         mov     $1,     x9                      // result
@@ -85,7 +81,6 @@ define(xmin, `
         // M4: MIN
         mov     x9,     $2
         mov     x10,    $3
-        // csel    $1,     x9,     x10,    le
 
         format(`
 
@@ -130,7 +125,6 @@ define(xmax, `
 // xmul(destination, param2, param3, ...)
 define(xmul, `
         // M4: MUL
-        define(`index', eval(`1'))
         mov     x9,     1                       // initialize x9 to 1
         
         forloop(`t', `2', `$#', `
