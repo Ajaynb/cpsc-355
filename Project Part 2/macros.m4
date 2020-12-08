@@ -387,8 +387,6 @@ define(xret, `
 
         ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
         ret
-
-
 ')
 
 
