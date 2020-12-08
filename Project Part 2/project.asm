@@ -17,7 +17,7 @@ str_tile_number:                .string "%c  "
 str_stats_peek_negatives:       .string "Total negatives: %d/%d (%d%%)\n"
 str_stats_peek_specials:        .string "Total specials:  %d/%d (%d%%)\n"
 str_play_lives:                 .string "Lives: %d	\n"
-str_play_bombs:                 .string "Bombs: %d	\n"
+str_play_bombs:                 .string "Bombs: %d	(range: x%d)\n"
 str_play_score:                 .string "Score: %.2f	\n"
 str_play_total_score:           .string "Total: %.2f	\n"
 str_result_header:              .string "Result: \n\n"
@@ -156,8 +156,8 @@ main:   // main()
 
         /*xprint(allstr, sp, fp)*/
 
-        xwriteStruct(10, board, board_row)
-        xwriteStruct(10, board, board_column)
+        xwriteStruct(30, board, board_row)
+        xwriteStruct(30, board, board_column)
 
 
         // Alloc for array in struct Board
@@ -810,23 +810,26 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                 define(lives, x24)
                 define(bombs, x25)
                 define(score, d26)
+                define(range, x28)
                 define(total_score, d27)
                 
                 // Read from struct Play* play
                 xreadStruct(lives, _play, play_lives, true)
                 xreadStruct(bombs, _play, play_bombs, true)
                 xreadStruct(score, _play, play_score, true)
+                xreadStruct(range, _play, play_range, true)
                 xreadStruct(total_score, _play, play_total_score, true)
 
                 // Print stats
                 xprint(str_play_lives, lives)
-                xprint(str_play_bombs, bombs)
+                xprint(str_play_bombs, bombs, range)
                 xprint(str_play_score, score)
                 xprint(str_play_total_score, total_score)
         
                 undefine(`lives')
                 undefine(`bombs')
                 undefine(`score')
+                undefine(`range')
                 undefine(`total_score')
         display_stats_normal_end:
 
