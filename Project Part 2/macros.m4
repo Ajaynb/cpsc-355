@@ -25,11 +25,18 @@ define(`forloop_arg', `ifelse(eval(`($1) <= ($2)'), `1',
 # forloop(var, from, to, stmt) - refactored to share code
 define(`forloop', `ifelse(eval(`($2) <= ($3)'), `1',
   `pushdef(`$1')_forloop(eval(`$2'), eval(`$3'),
+    `define(`$1',', `)$4')popdef(`$1')',
+   `pushdef(`$1')_forloop_decr(eval(`$2'), eval(`$3'),
     `define(`$1',', `)$4')popdef(`$1')')')
 define(`_forloop',
   `$3`$1'$4`'ifelse(`$1', `$2', `',
     `$0(incr(`$1'), `$2', `$3', `$4')')')
+define(`_forloop_decr',
+  `$3`$1'$4`'ifelse(`$1', `$2', `',
+    `$0(decr(`$1'), `$2', `$3', `$4')')')
 
+define(`argn', `ifelse(`$1', 1, ``$2'',
+       `argn(decr(`$1'), shift(shift($@)))')')
 
 // xadd(destination, param2, param3, ...) -> destination = param2 + param3 + ...
 define(xadd, `
@@ -171,14 +178,24 @@ define(xprint, `
 ')
 
 
-// xscan(string, destination)
+// xscan(string, destination1, destination2, ...)
 define(xscan, `
         // M4: SCAN
         ldr     x0,     =$1                     // 1st parameter: scnocc, the formatted string
-        ldr     x1,     =n                      // 2nd parameter: &n, the data to store for user input
-        bl      scanf                           // scanf(scnocc, &n);
-        ldr     x1,     =n                      // 2nd parameter: &n
-        ldr     $2,    [x1]                     // int n = x1;
+
+        forloop(`t', `2', `$#', `
+            format(`
+                sub     sp, sp, 16
+                mov     x%s, sp
+            ', eval(decr(t)))
+        ')
+        
+        bl      scanf                           // scanf(string, &pointer);
+
+        forloop(`t', `$#', `2', `
+            ldr     argn(t, $@), [sp]
+            add     sp, sp, 16
+        ')
 ')
 
 

@@ -27,6 +27,9 @@ str_result_left_bombs:          .string "Left bombs    %d\n"
 str_result_left_lives:          .string "Left lives    %d\n"
 str_result_duration:            .string "Duration      %lu s\n"
 str_result_final_score:         .string "Final score   %d pts\n"
+str_enter_q:                    .string "Enter q to quit, \n"
+str_bomb_position_ask:          .string "Enter bomb position (x y): "
+str_bomb_position_input:        .string "%d %d"
 
 
 
@@ -106,7 +109,7 @@ str_result_final_score:         .string "Final score   %d pts\n"
         play_size = -play_size_alloc
         
         /**
-        * Define GAMING board
+        * Define gaming board
         *
         * The game board contains all the tiles and relative informations.
         */
@@ -179,29 +182,46 @@ main:   // main()
         mov     x2,     TRUE
         bl      displayGame
 
-        // Play one round
-        // playGame(&board, &play, x, y);
-        sub     x0,     fp,     board
-        sub     x1,     fp,     play
-        mov     x2,     0
-        mov     x3,     0
-        bl      playGame
-
-        
-        // Peek game board before start
-        // displayGame(&board, &play, true);
-        sub     x0,     fp,     board
-        sub     x1,     fp,     play
-        mov     x2,     FALSE
-        bl      displayGame
 
         // Breaks for actual game
-        /*xprint(str_linebr)
+        xprint(str_linebr)
         xprint(str_enter_continue)
         bl      getchar
         xprint(str_linebr)
-        xprint(str_linebr)*/
+        xprint(str_linebr)
 
+
+        play_start:
+                // Play one round
+                // playGame(&board, &play, x, y);
+                sub     x0,     fp,     board
+                sub     x1,     fp,     play
+                mov     x2,     5
+                mov     x3,     5
+                bl      playGame
+
+                
+                // Peek game board before start
+                // displayGame(&board, &play, true);
+                sub     x0,     fp,     board
+                sub     x1,     fp,     play
+                mov     x2,     FALSE
+                bl      displayGame
+
+
+                // Breaks for actual game
+                xprint(str_linebr)
+                xprint(str_enter_continue)
+                bl      getchar
+                xprint(str_linebr)
+                xprint(str_linebr)
+
+                // b       play_start
+                xscan(str_bomb_position_input, x18, x17)
+                xprint(str_bomb_position_input, x18, x17)
+
+        play_end:
+        
 
         // Dealloc for struct Play & struct Board and its array
         xdealloc(play_size_alloc)
@@ -1117,7 +1137,6 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 xreadStruct(range, _play, play_range, true)
 
                 // Modify values
-                mov     range_new, range
                 mov     range_new, 1    // play->range = 1;
                 xminusMinus(bombs)      // play->bombs--;
 
@@ -1355,7 +1374,7 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
 
                 play_game_lives_bombs_check_lose:
                         // Claim die
-                        xwriteStruct(DIE, _play, play_status, true)
+                        xwriteStruct(DIE, _play, play_status, true)     // play->status = DIE;
                 play_game_lives_bombs_check_lose_end:
 
 
@@ -1375,3 +1394,9 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         undefine(`range')
 
         xret()
+
+
+
+        .data                                            // global variables
+n:      .int    0                                        // int n = 0
+
