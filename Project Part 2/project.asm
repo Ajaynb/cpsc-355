@@ -1127,6 +1127,18 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 undefine(`column')
 
         
+        // Control range value
+        // If the range is extremely big, when uncover tils, inefficient
+        // Set the range value to the max size of board if exceeded
+        play_game_range_control:
+                // Read range value
+                xreadStruct(range, _play, play_range, true)
+
+                // Find larger max value and set max value of range
+                xmax(x18, MAX_ROW, MAX_COL)
+                xmin(range, range, x18)
+
+
 
 
         // Reset range and deduct bomb by one
