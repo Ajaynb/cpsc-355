@@ -99,7 +99,7 @@ define(xmin, `
                 b       end_%s
         end_%s:
 
-        ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+        ', xcounter, xcounter, xcounter, xcounter, xcounter, xcounter, xcounter)
         
         xcount()
 ')
@@ -109,7 +109,6 @@ define(xmax, `
         // M4: MAX
         mov     x9,     $2
         mov     x10,    $3
-        // csel    $1,     x9,     x10,    ge
 
         format(`
 
@@ -123,7 +122,7 @@ define(xmax, `
                 b       end_%s
         end_%s:
 
-        ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+        ', xcounter, xcounter, xcounter, xcounter, xcounter, xcounter, xcounter)
         
         xcount()
 ')
@@ -232,7 +231,7 @@ define(xarray, `
                     b       loop_%s
             loop_end_%s:
 
-        ', eval(xcounter), eval(xcounter), eval(xcounter), eval(xcounter))
+        ', xcounter, xcounter, xcounter, xcounter)
         xcount()
 ')
 // xreadArray(destination, base, size, index, ignore_fp = false)
