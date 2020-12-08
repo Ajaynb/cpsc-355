@@ -153,8 +153,8 @@ main:   // main()
 
         /*xprint(allstr, sp, fp)*/
 
-        xwriteStruct(5, board, board_row)
-        xwriteStruct(5, board, board_column)
+        xwriteStruct(10, board, board_row)
+        xwriteStruct(10, board, board_column)
 
 
         // Alloc for array in struct Board
@@ -179,12 +179,28 @@ main:   // main()
         mov     x2,     TRUE
         bl      displayGame
 
+        // Play one round
+        // playGame(&board, &play, x, y);
+        sub     x0,     fp,     board
+        sub     x1,     fp,     play
+        mov     x2,     5
+        mov     x3,     5
+        bl      playGame
+
+        
+        // Peek game board before start
+        // displayGame(&board, &play, true);
+        sub     x0,     fp,     board
+        sub     x1,     fp,     play
+        mov     x2,     FALSE
+        bl      displayGame
+
         // Breaks for actual game
-        xprint(str_linebr)
+        /*xprint(str_linebr)
         xprint(str_enter_continue)
         bl      getchar
         xprint(str_linebr)
-        xprint(str_linebr)
+        xprint(str_linebr)*/
 
 
         // Dealloc for struct Play & struct Board and its array
@@ -294,7 +310,7 @@ randomNum:      // randomNum(m, n)
  * Simply convert between 1-d array index to x and y by math.
  */
 
- initializeGame:        // initializeGame(struct Board* board, struct Play* play)
+initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         xfunc()
 
         define(_board, x19)
@@ -324,7 +340,7 @@ randomNum:      // randomNum(m, n)
 
         // Write new row & column back to struct Board* board
         xwriteStruct(row, _board, board_row, true)
-        xwriteStruct(column, _board, board_row, true)
+        xwriteStruct(column, _board, board_column, true)
 
         // Calculate tiles
         mul     tiles, row, column
@@ -615,7 +631,7 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                         // Read tile value
                         xreadStruct(t_value, _tile, tile_value, true)
 
-                        // If tile is uncovered
+                        // If tile is not covered
                         cmp     x18, FALSE
                         b.eq    display_uncovered
 
@@ -1042,3 +1058,182 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
  *
  * Using for loop with range to uncover tiles.
  */
+
+playGame:       // playGame(struct Board* board, struct Play* play, const int x, const int y)
+        xfunc()
+        
+        define(_board, x19)
+        define(_play, x20)
+        define(x, x21)
+        define(y, x22)
+
+        // Store pointer of struct Table & struct Play & x & y
+        mov     _board, x0
+        mov     _play, x1
+        mov     x, x2
+        mov     y, x3
+
+        // Check both x and y values within the board and gaming status
+        play_game_check_x_y:
+                define(row, x23)
+                define(column, x24)
+
+
+                // Read from struct
+                xreadStruct(row, _board, board_row, true)
+                xreadStruct(column, _board, board_column, true)
+
+                // Check range for x, if less than 0, then return
+                cmp     x, 0
+                b.lt    play_game_end
+
+                // Check range for x, if greter or equal to row, then return
+                cmp     x, row
+                b.ge    play_game_end
+
+                // Check range for y, if less than 0, then return
+                cmp     y, 0
+                b.lt    play_game_end
+
+                // Check rnage for y, if greater or equal to column, then return
+                cmp     y, column
+                b.ge    play_game_end
+
+                undefine(`row')
+                undefine(`column')
+
+
+
+
+        // Loop for uncover tiles
+        play_game_uncover_tile:
+                define(t, x23)
+                define(r, x24)
+                define(range, x25)
+
+                //Read value and set t & r
+                xreadStruct(range, _play, play_range, true)
+                xmul(t, range, -1)
+                xmul(r, range, -1)
+
+
+                // Loop for uncovering rows in range
+                play_game_uncover_tile_row:
+                        cmp     t, range
+                        b.gt    play_game_uncover_tile_row_end
+
+                        mov     r, 0
+                        // Loop for uncovering columns in range
+                        play_game_uncover_tile_column:
+                                cmp     r, range
+                                b.gt    play_game_uncover_tile_column_end
+
+                                
+                                // Validate if the index is within valid range
+                                play_game_uncover_tile_index_validate:
+                                        // Define uncover index variable
+                                        define(uncover_index, x28)
+                                        define(uncover_x, x17)
+                                        define(uncover_y, x18)
+                                        define(column, x27)
+                                        define(tiles, x16)
+                                        define(_tile, x26)
+                                        define(t_covered, x15)
+
+                                        // Read from struct Board* board
+                                        xreadStruct(tiles, _board, board_tiles, true)
+                                        xreadStruct(column, _board, board_column, true)
+
+                                        // Calculate x and y of the tile to uncover
+                                        xadd(uncover_x, x, t)   // int uncover_x = x + t;
+                                        xadd(uncover_y, y, r)   // int uncover_y = y + r;
+
+                                        // int index = (uncover_x * board->column) + uncover_y;
+                                        madd    uncover_index, uncover_x, column, uncover_y
+
+
+                                        // If index < 0, then it's invalid, do nothing
+                                        cmp     uncover_index, 0
+                                        b.lt    play_game_uncover_tile_index_validate_end
+
+                                        // If index >= tiles, then it's invalid, do nothing
+                                        cmp     uncover_index, tiles
+                                        b.ge    play_game_uncover_tile_index_validate_end
+
+                                        // If y of uncover tile < 0, then it's invalid, do nothing
+                                        cmp     uncover_y, 0
+                                        b.lt    play_game_uncover_tile_index_validate_end
+
+                                        // If y of uncover tile >= column, then it's invalid, do nothing
+                                        cmp     uncover_y, column
+                                        b.ge    play_game_uncover_tile_index_validate_end
+                                        
+                                        // Get current tile pointer
+                                        xtilePointer(_tile, _board, uncover_index)
+
+                                        // If tile.covered == FALSE, then it's already uncovered, do nothing
+                                        xreadStruct(t_covered, _tile, tile_covered, true)
+                                        cmp     t_covered, FALSE
+                                        b.eq    play_game_uncover_tile_index_validate_end
+
+                                        // Uncover tile
+                                        xwriteStruct(FALSE, _tile, tile_covered, true)
+
+
+                                        undefine(`uncover_index')
+                                        undefine(`uncover_x')
+                                        undefine(`uncover_y')
+                                        undefine(`column')
+                                        undefine(`tiles')
+                                        undefine(`_tile')
+                                        undefine(`t_covered')
+                                play_game_uncover_tile_index_validate_end:
+
+
+
+                                // Increment & loop again
+                                xaddAdd(r)
+                                b       play_game_uncover_tile_column
+                        play_game_uncover_tile_column_end:
+
+                        // Increment & loop again
+                        xaddAdd(t)
+                        b       play_game_uncover_tile_row
+                play_game_uncover_tile_row_end:
+
+                undefine(`t')
+                undefine(`r')
+                undefine(`range')
+                undefine(`row')
+
+
+        // Reset range and deduct bomb by one
+        play_game_deduct:
+                define(bomb, x23)
+                define(range, x24)
+
+                // Read values
+                xreadStruct(bomb, _play, play_bombs, true)
+                xreadStruct(range, _play, play_range, true)
+
+                // Modify values
+                mov     range, 1        // play->range = 1;
+                xminusMinus(range)      // play->bombs--;
+
+                // Write back values
+                xwriteStruct(bomb, _play, play_bombs, true)
+                xwriteStruct(range, _play, play_range, true)
+
+                undefine(`bomb')
+                undefine(`range')
+
+
+        // Function end
+        play_game_end:
+
+        undefine(`_board')
+        undefine(`_play')
+        undefine(`x')
+        undefine(`y')
+
+        xret()
