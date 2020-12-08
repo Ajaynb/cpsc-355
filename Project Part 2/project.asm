@@ -219,13 +219,14 @@ main:   // main()
                 mov     x3,     y
                 bl      playGame
 
+                // Line br
+                xprint(str_linebr)
+                xprint(str_linebr)
 
                 // Get gamming status, if not gamming, then get out from loop
                 xreadStruct(status, play, play_status)
                 cmp     status, GAMING
                 b.ne    play_end
-
-
 
                 b       play_start
                 undefine(`x')
@@ -239,6 +240,9 @@ main:   // main()
         sub     x0,     fp,     play
         bl      exitGame
 
+        // Line br
+        xprint(str_linebr)
+        xprint(str_linebr)
 
         // Calculate gamming score
         // calculateScore(&board, &play);
