@@ -1206,11 +1206,11 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                         xreadStruct(t_value, _tile, tile_value, true)
 
                                         // Do different things when meet different tiles
-                                        
                                         play_game_uncover_tile_value:
                                                 
                                                 // If the tile is EXIT
-                                                ldr     d16, =EXIT
+                                                ldr     x16, =EXIT
+                                                scvtf   d16, x16
                                                 fcmp    t_value, d16
                                                 b.eq    play_game_uncover_tile_value_exit
                                                 b       play_game_uncover_tile_value_exit_end
@@ -1218,11 +1218,13 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                                 play_game_uncover_tile_value_exit:
                                                         // Claim winning
                                                         xwriteStruct(WIN, _play, play_status, true)
+                                                        b       play_game_uncover_tile_value_end
                                                 play_game_uncover_tile_value_exit_end:
 
                                                 
                                                 // If the tile is DOUBLE RANGE
-                                                ldr     d16, =DOUBLE_RANGE
+                                                ldr     x16, =DOUBLE_RANGE
+                                                scvtf   d16, x16
                                                 fcmp    t_value, d16
                                                 b.eq    play_game_uncover_tile_value_double_range
                                                 b       play_game_uncover_tile_value_double_range_end
@@ -1236,6 +1238,7 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                                         xwriteStruct(t_range, _play, play_range, true)
 
                                                         undefine(`t_range')
+                                                        b       play_game_uncover_tile_value_end
                                                 play_game_uncover_tile_value_double_range_end:
 
 
@@ -1243,25 +1246,23 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                                 play_game_uncover_tile_value_number:
                                                         define(total_score, d17)
                                                         define(score, d16)
-
-                                                        // Read tile value
-                                                        /*xreadStruct(t_value, _tile, tile_value, true)*/
                                                         
                                                         // Read total score and increase by tile value, and write back
                                                         xreadStruct(total_score, _play, play_total_score, true)
-                                                        test1:
                                                         fadd    total_score, total_score, t_value
                                                         xwriteStruct(total_score, _play, play_total_score, true)
                                                         
                                                         // Read score and increase by tile value, and write back
                                                         xreadStruct(score, _play, play_score, true)
-                                                        test2:
                                                         fadd    score, score, t_value
                                                         xwriteStruct(score, _play, play_score, true)
 
                                                         undefine(`total_score')
                                                         undefine(`score')
-                                        
+                                                        b       play_game_uncover_tile_value_end
+
+                                                
+                                        play_game_uncover_tile_value_end:
 
 
                                         undefine(`uncover_index')
