@@ -159,18 +159,17 @@ define(xprint, `
         define(`register_x_index', eval(`0'))
         define(`register_d_index', eval(`0'))
 
-        foreach(`t', `$@', `
-            define(`register_type', substr(t, 0, 1))
+        forloop(`t', `1', `$#', `
+            define(`param', argn(t, $@))
+            define(`register_type', substr(param, 0, 1))
             
             ifelse(register_type, `d', `
-                ifelse(index, `0', `', `format(`fmov     d%s,    %s', eval(register_d_index), `t')')
+                format(`fmov     d%s,    %s', register_d_index, param)
                 define(`register_d_index', incr(register_d_index))
             ', `
-                ifelse(index, `0', `', `format(`mov     x%s,    %s', eval(register_x_index), `t')')
+                format(`mov     x%s,    %s', register_x_index, param)
                 define(`register_x_index', incr(register_x_index))
             ')
-
-            define(`index', incr(index))
         ')
 
         ldr     x0,     =$1
