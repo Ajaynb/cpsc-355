@@ -188,12 +188,17 @@ main:   // main()
         xprint(str_linebr)
         xprint(str_linebr)
 
-        
+
+        // Start game
+        // startGame(&play);
+        sub     x0,     fp,     play
+        bl      startGame
 
 
         play_start:
                 define(x, x27)
                 define(y, x28)
+                define(status, x20)
                 
                 // Display game board, normally
                 // displayGame(&board, &play, true);
@@ -215,12 +220,38 @@ main:   // main()
                 bl      playGame
 
 
+                // Get gamming status, if not gamming, then get out from loop
+                xreadStruct(status, play, play_status)
+                cmp     status, GAMING
+                b.ne    play_end
+
+
 
                 b       play_start
                 undefine(`x')
                 undefine(`y')
+                undefine(`status')
         play_end:
         
+        
+        // Exit game
+        // exitGame(&play);
+        sub     x0,     fp,     play
+        bl      exitGame
+
+
+        // Calculate gamming score
+        // calculateScore(&board, &play);
+        sub     x0,     fp,     board
+        sub     x1,     fp,     play
+        bl      calculateScore
+
+        // Display result
+        // displayResult(&play);
+        sub     x0,     fp,     play
+        bl      displayResult
+
+
 
         // Dealloc for struct Play & struct Board and its array
         xdealloc(play_size_alloc)
@@ -912,14 +943,16 @@ displayResult:  // displayResult(struct Play* play)
         define(_play, x19)
         define(value, x20)
         define(value_float, d20)
+
+        // Store struct Play* play pointer
         mov     _play, x0
 
         // Print header
         xprint(str_result_header)
 
         // Print player name
-        xreadStruct(value, _play, play_player, true)
-        xprint(str_result_player, value)
+        /*xreadStruct(value, _play, play_player, true)
+        xprint(str_result_player, value)*/
 
         // Print total tile score
         xreadStruct(value_float, _play, play_total_score, true)
@@ -941,9 +974,6 @@ displayResult:  // displayResult(struct Play* play)
         xreadStruct(value, _play, play_final_score, true)
         xprint(str_result_final_score, value)
 
-        // Print enter continue
-        xprint(str_enter_continue)
-
 
         undefine(`_play')
         undefine(`value')
@@ -964,7 +994,7 @@ displayResult:  // displayResult(struct Play* play)
  * 4. Keep more lives to win
  * 5. Use less time to win
  *
- * The following formula gives player a relatively fair score.
+ * The following formula gives player a relatively fair score, hopefully.
  */
 
 calculateScore:        // calculateScore(struct Board* board, struct Play* play)
@@ -975,6 +1005,10 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
         define(score, d22)
         define(time_deduct, d23)
         define(final_score, x24)
+        
+        // Store pointer of struct Table & struct Play
+        mov     _board, x0
+        mov     _play, x1
 
         // Calculate rate
         // float rate = 1.0 * play->uncovered_tiles / board->tiles;
@@ -997,7 +1031,7 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
         // Calculate score
         // float score = play->total_score * 20 + play->bombs * 33 + play->lives * 10;
         calculate_score_score:
-                define(total_score, x25)
+                define(total_score, d25)
                 define(bombs, x26)
                 define(lives, x27)
 
@@ -1008,9 +1042,8 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
 
                 // Calculate portion of total score
                 mov     x18, 20
-                scvtf   d17, total_score
                 scvtf   d18, x18
-                fmul    d16, d17, d18
+                fmul    d16, total_score, d18
                 fadd    score, score, d16
 
                 // Calculate protion of bombs left
@@ -1059,7 +1092,7 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
 
         // Write final score to struct Play* play
         // play->final_score = final_score
-        xreadStruct(final_score, _play, play_final_score, true)
+        xwriteStruct(final_score, _play, play_final_score, true)
 
 
         undefine(`_board')
@@ -1229,6 +1262,15 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                         // Uncover tile
                                         xwriteStruct(FALSE, _tile, tile_covered, true)
 
+                                        // Increase uncovered tile amount
+                                        // play->uncovered_tiles++;
+                                        define(uncovered_tiles, x16)
+                                        xreadStruct(uncovered_tiles, _play, play_uncovered_tiles, true)
+                                        xaddAdd(uncovered_tiles)
+                                        xwriteStruct(uncovered_tiles, _play, play_uncovered_tiles, true)
+                                        undefine(`uncovered_tiles')
+
+
                                         // Read the tile value
                                         xreadStruct(t_value, _tile, tile_value, true)
 
@@ -1371,11 +1413,11 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
 
                 // If bombs is less than 0, then lose
                 cmp     bombs, 0
-                b.lt    play_game_lives_bombs_check_lose
+                b.le    play_game_lives_bombs_check_lose
 
                 // If lives is less than 0, then lose
                 cmp     lives, 0
-                b.lt    play_game_lives_bombs_check_lose
+                b.le    play_game_lives_bombs_check_lose
 
                 // Otherwise, do nothing
                 b       play_game_lives_bombs_check_lose_end
