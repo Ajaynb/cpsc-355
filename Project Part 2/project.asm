@@ -1292,6 +1292,77 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 undefine(`row')
 
 
+        // If the current life score is negative number, then lose a life and reset the score.
+        play_game_score_check:
+                define(score, d18)
+                define(lives, x26)
+
+                // Set float zero
+                define(`float_zero', d28)
+                mov     x18, 0
+                scvtf   float_zero, x18
+
+                xreadStruct(score, _play, play_score, true)
+                xreadStruct(lives, _play, play_lives, true)
+
+                fcmp    score, float_zero
+                b.lt    play_game_score_check_decrement
+                b       play_game_score_check_decrement_end
+
+                play_game_score_check_decrement:
+                        // Decrease live and set score to 0
+                        xminusMinus(lives)              // play->lives--;
+                        fmov    score, float_zero       // play->score = 0;
+                        
+                        // Write back to struct
+                        xwriteStruct(score, _play, play_score, true)
+                        xwriteStruct(lives, _play, play_lives, true)
+                play_game_score_check_decrement_end:
+                
+                undefine(`score')
+                undefine(`lives')
+                undefine(`float_zero')
+
+
+        // If the player is running out of bombs, or lives, then die.
+        // Also need to see if the game status is not win (from above), 
+        // because there's possibility that player is winning this round 
+        // but also run out of lives or bombs, but we're saying the player is winning.
+        play_game_lives_bombs_check:
+                define(status, x26)
+                define(bombs, x27)
+                define(lives, x28)
+
+                // Read values from struct
+                xreadStruct(status, _play, play_status, true)
+                xreadStruct(bombs, _play, play_bombs, true)
+                xreadStruct(lives, _play, play_lives, true)
+
+                // If already win, then skip lose
+                cmp     status, WIN
+                b.eq    play_game_lives_bombs_check_lose_end
+
+                // If bombs is less than 0, then lose
+                cmp     bombs, 0
+                b.lt    play_game_lives_bombs_check_lose
+
+                // If lives is less than 0, then lose
+                cmp     lives, 0
+                b.lt    play_game_lives_bombs_check_lose
+
+                // Otherwise, do nothing
+                b       play_game_lives_bombs_check_lose_end
+
+                play_game_lives_bombs_check_lose:
+                        // Claim die
+                        xwriteStruct(DIE, _play, play_status, true)
+                play_game_lives_bombs_check_lose_end:
+
+
+                undefine(`status')
+                undefine(`bombs')
+                undefine(`lives')
+                
 
 
         // Function end
