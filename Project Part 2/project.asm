@@ -166,8 +166,6 @@ main:   // main()
         and     board_array_size_alloc, board_array_size_alloc, -16
         xalloc(board_array_size_alloc)
 
-        /*xprint(allstr, sp, fp)*/
-        /*xprint(output, board_array_size_alloc)*/
 
         // Initialize game
         // initializeGame(&board, &play);
@@ -190,36 +188,37 @@ main:   // main()
         xprint(str_linebr)
         xprint(str_linebr)
 
+        
+
 
         play_start:
-                // Play one round
-                // playGame(&board, &play, x, y);
-                sub     x0,     fp,     board
-                sub     x1,     fp,     play
-                mov     x2,     5
-                mov     x3,     5
-                bl      playGame
-
+                define(x, x27)
+                define(y, x28)
                 
-                // Peek game board before start
+                // Display game board, normally
                 // displayGame(&board, &play, true);
                 sub     x0,     fp,     board
                 sub     x1,     fp,     play
                 mov     x2,     FALSE
                 bl      displayGame
 
+                // Ask for user input
+                xprint(str_bomb_position_ask)
+                xscan(str_bomb_position_input, x, y)
 
-                // Breaks for actual game
-                xprint(str_linebr)
-                xprint(str_enter_continue)
-                bl      getchar
-                xprint(str_linebr)
-                xprint(str_linebr)
+                // Play one round
+                // playGame(&board, &play, x, y);
+                sub     x0,     fp,     board
+                sub     x1,     fp,     play
+                mov     x2,     x
+                mov     x3,     y
+                bl      playGame
 
-                // b       play_start
-                xscan(str_bomb_position_input, x18, x17)
-                xprint(str_bomb_position_input, x18, x17)
 
+
+                b       play_start
+                undefine(`x')
+                undefine(`y')
         play_end:
         
 
@@ -1394,9 +1393,4 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         undefine(`range')
 
         xret()
-
-
-
-        .data                                            // global variables
-n:      .int    0                                        // int n = 0
 
