@@ -1132,22 +1132,16 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         // Reset range and deduct bomb by one
         play_game_deduct:
                 define(bombs, x23)
-                define(range_new, x18)
 
-                // Read values
+                // play->bombs --;
                 xreadStruct(bombs, _play, play_bombs, true)
-                xreadStruct(range, _play, play_range, true)
-
-                // Modify values
-                mov     range_new, 1    // play->range = 1;
-                xminusMinus(bombs)      // play->bombs--;
-
-                // Write back values
+                xminusMinus(bombs)
                 xwriteStruct(bombs, _play, play_bombs, true)
-                xwriteStruct(range, _play, play_range, true)
+
+                // play->range = 1
+                xwriteStruct(1, _play, play_range, true)
 
                 undefine(`bombs')
-                undefine(`range_new')
 
 
         // Loop for uncover tiles
