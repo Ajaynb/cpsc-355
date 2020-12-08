@@ -277,7 +277,7 @@ main:   // main()
                 mov     x12,    board_row                      // int attribute offset (positive)
                 add     x9,     x11,    x12             // int offset = base + attribute (positive)
                 sub     x9,     xzr,    x9              // offset = -offset (negative)
-                mov    x10,    5           // float value
+                mov    x10,    10           // float value
 
                 str	x10,    [fp,   x9]   // offset += fp (negative + negative)
         
@@ -298,7 +298,7 @@ main:   // main()
                 mov     x12,    board_column                      // int attribute offset (positive)
                 add     x9,     x11,    x12             // int offset = base + attribute (positive)
                 sub     x9,     xzr,    x9              // offset = -offset (negative)
-                mov    x10,    5           // float value
+                mov    x10,    10           // float value
 
                 str	x10,    [fp,   x9]   // offset += fp (negative + negative)
         
@@ -427,15 +427,24 @@ main:   // main()
         mov     x2,     TRUE
         bl      displayGame
 
+        // Play one round
         // playGame(&board, &play, x, y);
         sub     x0,     fp,     board
         sub     x1,     fp,     play
-        mov     x2,     0
-        mov     x3,     0
+        mov     x2,     5
+        mov     x3,     5
         bl      playGame
 
-        // Breaks for actual game
         
+        // Peek game board before start
+        // displayGame(&board, &play, true);
+        sub     x0,     fp,     board
+        sub     x1,     fp,     play
+        mov     x2,     FALSE
+        bl      displayGame
+
+        // Breaks for actual game
+        /*
         // M4: PRINT
         
         
@@ -515,7 +524,7 @@ main:   // main()
 
         ldr     x0,     =str_linebr
         bl      printf
-
+*/
 
 
         // Dealloc for struct Play & struct Board and its array
@@ -1004,7 +1013,7 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         
         
                 mov     x11,    x19                      // int base (negative)
-                mov     x12,    board_row                      // int attribute offset (positive)
+                mov     x12,    board_column                      // int attribute offset (positive)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
                 mov    x10,    x22           // float value
@@ -2245,7 +2254,7 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         
 
 
-                        // If tile is uncovered
+                        // If tile is not covered
                         cmp     x18, FALSE
                         b.eq    display_uncovered
 
@@ -3897,6 +3906,7 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         
         
         
+        
 
         // Store pointer of struct Table & struct Play & x21 & x22
         mov     x19, x0
@@ -3935,15 +3945,15 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         
 
 
-                // Check range for x21, if less than 0, then return
+                // Check x25 for x21, if less than 0, then return
                 cmp     x21, 0
                 b.lt    play_game_end
 
-                // Check range for x21, if greter or equal to x23, then return
+                // Check x25 for x21, if greter or equal to x23, then return
                 cmp     x21, x23
                 b.ge    play_game_end
 
-                // Check range for x22, if less than 0, then return
+                // Check x25 for x22, if less than 0, then return
                 cmp     x22, 0
                 b.lt    play_game_end
 
@@ -3954,16 +3964,26 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 
                 
 
+        
 
 
-
-        // Loop for uncover tiles
-        play_game_uncover_tile:
-                
-                
+        // Reset x25 and deduct bomb by one
+        play_game_deduct:
                 
 
-                //Read value and set x23 & x24
+                // Read values
+                
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_bombs                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x23,     [x9]                    // load the value
+        
+
                 
         // M4: READ STRUCT
 
@@ -3976,6 +3996,68 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 ldr	x25,     [x9]                    // load the value
         
 
+
+                // Modify values
+                mov     x25, 1        // play->x25 = 1;
+                
+        // M4: MINUS MINUS
+        sub     x25, x25, 1
+      // play->bombs--;
+
+                // Write back values
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_bombs                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x23           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_range                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x25           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+
+                
+                
+
+
+        // Loop for uncover tiles
+        play_game_uncover_tile:
+
+                // Set value for t
+                
+                
                 
         // M4: MUL
         
@@ -3986,7 +4068,7 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
             
         
             
-                mov     x10,    x25                       // move next multiplier to x10
+                mov     x10,    range                       // move next multiplier to x10
                 mul     x9,     x9,     x10             // and multiplies x10 to x9
             
             
@@ -4000,7 +4082,14 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         
         mov     x23,     x9                      // result
 
-                
+
+                // Loop for uncovering rows in range
+                play_game_uncover_tile_row:
+                        cmp     x23, range
+                        b.gt    play_game_uncover_tile_row_end
+
+                        // Set value for x24
+                        
         // M4: MUL
         
         mov     x9,     1                       // initialize x9 to 1
@@ -4010,7 +4099,7 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
             
         
             
-                mov     x10,    x25                       // move next multiplier to x10
+                mov     x10,    range                       // move next multiplier to x10
                 mul     x9,     x9,     x10             // and multiplies x10 to x9
             
             
@@ -4025,25 +4114,38 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         mov     x24,     x9                      // result
 
 
-
-                // Loop for uncovering rows in x25
-                play_game_uncover_tile_row:
-                        cmp     x23, row
-                        b.gt    play_game_uncover_tile_row_end
-
-                        // Loop for uncovering columns in x25
+                        // Loop for uncovering columns in range
                         play_game_uncover_tile_column:
-                                cmp     x24, column
+                                cmp     x24, range
                                 b.gt    play_game_uncover_tile_column_end
 
-                                // Define uncover 4 variable
                                 
-                                
-                                
-                                
+                                // Validate if the 4 is within valid range
+                                play_game_uncover_tile_index_validate:
+                                        // Define uncover 4 variable
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
 
-                                // Read board x18
-                                
+                                        // Read from struct Board* board
+                                        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x19                      // int base (negative)
+                mov     x12,    board_tiles                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x16,     [x9]                    // load the value
+        
+
+                                        
         // M4: READ STRUCT
 
         
@@ -4052,12 +4154,12 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
                 
-                ldr	x18,     [x9]                    // load the value
+                ldr	x27,     [x9]                    // load the value
         
 
 
-                                // Calculate x21 and x22 of the tile to uncover
-                                
+                                        // Calculate x21 and x22 of the tile to uncover
+                                        
         // M4: ADD
         
         mov     x9,     0                       // initialize x9 to 0
@@ -4079,9 +4181,9 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
             
         
         
-        mov     x26,     x9                      // result
-   // int x26 = x21 + x23;
-                                
+        mov     x17,     x9                      // result
+   // int x17 = x21 + x23;
+                                        
         // M4: ADD
         
         mov     x9,     0                       // initialize x9 to 0
@@ -4103,51 +4205,30 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
             
         
         
-        mov     x27,     x9                      // result
-   // int x27 = x22 + x24;
+        mov     x18,     x9                      // result
+   // int x18 = x22 + x24;
 
-                                // int 4 = (x26 * board->x18) + x27;
-                                madd    x28, x26, x18, x27
-
-
-                                
-
-                                // Validate if the 4 is within valid x25
-                                play_game_uncover_tile_index_validate:
-                                        // Read tiles from struct Board* board
-                                        
-                                        
-        // M4: READ STRUCT
-
-        
-                mov     x11,    x19                      // int base (negative)
-                mov     x12,    board_tiles                      // int attribute offset (positive)
-                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
-                add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                
-                ldr	x18,     [x9]                    // load the value
-        
+                                        // int 4 = (x17 * board->x27) + x18;
+                                        madd    x28, x17, x27, x18
 
 
                                         // If 4 < 0, then it's invalid, do nothing
                                         cmp     x28, 0
                                         b.lt    play_game_uncover_tile_index_validate_end
 
-                                        // If 4 >= x18, then it's invalid, do nothing
-                                        cmp     x28, x18
+                                        // If 4 >= x16, then it's invalid, do nothing
+                                        cmp     x28, x16
                                         b.ge    play_game_uncover_tile_index_validate_end
 
                                         // If x22 of uncover tile < 0, then it's invalid, do nothing
-                                        cmp     x27, 0
+                                        cmp     x18, 0
                                         b.lt    play_game_uncover_tile_index_validate_end
 
-                                        // If x22 of uncover tile >= x18, then it's invalid, do nothing
-                                        cmp     x27, x18
+                                        // If x22 of uncover tile >= x27, then it's invalid, do nothing
+                                        cmp     x18, x27
                                         b.ge    play_game_uncover_tile_index_validate_end
                                         
                                         // Get current tile pointer
-                                        
-                                        
                                         
                 
         // M4: MUL
@@ -4198,11 +4279,11 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
                 
-                ldr	x18,     [x9]                    // load the value
+                ldr	x15,     [x9]                    // load the value
         
 
-                                        cmp     x18, FALSE
-                                        b.ge    play_game_uncover_tile_index_validate_end
+                                        cmp     x15, FALSE
+                                        b.eq    play_game_uncover_tile_index_validate_end
 
                                         // Uncover tile
                                         
@@ -4227,14 +4308,214 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         
 
 
+                                        // Read the tile value
+                                        
+        // M4: READ STRUCT
 
+        
+                mov     x11,    x26                      // int base (negative)
+                mov     x12,    tile_value                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	d18,     [x9]                    // load the value
+        
+
+
+                                        // Do different things when meet different x16
+                                        play_game_uncover_tile_value:
+
+                                                // If the tile is EXIT
+                                                ldr     d18, =EXIT
+                                                fcmp    d18, d18
+                                                b.eq    play_game_uncover_tile_value_exit
+                                                b       play_game_uncover_tile_value_exit_end
+                                                
+                                                play_game_uncover_tile_value_exit:
+                                                        // Claim winning
+                                                        
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_status                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    WIN           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+                                                play_game_uncover_tile_value_exit_end:
+
+                                                
+                                                // If the tile is DOUBLE RANGE
+                                                ldr     d18, =DOUBLE_RANGE
+                                                fcmp    d18, d18
+                                                b.eq    play_game_uncover_tile_value_double_range
+                                                b       play_game_uncover_tile_value_double_range_end
+                                                
+                                                play_game_uncover_tile_value_double_range:
+                                                        // Increase range by 1
+                                                        
+
+                                                        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_range                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x17,     [x9]                    // load the value
+        
+
+                                                        
+        // M4: MUL EQUAL
+        mov     x10,    2
+        mul     x17,     x17,     x10
+
+                                                        
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_range                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x17           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+
+                                                        
+                                                play_game_uncover_tile_value_double_range_end:
+
+
+                                                // Else the tile is a number tile
+                                                play_game_uncover_tile_value_number:
+                                                        
+                                                        
+
+                                                        // Read tile value
+                                                        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x26                      // int base (negative)
+                mov     x12,    tile_value                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	d18,     [x9]                    // load the value
+        
+
+                                                        
+                                                        // Read total d16 and increase by tile value, and write back
+                                                        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_total_score                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	d17,     [x9]                    // load the value
+        
+
+                                                        fadd    d17, d18, d18
+                                                        
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_total_score                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                fmov    d10,    d17           // float value
+
+                str	d10,    [x9]         // store the value
+        
+
+                                                        
+                                                        // Read d16 and increase by tile value, and write back
+                                                        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_score                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	d16,     [x9]                    // load the value
+        
+
+                                                        fadd    d16, d18, d18
+                                                        
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_score                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                fmov    d10,    d16           // float value
+
+                str	d10,    [x9]         // store the value
+        
+
+
+                                                        
+                                                        
+
+
+
+                                        
+                                        
+                                        
+                                        
+                                        
                                         
                                         
                                         
                                 play_game_uncover_tile_index_validate_end:
 
-                                
-                                
 
 
                                 // Increment & loop again
@@ -4258,95 +4539,12 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 
 
 
-        // Reset range and deduct bomb by one
-        play_game_deduct:
-                
-                
-
-                // Read values
-                
-        // M4: READ STRUCT
-
-        
-                mov     x11,    x20                      // int base (negative)
-                mov     x12,    play_bombs                      // int attribute offset (positive)
-                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
-                add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                
-                ldr	x23,     [x9]                    // load the value
-        
-
-                
-        // M4: READ STRUCT
-
-        
-                mov     x11,    x20                      // int base (negative)
-                mov     x12,    play_range                      // int attribute offset (positive)
-                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
-                add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                
-                ldr	x24,     [x9]                    // load the value
-        
-
-
-                // Modify values
-                mov     x24, 1        // play->x24 = 1;
-                
-        // M4: MINUS MINUS
-        sub     x24, x24, 1
-      // play->bombs--;
-
-                // Write back values
-                
-        
-        
-        
-
-        // M4: WRITE STRUCT
-        
-                
-                
-        
-        
-        
-                mov     x11,    x20                      // int base (negative)
-                mov     x12,    play_bombs                      // int attribute offset (positive)
-                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
-                add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                mov    x10,    x23           // float value
-
-                str	x10,    [x9]         // store the value
-        
-
-                
-        
-        
-        
-
-        // M4: WRITE STRUCT
-        
-                
-                
-        
-        
-        
-                mov     x11,    x20                      // int base (negative)
-                mov     x12,    play_range                      // int attribute offset (positive)
-                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
-                add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                mov    x10,    x24           // float value
-
-                str	x10,    [x9]         // store the value
-        
-
-
-                
-                
 
 
         // Function end
         play_game_end:
 
+        
         
         
         

@@ -183,8 +183,8 @@ main:   // main()
         // playGame(&board, &play, x, y);
         sub     x0,     fp,     board
         sub     x1,     fp,     play
-        mov     x2,     5
-        mov     x3,     5
+        mov     x2,     0
+        mov     x3,     0
         bl      playGame
 
         
@@ -1066,6 +1066,7 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         define(_play, x20)
         define(x, x21)
         define(y, x22)
+        define(range, x25)
 
         // Store pointer of struct Table & struct Play & x & y
         mov     _board, x0
@@ -1077,7 +1078,6 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         play_game_check_x_y:
                 define(row, x23)
                 define(column, x24)
-
 
                 // Read from struct
                 xreadStruct(row, _board, board_row, true)
@@ -1102,26 +1102,45 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 undefine(`row')
                 undefine(`column')
 
+        
 
+
+        // Reset range and deduct bomb by one
+        play_game_deduct:
+                define(bombs, x23)
+                define(range_new, x18)
+
+                // Read values
+                xreadStruct(bombs, _play, play_bombs, true)
+                xreadStruct(range, _play, play_range, true)
+
+                // Modify values
+                mov     range_new, range
+                mov     range_new, 1    // play->range = 1;
+                xminusMinus(bombs)      // play->bombs--;
+
+                // Write back values
+                xwriteStruct(bombs, _play, play_bombs, true)
+                xwriteStruct(range, _play, play_range, true)
+
+                undefine(`bombs')
+                undefine(`range_new')
 
 
         // Loop for uncover tiles
         play_game_uncover_tile:
+
+                // Set value for t
                 define(t, x23)
                 define(r, x24)
-                define(range, x25)
-
-                //Read value and set t
-                xreadStruct(range, _play, play_range, true)
                 xmul(t, range, -1)
-
 
                 // Loop for uncovering rows in range
                 play_game_uncover_tile_row:
                         cmp     t, range
                         b.gt    play_game_uncover_tile_row_end
 
-                        // Set value for t
+                        // Set value for r
                         xmul(r, range, -1)
 
                         // Loop for uncovering columns in range
@@ -1140,6 +1159,7 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                         define(tiles, x16)
                                         define(_tile, x26)
                                         define(t_covered, x15)
+                                        define(t_value, d28)
 
                                         // Read from struct Board* board
                                         xreadStruct(tiles, _board, board_tiles, true)
@@ -1180,6 +1200,65 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                         // Uncover tile
                                         xwriteStruct(FALSE, _tile, tile_covered, true)
 
+                                        // Read the tile value
+                                        xreadStruct(t_value, _tile, tile_value, true)
+
+                                        // Do different things when meet different tiles
+                                        
+                                        play_game_uncover_tile_value:
+                                                
+                                                // If the tile is EXIT
+                                                ldr     d16, =EXIT
+                                                fcmp    t_value, d16
+                                                b.eq    play_game_uncover_tile_value_exit
+                                                b       play_game_uncover_tile_value_exit_end
+                                                
+                                                play_game_uncover_tile_value_exit:
+                                                        // Claim winning
+                                                        xwriteStruct(WIN, _play, play_status, true)
+                                                play_game_uncover_tile_value_exit_end:
+
+                                                
+                                                // If the tile is DOUBLE RANGE
+                                                ldr     d16, =DOUBLE_RANGE
+                                                fcmp    t_value, d16
+                                                b.eq    play_game_uncover_tile_value_double_range
+                                                b       play_game_uncover_tile_value_double_range_end
+                                                
+                                                play_game_uncover_tile_value_double_range:
+                                                        // Increase range by 1
+                                                        define(t_range, x17)
+
+                                                        xreadStruct(t_range, _play, play_range, true)
+                                                        xmulEqual(t_range, 2)
+                                                        xwriteStruct(t_range, _play, play_range, true)
+
+                                                        undefine(`t_range')
+                                                play_game_uncover_tile_value_double_range_end:
+
+
+                                                // Else the tile is a number tile
+                                                play_game_uncover_tile_value_number:
+                                                        define(total_score, d17)
+                                                        define(score, d16)
+
+                                                        // Read tile value
+                                                        xreadStruct(t_value, _tile, tile_value, true)
+                                                        
+                                                        // Read total score and increase by tile value, and write back
+                                                        xreadStruct(total_score, _play, play_total_score, true)
+                                                        fadd    total_score, t_value, t_value
+                                                        xwriteStruct(total_score, _play, play_total_score, true)
+                                                        
+                                                        // Read score and increase by tile value, and write back
+                                                        xreadStruct(score, _play, play_score, true)
+                                                        fadd    score, t_value, t_value
+                                                        xwriteStruct(score, _play, play_score, true)
+
+                                                        undefine(`total_score')
+                                                        undefine(`score')
+                                        
+
 
                                         undefine(`uncover_index')
                                         undefine(`uncover_x')
@@ -1188,6 +1267,7 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                         undefine(`tiles')
                                         undefine(`_tile')
                                         undefine(`t_covered')
+                                        undefine(`t_value')
                                 play_game_uncover_tile_index_validate_end:
 
 
@@ -1204,29 +1284,9 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
 
                 undefine(`t')
                 undefine(`r')
-                undefine(`range')
                 undefine(`row')
 
 
-        // Reset range and deduct bomb by one
-        play_game_deduct:
-                define(bomb, x23)
-                define(range, x24)
-
-                // Read values
-                xreadStruct(bomb, _play, play_bombs, true)
-                xreadStruct(range, _play, play_range, true)
-
-                // Modify values
-                mov     range, 1        // play->range = 1;
-                xminusMinus(range)      // play->bombs--;
-
-                // Write back values
-                xwriteStruct(bomb, _play, play_bombs, true)
-                xwriteStruct(range, _play, play_range, true)
-
-                undefine(`bomb')
-                undefine(`range')
 
 
         // Function end
@@ -1236,5 +1296,6 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         undefine(`_play')
         undefine(`x')
         undefine(`y')
+        undefine(`range')
 
         xret()
