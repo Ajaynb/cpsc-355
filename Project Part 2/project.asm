@@ -345,13 +345,18 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         // Calculate tiles
         mul     tiles, row, column
 
+        // Set float zero
+        define(`float_zero', d28)
+        mov     x18, 0
+        scvtf   float_zero, x18
+
         // Initialize statistics, giving default values
         xwriteStruct(tiles, _board, board_tiles, true)
         xwriteStruct(0, _board, board_negatives, true)
         xwriteStruct(0, _board, board_specials, true)
         xwriteStruct(3, _play, play_lives, true)
-        xwriteStruct(0, _play, play_score, true)
-        xwriteStruct(0, _play, play_total_score, true)
+        xwriteStruct(float_zero, _play, play_score, true)
+        xwriteStruct(float_zero, _play, play_total_score, true)
         xwriteStruct(5, _play, play_bombs, true)
         xwriteStruct(1, _play, play_range, true)
         xwriteStruct(0, _play, play_uncovered_tiles, true)
@@ -424,15 +429,14 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 // Calculate and store the pointer of current struct Tile
                 xtilePointer(_tile, _board, t_index)
 
-                // Flip number to negative
+                // Read tile value
                 xreadStruct(t_value, _tile, tile_value, true)
 
-                mov     x17, 0
-                scvtf   d17, x17
-
-                fcmp    t_value, d17
+                // If the number is already negative, then skip
+                fcmp    t_value, float_zero
                 b.lt    initialize_flip_neg
-
+                
+                // Else flip the tile to negative
                 mov     x17, -1
                 scvtf   d17, x17
                 fmul    t_value, t_value, d17
@@ -486,9 +490,7 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 xreadStruct(t_value, _tile, tile_value, true)
 
                 // Check if tile is already negative
-                mov     x17, 0
-                scvtf   d17, x17
-                fcmp    t_value, d17
+                fcmp    t_value, float_zero
                 b.lt    initialize_flip_spe
 
                 // Check if tile is already special
@@ -497,14 +499,14 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 fcmp    t_value, d17
                 b.ge    initialize_flip_spe
 
-                // Pick a special
+                // Else pick a special
                 mov     x0, DOUBLE_RANGE
                 mov     x1, DOUBLE_RANGE
                 bl      randomNum
                 mov     x18, x0
                 scvtf   t_value, x18
 
-                // Flip the tile into special
+                // And flip the tile into special
                 xwriteStruct(t_value, _tile, tile_value, true)
                 
                 /*xprint(output_init, t_index, t_value)*/
@@ -1159,7 +1161,7 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                         define(tiles, x16)
                                         define(_tile, x26)
                                         define(t_covered, x15)
-                                        define(t_value, d28)
+                                        define(t_value, d20)
 
                                         // Read from struct Board* board
                                         xreadStruct(tiles, _board, board_tiles, true)
@@ -1243,16 +1245,18 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                                         define(score, d16)
 
                                                         // Read tile value
-                                                        xreadStruct(t_value, _tile, tile_value, true)
+                                                        /*xreadStruct(t_value, _tile, tile_value, true)*/
                                                         
                                                         // Read total score and increase by tile value, and write back
                                                         xreadStruct(total_score, _play, play_total_score, true)
-                                                        fadd    total_score, t_value, t_value
+                                                        test1:
+                                                        fadd    total_score, total_score, t_value
                                                         xwriteStruct(total_score, _play, play_total_score, true)
                                                         
                                                         // Read score and increase by tile value, and write back
                                                         xreadStruct(score, _play, play_score, true)
-                                                        fadd    score, t_value, t_value
+                                                        test2:
+                                                        fadd    score, score, t_value
                                                         xwriteStruct(score, _play, play_score, true)
 
                                                         undefine(`total_score')
