@@ -1111,10 +1111,9 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 define(r, x24)
                 define(range, x25)
 
-                //Read value and set t & r
+                //Read value and set t
                 xreadStruct(range, _play, play_range, true)
                 xmul(t, range, -1)
-                xmul(r, range, -1)
 
 
                 // Loop for uncovering rows in range
@@ -1122,7 +1121,9 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                         cmp     t, range
                         b.gt    play_game_uncover_tile_row_end
 
-                        mov     r, 0
+                        // Set value for t
+                        xmul(r, range, -1)
+
                         // Loop for uncovering columns in range
                         play_game_uncover_tile_column:
                                 cmp     r, range
