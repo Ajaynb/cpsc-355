@@ -263,12 +263,8 @@ define(xwriteArray, `
 // xstruct(base, attribute1, attribute2, ...)
 define(xstruct, `
         // M4: STRUCT
-        define(`index', eval(`1'))
-        foreach(`t', `$@', `
-            ifelse(index, `1', `', `format(`
-                xwriteStruct(xzr, $1, t)
-            ')')
-            define(`index', incr(index))
+        forloop(`t', `2', `$#', `
+            xwriteStruct(xzr, $1, argn(t, $@))
         ')
 ')
 
