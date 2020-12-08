@@ -186,28 +186,25 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    allstr
+                
             
         
+            
             
             
             
                 mov     x1,    sp
                 
             
-
-            
         
+            
             
             
             
                 mov     x2,    fp
                 
-            
-
             
         
 
@@ -235,28 +232,25 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    allstr
+                
             
         
+            
             
             
             
                 mov     x1,    sp
                 
             
-
-            
         
+            
             
             
             
                 mov     x2,    fp
                 
-            
-
             
         
 
@@ -315,28 +309,19 @@ main:   // main()
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x19             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    MAX_ROW                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    MAX_ROW             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    MAX_COL                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    MAX_COL             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    tile_size_alloc                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    tile_size_alloc             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x19,     x9                      // result
 
         
@@ -359,28 +344,25 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    allstr
+                
             
         
+            
             
             
             
                 mov     x1,    sp
                 
             
-
-            
         
+            
             
             
             
                 mov     x2,    fp
                 
-            
-
             
         
 
@@ -397,19 +379,17 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    output
+                
             
         
             
             
             
+            
                 mov     x1,    x19
                 
-            
-
             
         
 
@@ -442,10 +422,9 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    str_linebr
+                
             
         
 
@@ -462,10 +441,9 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    str_enter_continue
+                
             
         
 
@@ -483,10 +461,9 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    str_linebr
+                
             
         
 
@@ -503,10 +480,9 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    str_linebr
+                
             
         
 
@@ -544,10 +520,9 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    str_linebr
+                
             
         
 
@@ -564,10 +539,9 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    str_enter_continue
+                
             
         
 
@@ -585,10 +559,9 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    str_linebr
+                
             
         
 
@@ -605,10 +578,9 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    str_linebr
+                
             
         
 
@@ -653,28 +625,25 @@ main:   // main()
             
             
             
-                
-                
             
-
+                mov     x0,    str_bomb_position_input
+                
             
         
+            
             
             
             
                 mov     x1,    x18
                 
             
-
-            
         
+            
             
             
             
                 mov     x2,    x17
                 
-            
-
             
         
 
@@ -915,7 +884,7 @@ randomNum:      // randomNum(m, n)
  * Thirdly, flip tiles to special tiles. Simply assign new value.
  *
  * The board->array, the tile array, is a 1-d array, but used as a 2-d.
- * Simply convert between 1-d array 3 to x and y by math.
+ * Simply convert between 1-d array 0 to x and y by math.
  */
 
 initializeGame:        // initializeGame(struct Board* board, struct Play* play)
@@ -971,19 +940,17 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    output
+                
             
         
             
             
             
+            
                 mov     x1,    x19
                 
-            
-
             
         
 
@@ -1000,19 +967,17 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    output
+                
             
         
             
             
             
+            
                 mov     x1,    x20
                 
-            
-
             
         
 
@@ -1430,19 +1395,17 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    output_f
+                
             
         
             
             
             
+            
                 fmov     d0,    d18
                 
-            
-
             
         
 
@@ -1458,22 +1421,16 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x25             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x24                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x24             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    tile_size                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    tile_size             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x25,     x9                      // result
 
                 
@@ -1575,22 +1532,16 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x26             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x23                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x23             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    NEG_PERCENT                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    NEG_PERCENT             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x26,     x9                      // result
 
         mov     x18, 100
@@ -1626,22 +1577,16 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x24             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x27                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x27             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    tile_size                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    tile_size             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x24,     x9                      // result
 
                 
@@ -1713,28 +1658,25 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    output_init
+                
             
         
+            
             
             
             
                 mov     x1,    x27
                 
             
-
-            
         
+            
             
             
             
                 fmov     d0,    d18
                 
-            
-
             
         
 
@@ -1795,22 +1737,16 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x26             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x23                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x23             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    SPE_PERCENT                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    SPE_PERCENT             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x26,     x9                      // result
 
         mov     x18, 100
@@ -1846,22 +1782,16 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x24             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x27                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x27             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    tile_size                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    tile_size             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x24,     x9                      // result
 
                 
@@ -1943,28 +1873,25 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    output_init
+                
             
         
+            
             
             
             
                 mov     x1,    x27
                 
             
-
-            
         
+            
             
             
             
                 fmov     d0,    d18
                 
-            
-
             
         
 
@@ -2010,19 +1937,17 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    output
+                
             
         
             
             
             
+            
                 mov     x1,    x25
                 
-            
-
             
         
 
@@ -2061,22 +1986,16 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x24             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x27                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x27             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    tile_size                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    tile_size             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x24,     x9                      // result
 
                 
@@ -2130,28 +2049,25 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    output_init
+                
             
         
+            
             
             
             
                 mov     x1,    x27
                 
             
-
-            
         
+            
             
             
             
                 fmov     d0,    d18
                 
-            
-
             
         
 
@@ -2288,10 +2204,9 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_table_header
+                
             
         
 
@@ -2325,22 +2240,16 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x18             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x24                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x24             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x22                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x22             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x18,     x9                      // result
 
                         
@@ -2354,22 +2263,16 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x26             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x18                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x18             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    tile_size                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    tile_size             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x26,     x9                      // result
 
                 
@@ -2456,19 +2359,17 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_tile_special_peek
+                
             
         
             
             
             
+            
                 mov     x1,    x27
                 
-            
-
             
         
 
@@ -2492,19 +2393,17 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_tile_special
+                
             
         
             
             
             
+            
                 mov     x1,    x27
                 
-            
-
             
         
 
@@ -2536,19 +2435,17 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_tile_number_peek
+                
             
         
             
             
             
+            
                 fmov     d0,    d27
                 
-            
-
             
         
 
@@ -2581,19 +2478,17 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_tile_number
+                
             
         
             
             
             
+            
                 mov     x1,    POSITIVE
                 
-            
-
             
         
 
@@ -2616,19 +2511,17 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_tile_number
+                
             
         
             
             
             
+            
                 mov     x1,    NEGATIVE
                 
-            
-
             
         
 
@@ -2658,10 +2551,9 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_tile_covered
+                
             
         
 
@@ -2690,10 +2582,9 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_linebr
+                
             
         
 
@@ -2774,22 +2665,16 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x18             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x24                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x24             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    100                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    100             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x18,     x9                      // result
 
                 udiv    x27, x18, x26
@@ -2803,37 +2688,33 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_stats_peek_negatives
+                
             
         
+            
             
             
             
                 mov     x1,    x24
                 
             
-
-            
         
+            
             
             
             
                 mov     x2,    x26
                 
             
-
-            
         
+            
             
             
             
                 mov     x3,    x27
                 
-            
-
             
         
 
@@ -2848,22 +2729,16 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x18             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x25                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x25             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    100                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    100             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x18,     x9                      // result
 
                 udiv    x27, x18, x26
@@ -2877,37 +2752,33 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_stats_peek_specials
+                
             
         
+            
             
             
             
                 mov     x1,    x25
                 
             
-
-            
         
+            
             
             
             
                 mov     x2,    x26
                 
             
-
-            
         
+            
             
             
             
                 mov     x3,    x27
                 
-            
-
             
         
 
@@ -2990,19 +2861,17 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_play_lives
+                
             
         
             
             
             
+            
                 mov     x1,    x24
                 
-            
-
             
         
 
@@ -3019,19 +2888,17 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_play_bombs
+                
             
         
             
             
             
+            
                 mov     x1,    x25
                 
-            
-
             
         
 
@@ -3048,19 +2915,17 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_play_score
+                
             
         
             
             
             
+            
                 fmov     d0,    d26
                 
-            
-
             
         
 
@@ -3077,19 +2942,17 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
             
             
             
-                
-                
             
-
+                mov     x0,    str_play_total_score
+                
             
         
             
             
             
+            
                 fmov     d0,    d27
                 
-            
-
             
         
 
@@ -3458,10 +3321,9 @@ displayResult:  // displayResult(struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    str_result_header
+                
             
         
 
@@ -3492,19 +3354,17 @@ displayResult:  // displayResult(struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    str_result_player
+                
             
         
             
             
             
+            
                 mov     x1,    x20
                 
-            
-
             
         
 
@@ -3535,19 +3395,17 @@ displayResult:  // displayResult(struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    str_result_total_score
+                
             
         
             
             
             
+            
                 fmov     d0,    d20
                 
-            
-
             
         
 
@@ -3578,19 +3436,17 @@ displayResult:  // displayResult(struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    str_result_left_bombs
+                
             
         
             
             
             
+            
                 mov     x1,    x20
                 
-            
-
             
         
 
@@ -3621,19 +3477,17 @@ displayResult:  // displayResult(struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    str_result_left_lives
+                
             
         
             
             
             
+            
                 mov     x1,    x20
                 
-            
-
             
         
 
@@ -3664,19 +3518,17 @@ displayResult:  // displayResult(struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    str_result_duration
+                
             
         
             
             
             
+            
                 mov     x1,    x20
                 
-            
-
             
         
 
@@ -3707,19 +3559,17 @@ displayResult:  // displayResult(struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    str_result_final_score
+                
             
         
             
             
             
+            
                 mov     x1,    x20
                 
-            
-
             
         
 
@@ -3738,10 +3588,9 @@ displayResult:  // displayResult(struct Play* play)
             
             
             
-                
-                
             
-
+                mov     x0,    str_enter_continue
+                
             
         
 
@@ -4225,22 +4074,16 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x23             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x25                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x25             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    -1                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    -1             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x23,     x9                      // result
 
 
@@ -4256,22 +4099,16 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x24             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x25                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x25             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    -1                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    -1             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x24,     x9                      // result
 
 
@@ -4281,9 +4118,9 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                 b.gt    play_game_uncover_tile_column_end
 
                                 
-                                // Validate if the 4 is within valid x25
+                                // Validate if the 1 is within valid x25
                                 play_game_uncover_tile_index_validate:
-                                        // Define uncover 4 variable
+                                        // Define uncover 1 variable
                                         
                                         
                                         
@@ -4397,22 +4234,16 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         mov     x9,     1                       // initialize x9 to 1
         
         
-            
-            
+            mov     x10,    x26             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    x28                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    x28             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-            
-                mov     x10,    tile_size                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            
-            
+            mov     x10,    tile_size             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
-        
+
         mov     x26,     x9                      // result
 
                 

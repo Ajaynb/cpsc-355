@@ -134,14 +134,11 @@ define(xmul, `
         define(`index', eval(`1'))
         mov     x9,     1                       // initialize x9 to 1
         
-        foreach(`t', `$@', `
-            ifelse(index, `1', `', `format(`
-                mov     x10,    t                       // move next multiplier to x10
-                mul     x9,     x9,     x10             // and multiplies x10 to x9
-            ')')
-            define(`index', incr(index))
+        forloop(`t', `2', `$#', `
+            mov     x10,    argn(t, $@)             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
         ')
-        
+
         mov     $1,     x9                      // result
 ')
 
