@@ -4,4 +4,4 @@ m4 project.asm > project.s
 
 gcc project.s
 
-gdb ./a.out
+gdb --args ./a.out 15 15 cloudy

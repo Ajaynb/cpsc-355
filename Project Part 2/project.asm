@@ -30,7 +30,7 @@ str_result_final_score:         .string "Final score   %d pts\n"
 str_enter_q:                    .string "Enter q to quit, \n"
 str_bomb_position_ask:          .string "Enter bomb position (x y): "
 str_bomb_position_input:        .string "%d %d"
-
+str_player:                     .string "player"
 
 
         // Equates for alloc & dealloc
@@ -142,8 +142,39 @@ str_bomb_position_input:        .string "%d %d"
  */
 main:   // main()
         xfunc()
-
         define(board_array_size_alloc, x19)
+        define(row, x20)
+        define(column, x21)
+        define(player, x22)
+        define(argv, x23)
+
+        // Set default values
+        mov     row, MIN_ROW
+        mov     column, MIN_COL
+        ldr     player, =str_player
+
+        // If command arguments contain row & col & player name
+        cmp     x0, 4                                   // if (argc >= 4)
+        b.ge    command_param                           // {read argument from command line}
+        b       command_param_end                       // {do nothing}
+
+        command_param:
+                mov     argv, x1
+
+                // Store row
+                ldr     x0, [argv, 8]
+                bl      atoi
+                mov     row, x0
+
+                // Store column
+                ldr     x0, [argv, 16]
+                bl      atoi
+                mov     column, x0
+
+                // Store column
+                ldr     player, [argv, 24]
+        command_param_end:
+
         
         // Rand seed
         xrandSeed()
@@ -156,8 +187,9 @@ main:   // main()
 
         /*xprint(allstr, sp, fp)*/
 
-        xwriteStruct(30, board, board_row)
-        xwriteStruct(30, board, board_column)
+        xwriteStruct(row, board, board_row)
+        xwriteStruct(column, board, board_column)
+        xwriteStruct(player, play, play_player)
 
 
         // Alloc for array in struct Board
@@ -198,7 +230,7 @@ main:   // main()
         play_start:
                 define(x, x27)
                 define(y, x28)
-                define(status, x20)
+                define(status, x26)
                 
                 // Display game board, normally
                 // displayGame(&board, &play, true);
@@ -263,6 +295,10 @@ main:   // main()
         xdealloc(board_array_size_alloc)
 
         undefine(`board_array_size_alloc')
+        undefine(`row')
+        undefine(`column')
+        undefine(`player')
+        undefine(`argv')
 
         xret()
 
@@ -955,8 +991,8 @@ displayResult:  // displayResult(struct Play* play)
         xprint(str_result_header)
 
         // Print player name
-        /*xreadStruct(value, _play, play_player, true)
-        xprint(str_result_player, value)*/
+        xreadStruct(value, _play, play_player, true)
+        xprint(str_result_player, value)
 
         // Print total tile score
         xreadStruct(value_float, _play, play_total_score, true)
