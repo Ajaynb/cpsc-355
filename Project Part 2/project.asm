@@ -31,6 +31,9 @@ str_enter_q:                    .string "Enter q to quit, \n"
 str_bomb_position_ask:          .string "Enter bomb position (x y): "
 str_bomb_position_input:        .string "%d %d"
 str_player:                     .string "player"
+str_log_filename:               .string "scores.log"
+str_log_filemode:               .string "a"
+str_log_line:                   .string "%s %d %lu %.2f %d %d %d\n"
 
 
         // Equates for alloc & dealloc
@@ -278,6 +281,17 @@ main:   // main()
         bl      exitGame
 
 
+        // Calculate gamming score
+        // calculateScore(&board, &play);
+        sub     x0,     fp,     board
+        sub     x1,     fp,     play
+        bl      calculateScore
+        
+        sub     x0,     fp,     play
+        bl      logScore
+
+
+
         // Display game board, normally
         // displayGame(&board, &play, true);
         sub     x0,     fp,     board
@@ -292,18 +306,15 @@ main:   // main()
         xprint(str_linebr)
         xprint(str_linebr)
 
-        // Calculate gamming score
-        // calculateScore(&board, &play);
-        sub     x0,     fp,     board
-        sub     x1,     fp,     play
-        bl      calculateScore
-
         // Display result
         // displayResult(&play);
         sub     x0,     fp,     play
         bl      displayResult
 
 
+        // Line br
+        xprint(str_linebr)
+        xprint(str_linebr)
 
         // Dealloc for struct Play & struct Board and its array
         xdealloc(play_size_alloc)
@@ -966,9 +977,6 @@ exitGame:       // exitGame(struct Play* play)
         define(duration, x22)
         mov     _play, x0
 
-        // Change play status to EXIT
-        xwriteStruct(EXIT, _play, play_status, true)
-
         // Record end time
         mov     x0, 0
         bl      time
@@ -1045,12 +1053,10 @@ displayResult:  // displayResult(struct Play* play)
  *
  * According to the formula, by doing the following would get a higher mark:
  * 1. Uncover more tiles
- * 2. Get higher uncover tile score
+ * 2. Get higher uncover tile score (if at the end the score is negative, then probably the final score is negative too)
  * 3. Use less bombs to win
  * 4. Keep more lives to win
  * 5. Use less time to win
- *
- * The following formula gives player a relatively fair score, hopefully.
  */
 
 calculateScore:        // calculateScore(struct Board* board, struct Play* play)
@@ -1103,14 +1109,14 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
                 fadd    score, score, d16
 
                 // Calculate protion of bombs left
-                mov     x18, 33
+                mov     x18, 69
                 scvtf   d17, bombs
                 scvtf   d18, x18
                 fmul    d16, d17, d18
                 fadd    score, score, d16
                 
                 // Calculate protion of lives left
-                mov     x18, 33
+                mov     x18, 69
                 scvtf   d17, lives
                 scvtf   d18, x18
                 fmul    d16, d17, d18
@@ -1501,3 +1507,42 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
 
         xret()
 
+
+
+/**
+ * Log the score to file
+ *
+ * Open the log file and append the score.
+ */
+logScore:       // void logScore(struct Play* play)
+        xfunc()
+        define(_play, x19)
+        define(_file, x20)
+
+        // Store pointer of struct Table & struct Play & x & y
+        mov     _play, x0
+
+        // Open log file
+        ldr     x0, =str_log_filename
+        ldr     x1, =str_log_filemode
+        bl      fopen
+        mov     _file, x0
+
+        mov     x0, _file
+        ldr     x1, =str_log_line
+        xreadStruct(x2, _play, play_player, true)
+        xreadStruct(x3, _play, play_final_score, true)
+        xreadStruct(x4, _play, play_duration, true)
+        xreadStruct(d0, _play, play_total_score, true)
+        xreadStruct(x5, _play, play_bombs, true)
+        xreadStruct(x6, _play, play_lives, true)
+        xreadStruct(x7, _play, play_status, true)
+        bl      fprintf
+
+        // Close file
+        mov     x0, _file
+        bl      fclose
+
+        undefine(`_play')
+        undefine(`_file')
+        xret()
