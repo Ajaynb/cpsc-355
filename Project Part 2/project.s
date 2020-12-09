@@ -2,7 +2,7 @@
 
 output:         .string "%d\n"
 output_f:       .string "%f\n"
-output_s:       .string "%c\n"
+output_s:       .string "%s\n"
 allstr:         .string "sp %d, fp %d\n"
 output_init:    .string "tile index %d, tile value %f\n"
 
@@ -17,20 +17,24 @@ str_tile_number:                .string "%c  "
 str_stats_peek_negatives:       .string "Total negatives: %d/%d (%d%%)\n"
 str_stats_peek_specials:        .string "Total specials:  %d/%d (%d%%)\n"
 str_play_lives:                 .string "Lives: %d	\n"
-str_play_bombs:                 .string "Bombs: %d	\n"
+str_play_bombs:                 .string "Bombs: %d	(range: x%d)\n"
 str_play_score:                 .string "Score: %.2f	\n"
 str_play_total_score:           .string "Total: %.2f	\n"
 str_result_header:              .string "Result: \n\n"
 str_result_player:              .string "Player        %s\n"
-str_result_total_score:          .string "Tiles score   %.2f pts\n"
+str_result_total_score:         .string "Tiles score   %.2f pts\n"
 str_result_left_bombs:          .string "Left bombs    %d\n"
 str_result_left_lives:          .string "Left lives    %d\n"
-str_result_duration:            .string "Duration      %lu s\n"
+str_result_duration:            .string "Duration      %lus\n"
 str_result_final_score:         .string "Final score   %d pts\n"
 str_enter_q:                    .string "Enter q to quit, \n"
 str_bomb_position_ask:          .string "Enter bomb position (x y): "
 str_bomb_position_input:        .string "%d %d"
-
+str_player:                     .string "player"
+str_log_filename:               .string "scores.log"
+str_log_filemode_append:        .string "a"
+str_log_filemode_read:          .string "r"
+str_log_line:                   .string "%s %d %lu %.2f %d %d %d\n"
 
 
         // Equates for alloc & dealloc
@@ -127,6 +131,12 @@ str_bomb_position_input:        .string "%d %d"
         // xtilePointer(destination, struct Board* board, index)
         
 
+        // Press ENTER to continue
+        
+        
+        // xfscan(file, string, destination1, destination2, ...)
+        
+
         // Expose main function to OS and set balign
         .global main
         .balign 4
@@ -165,8 +175,39 @@ main:   // main()
         mov     x27,    0
         mov     x28,    0
 
-
         
+        
+        
+        
+        
+
+        // Set default values
+        mov     x20, MIN_ROW
+        mov     x21, MIN_COL
+        ldr     x22, =str_player
+
+        // If command arguments contain x20 & col & x22 name
+        cmp     x0, 4                                   // if (argc >= 4)
+        b.ge    command_param                           // {read argument from command line}
+        b       command_param_end                       // {do nothing}
+
+        command_param:
+                mov     x23, x1
+
+                // Store x20
+                ldr     x0, [x23, 8]
+                bl      atoi
+                mov     x20, x0
+
+                // Store x21
+                ldr     x0, [x23, 16]
+                bl      atoi
+                mov     x21, x0
+
+                // Store x21
+                ldr     x22, [x23, 24]
+        command_param_end:
+
         
         // Rand seed
         
@@ -274,7 +315,7 @@ main:   // main()
                 mov     x12,    board_row                      // int attribute offset (positive)
                 add     x9,     x11,    x12             // int offset = base + attribute (positive)
                 sub     x9,     xzr,    x9              // offset = -offset (negative)
-                mov    x10,    10           // float value
+                mov    x10,    x20           // float value
 
                 str	x10,    [fp,   x9]   // offset += fp (negative + negative)
         
@@ -295,7 +336,28 @@ main:   // main()
                 mov     x12,    board_column                      // int attribute offset (positive)
                 add     x9,     x11,    x12             // int offset = base + attribute (positive)
                 sub     x9,     xzr,    x9              // offset = -offset (negative)
-                mov    x10,    10           // float value
+                mov    x10,    x21           // float value
+
+                str	x10,    [fp,   x9]   // offset += fp (negative + negative)
+        
+
+        
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    play                      // int base (positive)
+                mov     x12,    play_player                      // int attribute offset (positive)
+                add     x9,     x11,    x12             // int offset = base + attribute (positive)
+                sub     x9,     xzr,    x9              // offset = -offset (negative)
+                mov    x10,    x22           // float value
 
                 str	x10,    [fp,   x9]   // offset += fp (negative + negative)
         
@@ -305,12 +367,8 @@ main:   // main()
         // Alloc for array in struct Board
         
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x19             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    MAX_ROW             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -334,68 +392,6 @@ main:   // main()
         add     sp,     sp,     x19              // allocate on SP
 
 
-        /*
-        // M4: PRINT
-        
-        
-        
-
-        
-            
-            
-            
-            
-                mov     x0,    allstr
-                
-            
-        
-            
-            
-            
-            
-                mov     x1,    sp
-                
-            
-        
-            
-            
-            
-            
-                mov     x2,    fp
-                
-            
-        
-
-        ldr     x0,     =allstr
-        bl      printf
-*/
-        /*
-        // M4: PRINT
-        
-        
-        
-
-        
-            
-            
-            
-            
-                mov     x0,    output
-                
-            
-        
-            
-            
-            
-            
-                mov     x1,    x19
-                
-            
-        
-
-        ldr     x0,     =output
-        bl      printf
-*/
 
         // Initialize game
         // initializeGame(&board, &play);
@@ -413,103 +409,6 @@ main:   // main()
 
         // Breaks for actual game
         
-        // M4: PRINT
-        
-        
-        
-
-        
-            
-            
-            
-            
-                mov     x0,    str_linebr
-                
-            
-        
-
-        ldr     x0,     =str_linebr
-        bl      printf
-
-        
-        // M4: PRINT
-        
-        
-        
-
-        
-            
-            
-            
-            
-                mov     x0,    str_enter_continue
-                
-            
-        
-
-        ldr     x0,     =str_enter_continue
-        bl      printf
-
-        bl      getchar
-        
-        // M4: PRINT
-        
-        
-        
-
-        
-            
-            
-            
-            
-                mov     x0,    str_linebr
-                
-            
-        
-
-        ldr     x0,     =str_linebr
-        bl      printf
-
-        
-        // M4: PRINT
-        
-        
-        
-
-        
-            
-            
-            
-            
-                mov     x0,    str_linebr
-                
-            
-        
-
-        ldr     x0,     =str_linebr
-        bl      printf
-
-
-
-        play_start:
-                // Play one round
-                // playGame(&board, &play, x, y);
-                sub     x0,     fp,     board
-                sub     x1,     fp,     play
-                mov     x2,     5
-                mov     x3,     5
-                bl      playGame
-
-                
-                // Peek game board before start
-                // displayGame(&board, &play, true);
-                sub     x0,     fp,     board
-                sub     x1,     fp,     play
-                mov     x2,     FALSE
-                bl      displayGame
-
-
-                // Breaks for actual game
                 
         // M4: PRINT
         
@@ -587,8 +486,47 @@ main:   // main()
         ldr     x0,     =str_linebr
         bl      printf
 
+        
 
-                // b       play_start
+
+        // Start game
+        // startGame(&play);
+        sub     x0,     fp,     play
+        bl      startGame
+
+
+        play_start:
+                
+                
+                
+                
+                // Display game board, normally
+                // displayGame(&board, &play, true);
+                sub     x0,     fp,     board
+                sub     x1,     fp,     play
+                mov     x2,     FALSE
+                bl      displayGame
+
+                // Ask for user input
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_bomb_position_ask
+                
+            
+        
+
+        ldr     x0,     =str_bomb_position_ask
+        bl      printf
+
                 
         // M4: SCAN
         ldr     x0,     =str_bomb_position_input                     // 1st parameter: scnocc, the formatted string
@@ -608,12 +546,41 @@ main:   // main()
         bl      scanf                           // scanf(string, &pointer);
 
         
-            ldr     x17, [sp]
+            ldr     x28, [sp]
             add     sp, sp, 16
         
-            ldr     x18, [sp]
+            ldr     x27, [sp]
             add     sp, sp, 16
         
+
+
+                // Play one round
+                // playGame(&board, &play, x27, x28);
+                sub     x0,     fp,     board
+                sub     x1,     fp,     play
+                mov     x2,     x27
+                mov     x3,     x28
+                bl      playGame
+
+                // Line br
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
 
                 
         // M4: PRINT
@@ -626,33 +593,390 @@ main:   // main()
             
             
             
-                mov     x0,    str_bomb_position_input
-                
-            
-        
-            
-            
-            
-            
-                mov     x1,    x18
-                
-            
-        
-            
-            
-            
-            
-                mov     x2,    x17
+                mov     x0,    str_linebr
                 
             
         
 
-        ldr     x0,     =str_bomb_position_input
+        ldr     x0,     =str_linebr
         bl      printf
 
 
-        play_end:
+                // Get gamming x26, if not gamming, then get out from loop
+                
+        // M4: READ STRUCT
+
         
+                mov     x11,    play                      // int base (positive)
+                mov     x12,    play_status                      // int attribute offset (positive)
+                add     x9,     x11,    x12             // int offset = base + attribute (positive)
+                sub     x9,     xzr,    x9              // offset = -offset (negative)
+                
+                ldr	x26,     [fp, x9]                // load the value
+        
+
+                cmp     x26, GAMING
+                b.ne    play_end
+
+                b       play_start
+                
+                
+                
+        play_end:
+
+        
+        // Exit game
+        // exitGame(&play);
+        sub     x0,     fp,     play
+        bl      exitGame
+        
+        
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_enter_continue
+                
+            
+        
+
+        ldr     x0,     =str_enter_continue
+        bl      printf
+
+                bl      getchar
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+        
+
+
+        // Calculate gamming score
+        // calculateScore(&board, &play);
+        sub     x0,     fp,     board
+        sub     x1,     fp,     play
+        bl      calculateScore
+        
+        sub     x0,     fp,     play
+        bl      logScore
+
+
+
+        // Display game board, normally
+        // displayGame(&board, &play, true);
+        sub     x0,     fp,     board
+        sub     x1,     fp,     play
+        mov     x2,     FALSE
+        bl      displayGame
+
+        
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_enter_continue
+                
+            
+        
+
+        ldr     x0,     =str_enter_continue
+        bl      printf
+
+                bl      getchar
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+        
+        
+
+        // Line br
+        
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+        
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+
+        // Display result
+        // displayResult(&play);
+        sub     x0,     fp,     play
+        bl      displayResult
+
+        
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_enter_continue
+                
+            
+        
+
+        ldr     x0,     =str_enter_continue
+        bl      printf
+
+                bl      getchar
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+                
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+        
+
+        mov     x0, 5
+        bl      displayTopScores
+
+        // Line br
+        
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
+        
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_linebr
+                
+            
+        
+
+        ldr     x0,     =str_linebr
+        bl      printf
+
 
         // Dealloc for struct Play & struct Board and its array
         
@@ -675,6 +999,10 @@ main:   // main()
 
 
         
+        
+        
+        
+        
 
         
         // M4: RET
@@ -693,8 +1021,6 @@ main:   // main()
 
         ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
         ret
-
-
 
 
 
@@ -757,7 +1083,6 @@ randomNum:      // randomNum(m, n)
         // M4: MAX
         mov     x9,     x19
         mov     x10,    x20
-        // csel    x27,     x9,     x10,    ge
 
         
 
@@ -779,7 +1104,6 @@ randomNum:      // randomNum(m, n)
         // M4: MIN
         mov     x9,     x19
         mov     x10,    x20
-        // csel    x28,     x9,     x10,    le
 
         
 
@@ -869,8 +1193,6 @@ randomNum:      // randomNum(m, n)
 
         ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
         ret
-
-
 
 
 
@@ -1016,7 +1338,6 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         // M4: MAX
         mov     x9,     x21
         mov     x10,    MIN_ROW
-        // csel    x21,     x9,     x10,    ge
 
         
 
@@ -1038,7 +1359,6 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         // M4: MAX
         mov     x9,     x22
         mov     x10,    MIN_COL
-        // csel    x22,     x9,     x10,    ge
 
         
 
@@ -1060,7 +1380,6 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         // M4: MIN
         mov     x9,     x21
         mov     x10,    MAX_ROW
-        // csel    x21,     x9,     x10,    le
 
         
 
@@ -1082,7 +1401,6 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         // M4: MIN
         mov     x9,     x22
         mov     x10,    MAX_COL
-        // csel    x22,     x9,     x10,    le
 
         
 
@@ -1417,12 +1735,8 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 
                 
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x25             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x24             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -1528,12 +1842,8 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         // Calculate max amount of x25
         
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x26             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x23             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -1573,12 +1883,8 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 
                 
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x24             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x27             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -1733,12 +2039,8 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         // Calculate max amount of x25
         
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x26             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x23             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -1778,12 +2080,8 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 
                 
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x24             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x27             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -1982,12 +2280,8 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 
                 
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x24             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x27             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -2105,8 +2399,6 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
 
         ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
         ret
-
-
 
 
 
@@ -2236,12 +2528,8 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                         // Calculate and store the pointer of current struct Tile
                         
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x18             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x24             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -2259,12 +2547,8 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                         
                 
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x26             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x18             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -2661,12 +2945,8 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                 // Calculate x24 x27
                 
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x18             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x24             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -2725,12 +3005,8 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                 // Calculate x25 x27
                 
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x18             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x25             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -2800,6 +3076,7 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                 
                 
                 
+                
                 // Read from struct Play* play
                 
         // M4: READ STRUCT
@@ -2835,6 +3112,18 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
                 
                 ldr	d26,     [x9]                    // load the value
+        
+
+                
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_range                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x28,     [x9]                    // load the value
         
 
                 
@@ -2901,6 +3190,14 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                 
             
         
+            
+            
+            
+            
+                mov     x2,    x28
+                
+            
+        
 
         ldr     x0,     =str_play_bombs
         bl      printf
@@ -2964,6 +3261,7 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
                 
                 
                 
+                
         display_stats_normal_end:
 
         
@@ -2990,8 +3288,6 @@ displayGame:            // displayGame(struct Board* board, struct Play* play, b
 
         ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
         ret
-
-
 
 
 
@@ -3102,8 +3398,6 @@ startGame:      // startGame(struct Play* play)
 
 
 
-
-
 /**
  * Exit game
  *
@@ -3145,29 +3439,6 @@ exitGame:       // exitGame(struct Play* play)
         
         
         mov     x19, x0
-
-        // Change play status to EXIT
-        
-        
-        
-        
-
-        // M4: WRITE STRUCT
-        
-                
-                
-        
-        
-        
-                mov     x11,    x19                      // int base (negative)
-                mov     x12,    play_status                      // int attribute offset (positive)
-                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
-                add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                mov    x10,    EXIT           // float value
-
-                str	x10,    [x9]         // store the value
-        
-
 
         // Record end time
         mov     x0, 0
@@ -3267,8 +3538,6 @@ exitGame:       // exitGame(struct Play* play)
 
 
 
-
-
 /**
  * Display play result
  *
@@ -3308,6 +3577,8 @@ displayResult:  // displayResult(struct Play* play)
         
         
         
+
+        // Store struct Play* play pointer
         mov     x19, x0
 
         // Print header
@@ -3577,27 +3848,6 @@ displayResult:  // displayResult(struct Play* play)
         bl      printf
 
 
-        // Print enter continue
-        
-        // M4: PRINT
-        
-        
-        
-
-        
-            
-            
-            
-            
-                mov     x0,    str_enter_continue
-                
-            
-        
-
-        ldr     x0,     =str_enter_continue
-        bl      printf
-
-
 
         
         
@@ -3623,8 +3873,6 @@ displayResult:  // displayResult(struct Play* play)
 
 
 
-
-
 /**
  * Calculate the final score of play
  *
@@ -3632,12 +3880,10 @@ displayResult:  // displayResult(struct Play* play)
  *
  * According to the formula, by doing the following would get a higher mark:
  * 1. Uncover more tiles
- * 2. Get higher uncover tile score
+ * 2. Get higher uncover tile score (if at the end the score is negative, then probably the final score is negative too)
  * 3. Use less bombs to win
  * 4. Keep more lives to win
  * 5. Use less time to win
- *
- * The following formula gives player a relatively fair score.
  */
 
 calculateScore:        // calculateScore(struct Board* board, struct Play* play)
@@ -3676,6 +3922,10 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
         
         
         
+        
+        // Store pointer of struct Table & struct Play
+        mov     x19, x0
+        mov     x20, x1
 
         // Calculate d21
         // float d21 = 1.0 * play->uncovered_tiles / board->tiles;
@@ -3734,7 +3984,7 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
                 
-                ldr	x25,     [x9]                    // load the value
+                ldr	d25,     [x9]                    // load the value
         
 
                 
@@ -3764,20 +4014,23 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
 
                 // Calculate portion of total d22
                 mov     x18, 20
-                scvtf   d17, x25
+                
+        // M4: ADD EQUAL
+        add     x18, x18, 1000
+
                 scvtf   d18, x18
-                fmul    d16, d17, d18
+                fmul    d16, d25, d18
                 fadd    d22, d22, d16
 
                 // Calculate protion of x26 left
-                mov     x18, 33
+                mov     x18, 69
                 scvtf   d17, x26
                 scvtf   d18, x18
                 fmul    d16, d17, d18
                 fadd    d22, d22, d16
                 
                 // Calculate protion of x27 left
-                mov     x18, 33
+                mov     x18, 69
                 scvtf   d17, x27
                 scvtf   d18, x18
                 fmul    d16, d17, d18
@@ -3827,15 +4080,24 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
         // Write final d22 to struct Play* play
         // play->x24 = x24
         
-        // M4: READ STRUCT
+        
+        
+        
 
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
         
                 mov     x11,    x20                      // int base (negative)
                 mov     x12,    play_final_score                      // int attribute offset (positive)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                
-                ldr	x24,     [x9]                    // load the value
+                mov    x10,    x24           // float value
+
+                str	x10,    [x9]         // store the value
         
 
 
@@ -3863,8 +4125,6 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
 
         ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
         ret
-
-
 
 
 
@@ -3974,26 +4234,11 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 
 
         
-
-
-        // Reset x25 and deduct bomb by one
-        play_game_deduct:
-                
-                
-
-                // Read values
-                
-        // M4: READ STRUCT
-
-        
-                mov     x11,    x20                      // int base (negative)
-                mov     x12,    play_bombs                      // int attribute offset (positive)
-                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
-                add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                
-                ldr	x23,     [x9]                    // load the value
-        
-
+        // Range max value protection
+        // If the x25 is extremely big, when uncover tils, inefficient
+        // Set the x25 value to the max size of board if exceeded
+        play_game_range_control:
+                // Read x25 value
                 
         // M4: READ STRUCT
 
@@ -4007,14 +4252,74 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
         
 
 
-                // Modify values
-                mov     x18, 1    // play->x25 = 1;
+                // Find larger max value and set max value of x25
+                
+        // M4: MAX
+        mov     x9,     MAX_ROW
+        mov     x10,    MAX_COL
+
+        
+
+        cmp     x9,     x10
+        b.gt    if_6
+        b       else_6
+
+        if_6:  mov     x18,     x9
+                b       end_6
+        else_6:mov     x18,     x10
+                b       end_6
+        end_6:
+
+        
+        
+        
+
+                
+        // M4: MIN
+        mov     x9,     x25
+        mov     x10,    x18
+
+        
+
+        cmp     x9,     x10
+        b.lt    if_7
+        b       else_7
+
+        if_7:  mov     x25,     x9
+                b       end_7
+        else_7:mov     x25,     x10
+                b       end_7
+        end_7:
+
+        
+        
+        
+
+
+
+
+
+        // Reset x25 and deduct bomb by one
+        play_game_deduct:
+                
+
+                // play->x23 --;
+                
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_bombs                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x23,     [x9]                    // load the value
+        
+
                 
         // M4: MINUS MINUS
         sub     x23, x23, 1
-      // play->x23--;
 
-                // Write back values
                 
         
         
@@ -4036,6 +4341,8 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 str	x10,    [x9]         // store the value
         
 
+
+                // play->x25 = 1
                 
         
         
@@ -4052,13 +4359,12 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 mov     x12,    play_range                      // int attribute offset (positive)
                 sub     x12,    xzr,    x12             // attibute = -attibute (negative)
                 add     x9,     x11,    x12             // int offset = base + attribute (negative)
-                mov    x10,    x25           // float value
+                mov    x10,    1           // float value
 
                 str	x10,    [x9]         // store the value
         
 
 
-                
                 
 
 
@@ -4070,12 +4376,8 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                 
                 
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x23             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x25             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -4095,12 +4397,8 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                         // Set value for x24
                         
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x24             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x25             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -4118,9 +4416,9 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                 b.gt    play_game_uncover_tile_column_end
 
                                 
-                                // Validate if the 1 is within valid x25
+                                // Validate if the 0 is within valid x25
                                 play_game_uncover_tile_index_validate:
-                                        // Define uncover 1 variable
+                                        // Define uncover 0 variable
                                         
                                         
                                         
@@ -4159,62 +4457,42 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                         // Calculate x21 and x22 of the tile to uncover
                                         
         // M4: ADD
-        
         mov     x9,     0                       // initialize x9 to 0
+
         
+            mov     x10,    x21             // move next number to x10
+            add     x9,     x9,     x10             // and Adds x10 to x9
         
-            
-            
-        
-            
-                mov     x10,    x21                       // move next number to x10
-                add     x9,     x9,     x10             // and Adds x10 to x9
-            
-            
-        
-            
-                mov     x10,    x23                       // move next number to x10
-                add     x9,     x9,     x10             // and Adds x10 to x9
-            
-            
+            mov     x10,    x23             // move next number to x10
+            add     x9,     x9,     x10             // and Adds x10 to x9
         
         
         mov     x17,     x9                      // result
    // int x17 = x21 + x23;
                                         
         // M4: ADD
-        
         mov     x9,     0                       // initialize x9 to 0
+
         
+            mov     x10,    x22             // move next number to x10
+            add     x9,     x9,     x10             // and Adds x10 to x9
         
-            
-            
-        
-            
-                mov     x10,    x22                       // move next number to x10
-                add     x9,     x9,     x10             // and Adds x10 to x9
-            
-            
-        
-            
-                mov     x10,    x24                       // move next number to x10
-                add     x9,     x9,     x10             // and Adds x10 to x9
-            
-            
+            mov     x10,    x24             // move next number to x10
+            add     x9,     x9,     x10             // and Adds x10 to x9
         
         
         mov     x18,     x9                      // result
    // int x18 = x22 + x24;
 
-                                        // int 4 = (x17 * board->x27) + x18;
+                                        // int 0 = (x17 * board->x27) + x18;
                                         madd    x28, x17, x27, x18
 
 
-                                        // If 4 < 0, then it's invalid, do nothing
+                                        // If 0 < 0, then it's invalid, do nothing
                                         cmp     x28, 0
                                         b.lt    play_game_uncover_tile_index_validate_end
 
-                                        // If 4 >= x16, then it's invalid, do nothing
+                                        // If 0 >= x16, then it's invalid, do nothing
                                         cmp     x28, x16
                                         b.ge    play_game_uncover_tile_index_validate_end
 
@@ -4230,12 +4508,8 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                         
                 
         // M4: MUL
-        
         mov     x9,     1                       // initialize x9 to 1
         
-        
-            mov     x10,    x26             // move next multiplier to x10
-            mul     x9,     x9,     x10             // and multiplies x10 to x9
         
             mov     x10,    x28             // move next multiplier to x10
             mul     x9,     x9,     x10             // and multiplies x10 to x9
@@ -4298,6 +4572,49 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
 
                 str	x10,    [x9]         // store the value
         
+
+
+                                        // Increase uncovered tile amount
+                                        // play->uncovered_tiles++;
+                                        
+                                        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_uncovered_tiles                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x16,     [x9]                    // load the value
+        
+
+                                        
+        // M4: ADD ADD
+        add     x16, x16, 1
+
+                                        
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    x20                      // int base (negative)
+                mov     x12,    play_uncovered_tiles                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x16           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+                                        
 
 
                                         // Read the tile value
@@ -4674,11 +4991,11 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
 
                 // If x27 is less than 0, then lose
                 cmp     x27, 0
-                b.lt    play_game_lives_bombs_check_lose
+                b.le    play_game_lives_bombs_check_lose
 
                 // If x28 is less than 0, then lose
                 cmp     x28, 0
-                b.lt    play_game_lives_bombs_check_lose
+                b.le    play_game_lives_bombs_check_lose
 
                 // Otherwise, do nothing
                 b       play_game_lives_bombs_check_lose_end
@@ -4745,8 +5062,616 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
 
 
 
+/**
+ * Log the score to file
+ *
+ * Open the log file and append the score.
+ */
+logScore:       // void logScore(struct Play* play)
+        
+        // M4: FUNC
+        stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
+        mov     fp,     sp                              // update FP to current SP
+        
+        // Save registers
+        str 	x19,    [fp, 16]
+        str 	x20,    [fp, 24]
+        str 	x21,    [fp, 32]
+        str 	x22,    [fp, 40]
+        str 	x23,    [fp, 48]
+        str 	x24,    [fp, 56]
+        str 	x25,    [fp, 64]
+        str 	x26,    [fp, 72]
+        str 	x27,    [fp, 80]
+        str 	x28,    [fp, 88]
+
+        // Reset registers to 0
+        mov     x19,    0
+        mov     x20,    0
+        mov     x21,    0
+        mov     x22,    0
+        mov     x23,    0
+        mov     x24,    0
+        mov     x25,    0
+        mov     x26,    0
+        mov     x27,    0
+        mov     x28,    0
+
+        
+        
+
+        // Store pointer of struct Table & struct Play & x & y
+        mov     x19, x0
+
+        // Open log file
+        ldr     x0, =str_log_filename
+        ldr     x1, =str_log_filemode_append
+        bl      fopen
+        mov     x20, x0
+
+        // Print to file
+        mov     x0, x20
+        ldr     x1, =str_log_line
+        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x19                      // int base (negative)
+                mov     x12,    play_player                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x2,     [x9]                    // load the value
+        
+
+        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x19                      // int base (negative)
+                mov     x12,    play_final_score                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x3,     [x9]                    // load the value
+        
+
+        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x19                      // int base (negative)
+                mov     x12,    play_duration                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x4,     [x9]                    // load the value
+        
+
+        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x19                      // int base (negative)
+                mov     x12,    play_total_score                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	d0,     [x9]                    // load the value
+        
+
+        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x19                      // int base (negative)
+                mov     x12,    play_bombs                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x5,     [x9]                    // load the value
+        
+
+        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x19                      // int base (negative)
+                mov     x12,    play_lives                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x6,     [x9]                    // load the value
+        
+
+        
+        // M4: READ STRUCT
+
+        
+                mov     x11,    x19                      // int base (negative)
+                mov     x12,    play_status                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                
+                ldr	x7,     [x9]                    // load the value
+        
+
+        bl      fprintf
+
+        // Close file
+        mov     x0, x20
+        bl      fclose
+
+        
+        
+        
+        // M4: RET
+
+        // Restore registers
+        ldr 	x19,    [fp, 16]
+        ldr 	x20,    [fp, 24]
+        ldr 	x21,    [fp, 32]
+        ldr 	x22,    [fp, 30]
+        ldr 	x23,    [fp, 48]
+        ldr 	x24,    [fp, 56]
+        ldr 	x25,    [fp, 64]
+        ldr 	x26,    [fp, 72]
+        ldr 	x27,    [fp, 80]
+        ldr 	x28,    [fp, 88]
+
+        ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
+        ret
 
 
-        .data                                            // global variables
-n:      .int    0                                        // int n = 0
+
+/**
+ * Display top scores.
+ *
+ * Using bubble sort. Sort and print top scores.
+ */
+displayTopScores:       // displayTopScores(int n)
+        
+        // M4: FUNC
+        stp     fp,     lr,     [sp, alloc]!            // store FP and LR on stack, and allocate space for local variables
+        mov     fp,     sp                              // update FP to current SP
+        
+        // Save registers
+        str 	x19,    [fp, 16]
+        str 	x20,    [fp, 24]
+        str 	x21,    [fp, 32]
+        str 	x22,    [fp, 40]
+        str 	x23,    [fp, 48]
+        str 	x24,    [fp, 56]
+        str 	x25,    [fp, 64]
+        str 	x26,    [fp, 72]
+        str 	x27,    [fp, 80]
+        str 	x28,    [fp, 88]
+
+        // Reset registers to 0
+        mov     x19,    0
+        mov     x20,    0
+        mov     x21,    0
+        mov     x22,    0
+        mov     x23,    0
+        mov     x24,    0
+        mov     x25,    0
+        mov     x26,    0
+        mov     x27,    0
+        mov     x28,    0
+
+        
+        
+        
+
+        // Store int x19
+        mov     x19, x0
+
+        // Open log file
+        ldr     x0, =str_log_filename
+        ldr     x1, =str_log_filemode_read
+        bl      fopen
+        mov     x20, x0
+
+        // Rewind file (set file position to the beginning)
+        mov     x0, x20
+        bl      rewind
+
+        // Read one line from log file each time
+        top_scores_read_line:
+                
+                
+                
+                
+                
+                
+                
+                
+        
+                // Read one line
+                mov     x0, x20
+                ldr     x1, =str_log_line
+                
+                // M4: FILE SCAN
+                mov     x0, x20
+                ldr     x1, =str_log_line                         // 1st parameter: scnocc, the formatted string
+
+                
+                
+                        sub     sp, sp, 16
+                        mov     x2, sp
+                
+                
+                
+                        sub     sp, sp, 16
+                        mov     x3, sp
+                
+                
+                
+                        sub     sp, sp, 16
+                        mov     x4, sp
+                
+                
+                
+                        sub     sp, sp, 16
+                        mov     x5, sp
+                
+                
+                
+                        sub     sp, sp, 16
+                        mov     x6, sp
+                
+                
+                
+                        sub     sp, sp, 16
+                        mov     x7, sp
+                
+                
+                
+                        sub     sp, sp, 16
+                        mov     x8, sp
+                
+                
+                
+                bl      fscanf                          // fscanf(string, &pointer);
+
+                
+                        ldr     x27, [sp]
+                        add     sp, sp, 16
+                
+                        ldr     x26, [sp]
+                        add     sp, sp, 16
+                
+                        ldr     x25, [sp]
+                        add     sp, sp, 16
+                
+                        ldr     d24, [sp]
+                        add     sp, sp, 16
+                
+                        ldr     x23, [sp]
+                        add     sp, sp, 16
+                
+                        ldr     x22, [sp]
+                        add     sp, sp, 16
+                
+
+                ldr     x21, [sp]
+                add     sp, sp, 16
+                
+        
+
+                // Get EOF x27
+                mov     x0, x20
+                bl      feof
+                mov     x28, x0
+
+                // If it is the end of file, then end the reading loop
+                cmp     x28, TRUE
+                b.eq    top_scores_read_line_end
+
+                // Create struct Play
+                
+        // M4: ALLOC
+        add     sp,     sp,     play_size_alloc              // allocate on SP
+
+                
+        // M4: ADD ADD
+        add     x24, x24, 1
+
+
+                
+
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    sp                      // int base (negative)
+                mov     x12,    play_player                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x21           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    sp                      // int base (negative)
+                mov     x12,    play_final_score                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x22           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    sp                      // int base (negative)
+                mov     x12,    play_duration                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x23           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    sp                      // int base (negative)
+                mov     x12,    play_total_score                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                fmov    d10,    d24           // float value
+
+                str	d10,    [x9]         // store the value
+        
+
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    sp                      // int base (negative)
+                mov     x12,    play_bombs                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x25           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    sp                      // int base (negative)
+                mov     x12,    play_lives                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x26           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+                
+        
+        
+        
+
+        // M4: WRITE STRUCT
+        
+                
+                
+        
+        
+        
+                mov     x11,    sp                      // int base (negative)
+                mov     x12,    play_status                      // int attribute offset (positive)
+                sub     x12,    xzr,    x12             // attibute = -attibute (negative)
+                add     x9,     x11,    x12             // int offset = base + attribute (negative)
+                mov    x10,    x27           // float value
+
+                str	x10,    [x9]         // store the value
+        
+
+
+                /*
+        // M4: PRINT
+        
+        
+        
+
+        
+            
+            
+            
+            
+                mov     x0,    str_log_line
+                
+            
+        
+            
+            
+            
+            
+                mov     x1,    EXIT
+                
+            
+        
+            
+            
+            
+            
+                mov     x2,    x22
+                
+            
+        
+            
+            
+            
+            
+                mov     x3,    x23
+                
+            
+        
+            
+            
+            
+            
+                fmov     d0,    d24
+                
+            
+        
+            
+            
+            
+            
+                mov     x4,    x25
+                
+            
+        
+            
+            
+            
+            
+                mov     x5,    x26
+                
+            
+        
+            
+            
+            
+            
+                mov     x6,    x27
+                
+            
+        
+
+        ldr     x0,     =str_log_line
+        bl      printf
+*/
+                mov     x0, x20
+                ldr     x1, =str_log_line
+                ldr     x2, [x21]
+                mov     x3, x22
+                mov     x4, x23
+                fmov    d0, d24
+                mov     x5, x25
+                mov     x6, x26
+                mov     x7, x27
+                bl      printf
+
+                
+
+                
+                
+                
+                
+                
+                
+                
+                
+
+                b       top_scores_read_line
+        top_scores_read_line_end:
+
+        // Close file
+        mov     x0, x20
+        bl      fclose
+
+        // Dealloc memory
+        
+        // M4: MUL
+        mov     x9,     1                       // initialize x9 to 1
+        
+        
+            mov     x10,    play_size_alloc             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+            mov     x10,    x24             // move next multiplier to x10
+            mul     x9,     x9,     x10             // and multiplies x10 to x9
+        
+
+        mov     x18,     x9                      // result
+
+        
+        // M4: DEALLOC
+        mov     x9,     x18                      // move to x9
+        sub     x9,     xzr,    x9              // negate the size again to positive
+        add     sp,     sp,     x9              // dealloc on SP
+
+
+        
+        
+        
+        
+        // M4: RET
+
+        // Restore registers
+        ldr 	x19,    [fp, 16]
+        ldr 	x20,    [fp, 24]
+        ldr 	x21,    [fp, 32]
+        ldr 	x22,    [fp, 30]
+        ldr 	x23,    [fp, 48]
+        ldr 	x24,    [fp, 56]
+        ldr 	x25,    [fp, 64]
+        ldr 	x26,    [fp, 72]
+        ldr 	x27,    [fp, 80]
+        ldr 	x28,    [fp, 88]
+
+        ldp     fp,     lr,     [sp], dealloc            // deallocate stack memory
+        ret
 

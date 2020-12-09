@@ -2,7 +2,7 @@
 
 output:         .string "%d\n"
 output_f:       .string "%f\n"
-output_s:       .string "%c\n"
+output_s:       .string "%s\n"
 allstr:         .string "sp %d, fp %d\n"
 output_init:    .string "tile index %d, tile value %f\n"
 
@@ -32,8 +32,9 @@ str_bomb_position_ask:          .string "Enter bomb position (x y): "
 str_bomb_position_input:        .string "%d %d"
 str_player:                     .string "player"
 str_log_filename:               .string "scores.log"
-str_log_filemode:               .string "a"
-str_log_line:                   .string "%s %d %lu %.2f %d %d %d\n"
+str_log_filemode_append:        .string "a"
+str_log_filemode_read:          .string "r"
+str_log_line:                   .string "%s %d %d\n"
 
 
         // Equates for alloc & dealloc
@@ -143,7 +144,7 @@ str_log_line:                   .string "%s %d %lu %.2f %d %d %d\n"
                 xprint(str_linebr)
                 xprint(str_linebr)
         ')
-
+        
         // Expose main function to OS and set balign
         .global main
         .balign 4
@@ -279,6 +280,8 @@ main:   // main()
         // exitGame(&play);
         sub     x0,     fp,     play
         bl      exitGame
+        
+        xenterContinue()
 
 
         // Calculate gamming score
@@ -311,6 +314,10 @@ main:   // main()
         sub     x0,     fp,     play
         bl      displayResult
 
+        xenterContinue()
+
+        mov     x0, 5
+        bl      displayTopScores
 
         // Line br
         xprint(str_linebr)
@@ -1104,6 +1111,7 @@ calculateScore:        // calculateScore(struct Board* board, struct Play* play)
 
                 // Calculate portion of total score
                 mov     x18, 20
+                xaddEqual(x18, 1000)
                 scvtf   d18, x18
                 fmul    d16, total_score, d18
                 fadd    score, score, d16
@@ -1524,19 +1532,16 @@ logScore:       // void logScore(struct Play* play)
 
         // Open log file
         ldr     x0, =str_log_filename
-        ldr     x1, =str_log_filemode
+        ldr     x1, =str_log_filemode_append
         bl      fopen
         mov     _file, x0
 
+        // Print to file
         mov     x0, _file
         ldr     x1, =str_log_line
         xreadStruct(x2, _play, play_player, true)
         xreadStruct(x3, _play, play_final_score, true)
         xreadStruct(x4, _play, play_duration, true)
-        xreadStruct(d0, _play, play_total_score, true)
-        xreadStruct(x5, _play, play_bombs, true)
-        xreadStruct(x6, _play, play_lives, true)
-        xreadStruct(x7, _play, play_status, true)
         bl      fprintf
 
         // Close file
@@ -1545,4 +1550,101 @@ logScore:       // void logScore(struct Play* play)
 
         undefine(`_play')
         undefine(`_file')
+        xret()
+
+
+/**
+ * Display top scores.
+ *
+ * Using bubble sort. Sort and print top scores.
+ */
+displayTopScores:       // displayTopScores(int n)
+        xfunc()
+        define(n, x19)
+        define(_file, x20)
+        define(amount, x24)
+
+        // Store int n
+        mov     n, x0
+
+        // Open log file
+        ldr     x0, =str_log_filename
+        ldr     x1, =str_log_filemode_read
+        bl      fopen
+        mov     _file, x0
+
+        // Rewind file (set file position to the beginning)
+        mov     x0, _file
+        bl      rewind
+
+        // Read one line from log file each time
+        top_scores_read_line:
+                define(player, x21)
+                define(final_score, x22)
+                define(duration, x23)
+                define(isEOF, x28)
+        
+                // Read one line
+                mov     x0, _file
+                ldr     x1, =str_log_line
+
+                sub     sp, sp, 16
+                mov     x2, sp
+                sub     sp, sp, 16
+                mov     x3, sp
+                sub     sp, sp, 16
+                mov     x4, sp
+
+                bl      fscanf
+
+                ldr     duration, [sp]
+                add     sp, sp, 16
+                ldr     final_score, [sp]
+                add     sp, sp, 16
+                mov     player, sp
+                add     sp, sp, 16
+                
+
+                // Get EOF status
+                mov     x0, _file
+                bl      feof
+                mov     isEOF, x0
+
+                // If it is the end of file, then end the reading loop
+                cmp     isEOF, TRUE
+                b.eq    top_scores_read_line_end
+
+                // Create struct Play
+                define(_play, sp)
+                xalloc(play_size_alloc)
+                xaddAdd(amount)
+
+
+                xwriteStruct(player, _play, play_player, true)
+                xwriteStruct(final_score, _play, play_final_score, true)
+                xwriteStruct(duration, _play, play_duration, true)
+
+                xprint(str_log_line, player, final_score, duration)
+
+                undefine(`_play')
+
+                undefine(`player')
+                undefine(`final_score')
+                undefine(`duration')
+                undefine(`isEOF')
+
+                b       top_scores_read_line
+        top_scores_read_line_end:
+
+        // Close file
+        mov     x0, _file
+        bl      fclose
+
+        // Dealloc memory
+        xmul(x18, play_size_alloc, amount)
+        xdealloc(x18)
+
+        undefine(`n')
+        undefine(`_file')
+        undefine(`amount')
         xret()
