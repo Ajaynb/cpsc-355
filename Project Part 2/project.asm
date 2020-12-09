@@ -1563,9 +1563,11 @@ displayTopScores:       // displayTopScores(int n)
         define(n, x19)
         define(_file, x20)
         define(amount, x24)
+        define(array, x25)
 
-        // Store int n
+        // Store int n & set array pointer
         mov     n, x0
+        mov     array, sp
 
         // Open log file
         ldr     x0, =str_log_filename
@@ -1585,24 +1587,29 @@ displayTopScores:       // displayTopScores(int n)
                 define(isEOF, x28)
         
                 // Read one line
-                mov     x0, _file
-                ldr     x1, =str_log_line
+                top_scores_read_line_one_line:
+                        // Load file pointer & format string
+                        mov     x0, _file
+                        ldr     x1, =str_log_line
 
-                sub     sp, sp, 16
-                mov     x2, sp
-                sub     sp, sp, 16
-                mov     x3, sp
-                sub     sp, sp, 16
-                mov     x4, sp
+                        // Assign memory for read data
+                        sub     sp, sp, 16
+                        mov     x2, sp
+                        sub     sp, sp, 16
+                        mov     x3, sp
+                        sub     sp, sp, 16
+                        mov     x4, sp
 
-                bl      fscanf
+                        // Invoke fscanf
+                        bl      fscanf
 
-                ldr     duration, [sp]
-                add     sp, sp, 16
-                ldr     final_score, [sp]
-                add     sp, sp, 16
-                mov     player, sp
-                add     sp, sp, 16
+                        // Store read data in memory to registers
+                        ldr     duration, [sp]
+                        add     sp, sp, 16
+                        ldr     final_score, [sp]
+                        add     sp, sp, 16
+                        mov     player, sp
+                        add     sp, sp, 16
                 
 
                 // Get EOF status
@@ -1614,31 +1621,87 @@ displayTopScores:       // displayTopScores(int n)
                 cmp     isEOF, TRUE
                 b.eq    top_scores_read_line_end
 
+
                 // Create struct Play
-                define(_play, sp)
-                xalloc(play_size_alloc)
-                xaddAdd(amount)
+                top_scores_read_line_create_play:
+                        define(_play, sp)
+                        xalloc(play_size_alloc)
+                        xaddAdd(amount)
+
+                        xwriteStruct(player, _play, play_player, true)
+                        xwriteStruct(final_score, _play, play_final_score, true)
+                        xwriteStruct(duration, _play, play_duration, true)
+
+                        xprint(str_log_line, player, final_score, duration)
+
+                        undefine(`_play')
 
 
-                xwriteStruct(player, _play, play_player, true)
-                xwriteStruct(final_score, _play, play_final_score, true)
-                xwriteStruct(duration, _play, play_duration, true)
-
-                xprint(str_log_line, player, final_score, duration)
-
-                undefine(`_play')
-
+                // Go back to loop top
                 undefine(`player')
                 undefine(`final_score')
                 undefine(`duration')
                 undefine(`isEOF')
-
                 b       top_scores_read_line
         top_scores_read_line_end:
 
         // Close file
         mov     x0, _file
         bl      fclose
+
+
+        // Bubble Sort
+        define(t, x21)
+        define(r, x22)
+        mov     t, 0
+        mov     r, 0
+        xmin(n, n, amount)      // n = min(n, amount); If n exceeded the amount, protect
+        top_scores_bubble_sort_row:
+                // If meet amount, then end loop
+                cmp     t, n
+                b.ge    top_scores_bubble_sort_row_end
+
+                // Reset r
+                mov     r, 0
+                top_scores_bubble_sort_row2:
+                        // If meet amount, then end loop
+                        cmp     r, n
+                        b.ge    top_scores_bubble_sort_row2_end
+
+                        // Calculate array offset
+                        define(offset, x23)
+                        xmul(offset, r, play_size, -1)
+                        xaddEqual(offset, array)
+                        
+                        // Read values
+                        define(final_score, x24)
+                        define(player, x26)
+                        define(duration, x27)
+
+                        /*xreadStruct(final_score, offset, play_final_score, true)*/
+                        /*xprint(output, final_score)*/
+                        xprint(output, offset)
+                        
+
+                        
+
+                        undefine(`offset')
+                        undefine(`final_score')
+                        undefine(`player')
+                        undefine(`duration')
+
+                        // Increment and loop again
+                        xaddAdd(r)
+                        b       top_scores_bubble_sort_row2
+                top_scores_bubble_sort_row2_end:
+
+                // Increment and loop again
+                xaddAdd(t)
+                b       top_scores_bubble_sort_row
+        top_scores_bubble_sort_row_end:
+
+
+
 
         // Dealloc memory
         xmul(x18, play_size_alloc, amount)
