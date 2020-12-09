@@ -132,6 +132,15 @@ str_player:                     .string "player"
                 xaddEqual($1, $2)
         ')
 
+        // Press ENTER to continue
+        define(xenterContinue, `
+                xprint(str_linebr)
+                xprint(str_enter_continue)
+                bl      getchar
+                xprint(str_linebr)
+                xprint(str_linebr)
+        ')
+
         // Expose main function to OS and set balign
         .global main
         .balign 4
@@ -214,11 +223,7 @@ main:   // main()
 
 
         // Breaks for actual game
-        xprint(str_linebr)
-        xprint(str_enter_continue)
-        bl      getchar
-        xprint(str_linebr)
-        xprint(str_linebr)
+        xenterContinue()
 
 
         // Start game
@@ -265,12 +270,23 @@ main:   // main()
                 undefine(`y')
                 undefine(`status')
         play_end:
-        
+
         
         // Exit game
         // exitGame(&play);
         sub     x0,     fp,     play
         bl      exitGame
+
+
+        // Display game board, normally
+        // displayGame(&board, &play, true);
+        sub     x0,     fp,     board
+        sub     x1,     fp,     play
+        mov     x2,     FALSE
+        bl      displayGame
+
+        xenterContinue()
+        
 
         // Line br
         xprint(str_linebr)
