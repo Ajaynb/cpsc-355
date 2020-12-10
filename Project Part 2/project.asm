@@ -70,7 +70,7 @@ str_result_die:                 .string "\nYou die\n"
         EXTRA_BOMB = '@'
         EXTRA_SCORE = '!'
         HEAVEN = '~'
-        HELL = '#'
+        HELL = '-'
 
         // Define GAMING status
         PREPARE = 0
@@ -570,33 +570,33 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 b.ge    initialize_flip_spe
 
                 // Else pick a special
-                // 1 ~ 40 = DOUBLE_RANGE
-                // 41 ~ 45 = EXTRA_BOMB
-                // 46 ~ 50 = EXTRA_SCORE
-                // 51 = HEAVEN
-                // 52 = HELL
+                // 1 ~ 4000 = DOUBLE_RANGE
+                // 410 ~ 450 = EXTRA_BOMB
+                // 451 ~ 500 = EXTRA_SCORE
+                // 505 = HEAVEN
+                // 510 = HELL
                 mov     x0, 1
-                mov     x1, 52
+                mov     x1, 510
                 bl      randomNum
 
                 // If random number is 1 ~ 6, then go to DOUBLE_RANGE
-                cmp     x0, 40
+                cmp     x0, 400
                 b.le    initialize_flip_spe_decide_double_range
                 
                 // If random number is 7, then go to EXTRA_BOMB
-                cmp     x0, 45
+                cmp     x0, 450
                 b.le    initialize_flip_spe_decide_extra_bomb
 
                 // If random number is 8, then go to EXTRA_SCORE
-                cmp     x0, 50
+                cmp     x0, 500
                 b.le    initialize_flip_spe_decide_extra_score
 
                 // If random number is 9, then go to EXTRA_BOMB
-                cmp     x0, 51
+                cmp     x0, 505
                 b.eq    initialize_flip_spe_decide_heaven
 
                 // If random number is 10, then go to EXTRA_SCORE
-                cmp     x0, 52
+                cmp     x0, 510
                 b.eq    initialize_flip_spe_decide_hell
 
 
