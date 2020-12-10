@@ -190,7 +190,7 @@ main:   // main()
                 bl      atoi
                 mov     column, x0
 
-                // Store column
+                // Store player name
                 ldr     player, [argv, 24]
         command_param_end:
 
@@ -198,13 +198,11 @@ main:   // main()
         // Rand seed
         xrandSeed()
 
-        /*xprint(allstr, sp, fp)*/
 
         // Alloc for struct Play & struct Board
         xalloc(play_size_alloc)
         xalloc(board_size_alloc)
 
-        /*xprint(allstr, sp, fp)*/
 
         xwriteStruct(row, board, board_row)
         xwriteStruct(column, board, board_column)
@@ -395,8 +393,6 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
         mov     _board, x0
         mov     _play, x1
 
-        /*xprint(output, _board)*/
-        /*xprint(output, _play)*/
 
         // Read row and column
         xreadStruct(row, _board, board_row, true)
@@ -451,8 +447,6 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 scvtf   d0, x0
                 scvtf   d1, x1
                 fdiv    random_number, d0, d1
-
-                /*xprint(output_f, random_number)*/
 
                 // Calculate and store the pointer of current struct Tile
                 xtilePointer(_tile, _board, t)
@@ -511,8 +505,6 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 scvtf   d17, x17
                 fmul    t_value, t_value, d17
                 xwriteStruct(t_value, _tile, tile_value, true)
-
-                /*xprint(output_init, t_index, t_value)*/
 
 
                 // Increase negatives amount in struct Board
@@ -640,14 +632,12 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 // And flip the tile into special
                 xwriteStruct(t_value, _tile, tile_value, true)
                 
-                /*xprint(output_init, t_index, t_value)*/
 
 
                 // Increase negatives amount in struct Board
                 xaddAdd(specials)
                 xwriteStruct(specials, _board, board_specials, true)
 
-                /*xprint(output, specials)*/
 
                 // Loop again
                 b       initialize_flip_spe
@@ -676,12 +666,11 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 xtilePointer(_tile, _board, t_index)
 
 
-                // Write value
+                // Write value to the tile
                 mov     x18, EXIT
                 scvtf   t_value, x18
                 xwriteStruct(t_value, _tile, tile_value, true)
 
-                /*xprint(output_init, t_index, t_value)*/
 
                 initialize_flip_exit_end:
         undefine(`_tile')
@@ -1705,9 +1694,6 @@ displayTopScores:       // displayTopScores(int n)
                         define(_play, sp)
                         xaddAdd(amount)
 
-                        /*xprint(allstr, sp, fp)
-                        xprint(output, _play)*/
-
                         xwriteStruct(player, _play, play_player, true)
                         xwriteStruct(final_score, _play, play_final_score, true)
                         xwriteStruct(duration, _play, play_duration, true)
@@ -1761,9 +1747,6 @@ displayTopScores:       // displayTopScores(int n)
 
                         xreadStruct(duration, offset, play_duration, true)
                         xprint(output, duration)
-                        /*xprint(output, offset)*/
-                        
-
                         
 
                         undefine(`offset')
