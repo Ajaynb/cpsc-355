@@ -570,11 +570,11 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 b.ge    initialize_flip_spe
 
                 // Else pick a special
-                // 1 ~ 4000 = DOUBLE_RANGE
+                // 1 ~ 400 = DOUBLE_RANGE
                 // 410 ~ 450 = EXTRA_BOMB
                 // 451 ~ 500 = EXTRA_SCORE
-                // 505 = HEAVEN
-                // 510 = HELL
+                // 510 = HEAVEN
+                // 520 = HELL
                 mov     x0, 1
                 mov     x1, 510
                 bl      randomNum
@@ -593,11 +593,11 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
 
                 // If random number is 9, then go to EXTRA_BOMB
                 cmp     x0, 505
-                b.eq    initialize_flip_spe_decide_heaven
+                b.le    initialize_flip_spe_decide_heaven
 
                 // If random number is 10, then go to EXTRA_SCORE
                 cmp     x0, 510
-                b.eq    initialize_flip_spe_decide_hell
+                b.le    initialize_flip_spe_decide_hell
 
 
                 // Else
@@ -607,33 +607,37 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 // DOUBLE_RANGE
                 initialize_flip_spe_decide_double_range:
                         mov     x18, DOUBLE_RANGE
+                        scvtf   t_value, x18
                         b       initialize_flip_spe_decide_end
 
                 // EXTRA_BOMB
                 initialize_flip_spe_decide_extra_bomb:
                         mov     x18, EXTRA_BOMB
+                        scvtf   t_value, x18
                         b       initialize_flip_spe_decide_end
 
                 // EXTRA_SCORE
                 initialize_flip_spe_decide_extra_score:
                         mov     x18, EXTRA_SCORE
+                        scvtf   t_value, x18
                         b       initialize_flip_spe_decide_end
 
                 // HEAVEN
                 initialize_flip_spe_decide_heaven:
                         mov     x18, HEAVEN
+                        scvtf   t_value, x18
                         b       initialize_flip_spe_decide_end
 
                 // HELL
                 initialize_flip_spe_decide_hell:
                         mov     x18, HELL
+                        scvtf   t_value, x18
                         b       initialize_flip_spe_decide_end
 
                 initialize_flip_spe_decide_end:
 
 
                 // And flip the tile into special
-                scvtf   t_value, x18
                 xwriteStruct(t_value, _tile, tile_value, true)
                 
                 /*xprint(output_init, t_index, t_value)*/
