@@ -316,8 +316,6 @@ main:   // main()
 
         xenterContinue()
 
-        mov     x0, 5
-        bl      displayTopScores
 
         // Line br
         xprint(str_linebr)
