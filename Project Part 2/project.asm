@@ -1624,9 +1624,12 @@ displayTopScores:       // displayTopScores(int n)
 
                 // Create struct Play
                 top_scores_read_line_create_play:
-                        define(_play, sp)
                         xalloc(play_size_alloc)
+                        define(_play, sp)
                         xaddAdd(amount)
+
+                        /*xprint(allstr, sp, fp)
+                        xprint(output, _play)*/
 
                         xwriteStruct(player, _play, play_player, true)
                         xwriteStruct(final_score, _play, play_final_score, true)
@@ -1672,15 +1675,16 @@ displayTopScores:       // displayTopScores(int n)
                         define(offset, x23)
                         xmul(offset, r, play_size, -1)
                         xaddEqual(offset, array)
+                        /*xaddEqual(offset, play_size_alloc)*/
                         
                         // Read values
                         define(final_score, x24)
-                        define(player, x26)
-                        define(duration, x27)
+                        define(player, x25)
+                        define(duration, x26)
 
-                        /*xreadStruct(final_score, offset, play_final_score, true)*/
-                        /*xprint(output, final_score)*/
-                        xprint(output, offset)
+                        xreadStruct(duration, offset, play_duration, true)
+                        xprint(output, duration)
+                        /*xprint(output, offset)*/
                         
 
                         
