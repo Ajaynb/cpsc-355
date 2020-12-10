@@ -308,20 +308,27 @@ main:   // main()
         bl      displayGame
 
         
+        // Print result text for player
         define(status, x26)
         xreadStruct(status, play, play_status)
+
+        // If wins
         cmp     status, WIN
         b.eq    play_result_win
 
+        // If dies
         cmp     status, DIE
         b.eq    play_result_die
 
+        // Otherwise print nothing
         b       play_result_end
-
+        
+        // Print win text
         play_result_win:
                 xprint(str_result_win)
                 b       play_result_end
 
+        // Prin die test
         play_result_die:
                 xprint(str_result_die)
                 b       play_result_end
