@@ -67,6 +67,10 @@ str_result_die:                 .string "\nYou die\n"
         // Define special tile types
         EXIT = '*'
         DOUBLE_RANGE = '$'
+        EXTRA_BOMB = '@'
+        EXTRA_SCORE = '!'
+        HEAVEN = '~'
+        HELL = '#'
 
         // Define GAMING status
         PREPARE = 0
@@ -566,13 +570,70 @@ initializeGame:        // initializeGame(struct Board* board, struct Play* play)
                 b.ge    initialize_flip_spe
 
                 // Else pick a special
-                mov     x0, DOUBLE_RANGE
-                mov     x1, DOUBLE_RANGE
+                // 1 ~ 40 = DOUBLE_RANGE
+                // 41 ~ 45 = EXTRA_BOMB
+                // 46 ~ 50 = EXTRA_SCORE
+                // 51 = HEAVEN
+                // 52 = HELL
+                mov     x0, 1
+                mov     x1, 52
                 bl      randomNum
-                mov     x18, x0
-                scvtf   t_value, x18
+
+                // If random number is 1 ~ 6, then go to DOUBLE_RANGE
+                cmp     x0, 40
+                b.le    initialize_flip_spe_decide_double_range
+                
+                // If random number is 7, then go to EXTRA_BOMB
+                cmp     x0, 45
+                b.le    initialize_flip_spe_decide_extra_bomb
+
+                // If random number is 8, then go to EXTRA_SCORE
+                cmp     x0, 50
+                b.le    initialize_flip_spe_decide_extra_score
+
+                // If random number is 9, then go to EXTRA_BOMB
+                cmp     x0, 51
+                b.eq    initialize_flip_spe_decide_heaven
+
+                // If random number is 10, then go to EXTRA_SCORE
+                cmp     x0, 52
+                b.eq    initialize_flip_spe_decide_hell
+
+
+                // Else
+                b       initialize_flip_spe_decide_end
+
+
+                // DOUBLE_RANGE
+                initialize_flip_spe_decide_double_range:
+                        mov     x18, DOUBLE_RANGE
+                        b       initialize_flip_spe_decide_end
+
+                // EXTRA_BOMB
+                initialize_flip_spe_decide_extra_bomb:
+                        mov     x18, EXTRA_BOMB
+                        b       initialize_flip_spe_decide_end
+
+                // EXTRA_SCORE
+                initialize_flip_spe_decide_extra_score:
+                        mov     x18, EXTRA_SCORE
+                        b       initialize_flip_spe_decide_end
+
+                // HEAVEN
+                initialize_flip_spe_decide_heaven:
+                        mov     x18, HEAVEN
+                        b       initialize_flip_spe_decide_end
+
+                // HELL
+                initialize_flip_spe_decide_hell:
+                        mov     x18, HELL
+                        b       initialize_flip_spe_decide_end
+
+                initialize_flip_spe_decide_end:
+
 
                 // And flip the tile into special
+                scvtf   t_value, x18
                 xwriteStruct(t_value, _tile, tile_value, true)
                 
                 /*xprint(output_init, t_index, t_value)*/
@@ -1321,6 +1382,76 @@ playGame:       // playGame(struct Board* board, struct Play* play, const int x,
                                                         undefine(`t_range')
                                                         b       play_game_uncover_tile_value_end
                                                 play_game_uncover_tile_value_double_range_end:
+
+                                                // If the tile is EXTRA BOMB
+                                                ldr     x16, =EXTRA_BOMB
+                                                scvtf   d16, x16
+                                                fcmp    t_value, d16
+                                                b.eq    play_game_uncover_tile_value_extra_bomb
+                                                b       play_game_uncover_tile_value_extra_bomb_end
+                                                
+                                                play_game_uncover_tile_value_extra_bomb:
+                                                        // Increase bombs by 2
+                                                        define(t_bombs, x17)
+
+                                                        xreadStruct(t_bombs, _play, play_bombs, true)
+                                                        xaddEqual(t_bombs, 2)
+                                                        xwriteStruct(t_bombs, _play, play_bombs, true)
+
+                                                        undefine(`t_bombs')
+                                                        b       play_game_uncover_tile_value_end
+                                                play_game_uncover_tile_value_extra_bomb_end:
+
+                                
+                                                // If the tile is EXTRA SCORE
+                                                ldr     x16, =EXTRA_SCORE
+                                                scvtf   d16, x16
+                                                fcmp    t_value, d16
+                                                b.eq    play_game_uncover_tile_value_extra_score
+                                                b       play_game_uncover_tile_value_extra_score_end
+                                                
+                                                play_game_uncover_tile_value_extra_score:
+                                                        // Increase score by 100
+                                                        define(t_score, d17)
+
+                                                        xreadStruct(t_score, _play, play_score, true)
+                                                        mov     x18, 100
+                                                        scvtf   d18, x18
+                                                        fadd    t_score, t_score, d18
+                                                        xwriteStruct(t_score, _play, play_score, true)
+
+                                                        undefine(`t_score')
+                                                        b       play_game_uncover_tile_value_end
+                                                play_game_uncover_tile_value_extra_score_end:
+
+                                                
+                                                // If the tile is HEAVEN
+                                                ldr     x16, =HEAVEN
+                                                scvtf   d16, x16
+                                                fcmp    t_value, d16
+                                                b.eq    play_game_uncover_tile_value_heaven
+                                                b       play_game_uncover_tile_value_heaven_end
+                                                
+                                                play_game_uncover_tile_value_heaven:
+                                                        // Die
+                                                        xwriteStruct(DIE, _play, play_status, true)
+                                                        b       play_game_uncover_tile_value_end
+                                                play_game_uncover_tile_value_heaven_end:
+
+                                                
+                                                // If the tile is HELL
+                                                ldr     x16, =HELL
+                                                scvtf   d16, x16
+                                                fcmp    t_value, d16
+                                                b.eq    play_game_uncover_tile_value_hell
+                                                b       play_game_uncover_tile_value_hell_end
+                                                
+                                                play_game_uncover_tile_value_hell:
+                                                        // Win
+                                                        xwriteStruct(WIN, _play, play_status, true)
+                                                        b       play_game_uncover_tile_value_end
+                                                play_game_uncover_tile_value_hell_end:
+
 
 
                                                 // Else the tile is a number tile
